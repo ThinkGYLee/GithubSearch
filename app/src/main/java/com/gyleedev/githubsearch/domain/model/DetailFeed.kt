@@ -1,8 +1,5 @@
 package com.gyleedev.githubsearch.domain.model
 
-import com.gyleedev.githubusersearch.domain.model.RepositoryModel
-import com.gyleedev.githubusersearch.domain.model.UserModel
-
 sealed interface DetailFeed {
     data class UserProfile(
         val userModel: UserModel
