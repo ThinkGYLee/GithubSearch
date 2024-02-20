@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch
+package com.gyleedev.githubsearch.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
