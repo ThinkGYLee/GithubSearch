@@ -25,6 +25,8 @@ data class ReposEntity(
     val id: Long,
     @ColumnInfo(name = "user_entity_id")
     val userEntityId: Long,
+    @ColumnInfo(name = "user_github_id")
+    val userGithubId: String,
     @ColumnInfo(name = "name")
     val name: String?,
     @ColumnInfo(name = "description")
@@ -33,14 +35,18 @@ data class ReposEntity(
     val language: String?,
     @ColumnInfo(name = "stargazer")
     val stargazer: Int,
+    @ColumnInfo(name = "favorite")
+    val favorite: Boolean,
 )
 
 fun ReposEntity.toModel(): RepositoryModel {
     return RepositoryModel(
         name = name,
+        userGithubId = userGithubId,
         description = description,
         language = language,
         stargazer = stargazer,
+        favorite = favorite
     )
 }
 
@@ -48,9 +54,11 @@ fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity {
     return ReposEntity(
         id = 0,
         userEntityId = userEntityId,
+        userGithubId = userGithubId,
         description = description,
         name = name,
         stargazer = stargazer,
-        language = language
+        language = language,
+        favorite = favorite
     )
 }
