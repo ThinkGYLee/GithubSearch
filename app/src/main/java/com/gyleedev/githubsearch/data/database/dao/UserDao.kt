@@ -23,6 +23,9 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE id = :id")
     fun getUserById(id: Long): UserEntity
 
+    @Query("SELECT * FROM user WHERE user_id = :userId")
+    fun getUserByGithubId(userId: Long): UserEntity
+
     @Insert
     fun insertUser(user: UserEntity): Long
 

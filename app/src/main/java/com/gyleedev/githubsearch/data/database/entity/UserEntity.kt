@@ -39,6 +39,8 @@ data class UserEntity(
     val reposAddress: String,
     @ColumnInfo(name = "blogUrl")
     val blogUrl: String?,
+    @ColumnInfo(name = "favorite")
+    val favorite: Boolean
 )
 
 
@@ -57,7 +59,8 @@ fun UserModel.toEntity(): UserEntity {
         createdDate = createdDate,
         updatedDate = updatedDate,
         reposAddress = reposAddress,
-        blogUrl = blogUrl
+        blogUrl = blogUrl,
+        favorite = favorite
     )
 }
 
@@ -75,6 +78,7 @@ fun UserEntity.toModel(): UserModel {
         createdDate = createdDate,
         updatedDate = updatedDate,
         reposAddress = reposAddress,
-        blogUrl = blogUrl
+        blogUrl = blogUrl,
+        favorite = favorite
     )
 }
