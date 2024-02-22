@@ -7,6 +7,7 @@ import androidx.paging.map
 import com.gyleedev.githubsearch.data.database.dao.AccessTimeDao
 import com.gyleedev.githubsearch.data.database.dao.ReposDao
 import com.gyleedev.githubsearch.data.database.dao.UserDao
+import com.gyleedev.githubsearch.data.database.entity.AccessTime
 import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
@@ -14,6 +15,7 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.remote.GithubApiService
 import com.gyleedev.githubsearch.remote.response.toModel
+import java.time.LocalDateTime
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -69,23 +71,20 @@ class GitHubRepositoryImpl @Inject constructor(
         return list.map { it.toModel() }
     }
 
-
+    //Home에서 user정보를 요청하는 함수
     override suspend fun getUserAtHome(id: String): UserModel? {
-        val user = checkUserInDatabase(id)
+        val user = userDao.getUserByGithubId(id).toModel()
         return cachingUserAtHome(user, id)
     }
 
-    private fun checkUserInDatabase(id: String): UserModel? {
-        return userDao.getUserByGithubId(id).toModel()
-    }
-
+    //home에서 사용할 user의 db값과 network에 존재하는 값을 캐싱
     private suspend fun cachingUserAtHome(user: UserModel?, id: String): UserModel? {
+        //유저정보가 존재할때
         return if (user != null) {
             user
         } else {
-            val response = githubApiService.getUser(id)
-            userDao.insertUser(response.toModel().toEntity())
-            userDao.getUserByGithubId(id).toModel()
+            //존재하지 않을 때
+            return githubApiService.getUser(id).toModel()
         }
     }
 
