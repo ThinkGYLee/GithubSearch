@@ -24,7 +24,7 @@ interface UserDao {
     fun getUserById(id: Long): UserEntity
 
     @Query("SELECT * FROM user WHERE user_id = :userId")
-    fun getUserByGithubId(userId: Long): UserEntity
+    fun getUserByGithubId(userId: String): UserEntity
 
     @Insert
     fun insertUser(user: UserEntity): Long
@@ -37,4 +37,7 @@ interface UserDao {
 
     @Query("DELETE FROM user")
     fun deleteAll()
+
+    @Query("SELECT * FROM user WHERE favorite = :favorite")
+    fun getFavoriteUsers(favorite: Boolean): List<UserEntity>
 }
