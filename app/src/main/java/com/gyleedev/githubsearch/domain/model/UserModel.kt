@@ -17,4 +17,5 @@ data class UserModel(
     val updatedDate: String?,
     val reposAddress: String,
     val blogUrl: String?,
+    val favorite: Boolean
 )
