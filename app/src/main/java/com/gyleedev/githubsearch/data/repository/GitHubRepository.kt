@@ -55,7 +55,7 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun getRepositories(user: String): List<RepositoryModel> {
         val list = githubApiService.getRepos(user)
-        return list.map { it.toModel() }
+        return list.map { it.toModel(user) }
     }
 
     //Home에서 user정보를 요청하는 함수
@@ -96,7 +96,7 @@ class GitHubRepositoryImpl @Inject constructor(
         reposDao.deleteRepos(githubId)
         val respond = githubApiService.getRepos(githubId)
         if (respond != null) {
-            reposDao.insertRepos(respond.map { it.toModel().toEntity(userEntityId) })
+            reposDao.insertRepos(respond.map { it.toModel(githubId).toEntity(userEntityId) })
         }
     }
     //db에서 레포정보 가져오기
