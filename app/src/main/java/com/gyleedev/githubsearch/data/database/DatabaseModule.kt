@@ -2,6 +2,7 @@ package com.gyleedev.githubsearch.data.database
 
 import android.content.Context
 import androidx.room.Room
+import com.gyleedev.githubsearch.data.database.dao.AccessTimeDao
 import com.gyleedev.githubsearch.data.database.dao.ReposDao
 import com.gyleedev.githubsearch.data.database.dao.UserDao
 import dagger.Module
@@ -32,5 +33,9 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun providesReposDao(userDatabase: UserDatabase): ReposDao = userDatabase.reposDao()
+
+    @Singleton
+    @Provides
+    fun providesAccessTimeDao(userDatabase: UserDatabase): AccessTimeDao = userDatabase.accessTimeDao()
 
 }
