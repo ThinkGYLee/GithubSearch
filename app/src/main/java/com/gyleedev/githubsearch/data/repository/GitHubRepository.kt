@@ -15,18 +15,21 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.remote.GithubApiService
 import com.gyleedev.githubsearch.remote.response.toModel
-import java.time.LocalDateTime
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 interface GitHubRepository {
-    suspend fun getUser(user: String): UserModel?
+
     suspend fun getRepositories(user: String): List<RepositoryModel>
     fun getUsers(): Flow<PagingData<UserModel>>
     suspend fun getUserAtHome(id: String): UserModel?
+    suspend fun getLastAccessById(id: String): AccessTime?
+    suspend fun getUser(id: String): UserModel?
+    suspend fun getUserFromGithub(id: String): UserModel?
+    suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
+
+
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -50,22 +53,6 @@ class GitHubRepositoryImpl @Inject constructor(
 
     }
 
-
-    override suspend fun getUser(user: String): UserModel {
-        return withContext(Dispatchers.IO) {
-            val userLocal = userDao.getUser(user)
-            val response = githubApiService.getUser(user)
-            if (userLocal == null) {
-                val id = userDao.insertUser(response.toModel().toEntity())
-                userDao.getUserById(id).toModel()
-            } else {
-                userDao.deleteUser(user)
-                val id = userDao.insertUser(response.toModel().toEntity())
-                userDao.getUserById(id).toModel()
-            }
-        }
-    }
-
     override suspend fun getRepositories(user: String): List<RepositoryModel> {
         val list = githubApiService.getRepos(user)
         return list.map { it.toModel() }
@@ -86,6 +73,35 @@ class GitHubRepositoryImpl @Inject constructor(
             //존재하지 않을 때
             return githubApiService.getUser(id).toModel()
         }
+    }
+
+    //마지막 액세스 시간 가져오기
+    override suspend fun getLastAccessById(id: String): AccessTime? {
+        return accessTimeDao.getTimeByGithubId(id)
+    }
+    //유저정보 가져오기
+    override suspend fun getUser(id: String): UserModel? {
+        return userDao.getUser(id).toModel()
+    }
+    //유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
+    override suspend fun getUserFromGithub(id: String): UserModel? {
+        userDao.deleteUser(id)
+        val user = githubApiService.getUser(id)
+        val userEntityId = userDao.insertUser(user.toModel().toEntity())
+        insertRepos(id, userEntityId)
+        return user.toModel()
+    }
+    //레포정보 삽입
+    private suspend fun insertRepos(githubId: String, userEntityId: Long) {
+        reposDao.deleteRepos(githubId)
+        val respond = githubApiService.getRepos(githubId)
+        if (respond != null) {
+            reposDao.insertRepos(respond.map { it.toModel().toEntity(userEntityId) })
+        }
+    }
+    //db에서 레포정보 가져오기
+    override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>? {
+        return reposDao.getReposByGithubId(githubId).map { it.toModel() }
     }
 
 

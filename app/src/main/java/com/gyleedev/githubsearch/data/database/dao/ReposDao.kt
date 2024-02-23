@@ -21,4 +21,7 @@ interface ReposDao {
     @Query("SELECT * FROM repos WHERE favorite = :favorite")
     fun getFavoriteRepos(favorite: Boolean): List<ReposEntity>
 
+    @Query("DELETE FROM repos WHERE user_github_id = :githubId")
+    suspend fun deleteRepos(githubId: String)
+
 }
