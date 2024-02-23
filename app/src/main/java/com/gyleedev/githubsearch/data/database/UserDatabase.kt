@@ -22,5 +22,5 @@ import com.gyleedev.githubsearch.data.database.entity.AccessTime
 abstract class UserDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun reposDao(): ReposDao
-    abstract fun remoteKeyDao(): AccessTimeDao
+    abstract fun accessTimeDao(): AccessTimeDao
 }
