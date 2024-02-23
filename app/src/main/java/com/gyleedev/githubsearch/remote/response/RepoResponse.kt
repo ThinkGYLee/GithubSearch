@@ -10,11 +10,13 @@ data class RepoResponse(
     @SerializedName("stargazers_count") val stargazer: Int
 )
 
-fun RepoResponse.toModel(): RepositoryModel {
+fun RepoResponse.toModel(id: String): RepositoryModel {
     return RepositoryModel(
         name = name,
+        userGithubId = id,
         description = description,
         language = language,
-        stargazer = stargazer
+        stargazer = stargazer,
+        favorite = false
     )
 }

@@ -33,6 +33,7 @@ fun UserResponse.toModel(): UserModel {
         createdDate = createdDate,
         updatedDate = updatedDate,
         reposAddress = reposAddress,
-        blogUrl = blogUrl
+        blogUrl = blogUrl,
+        favorite = false
     )
 }
