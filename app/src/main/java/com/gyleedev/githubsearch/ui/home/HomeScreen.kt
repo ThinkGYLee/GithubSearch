@@ -1,16 +1,15 @@
 package com.gyleedev.githubsearch.ui.home
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -36,12 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -55,17 +53,26 @@ fun HomeScreen(
     moveToDetail: (String) -> Unit,
 ) {
     val users = viewModel.getUsers().collectAsLazyPagingItems()
-    /*val user = viewModel.userInfo.collectAsStateWithLifecycle()
-    val state = viewModel.state.collectAsStateWithLifecycle()*/
+    val user = viewModel.userInfo.collectAsStateWithLifecycle()
+
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             EmbeddedSearchBar(
-                onQueryChange = { searchText = it
-                                println(it)},
+                onQueryChange = {
+                    searchText = it
+                    viewModel.updateSearchId(it)
+                },
                 isSearchActive = isSearchActive,
                 onActiveChanged = { isSearchActive = it },
+                onSearch = {
+                    searchText = ""
+                    viewModel.getUser()
+                    isSearchActive = !isSearchActive
+                },
+                onSearchItemReset = { viewModel.resetUser() },
+                modifier = Modifier
             )
 
         },
@@ -74,83 +81,30 @@ fun HomeScreen(
             .padding(4.dp)
     ) { paddingValues ->
 
-        if (users.itemCount > 0) {
-            SearchItemList(
-                modifier = modifier.padding(paddingValues),
-                users = users,
-                onClick = {}//onScreenChange
+
+        if (user.value != null) {
+            SearchResultItem(
+                user = user.value!!,
+                onClick = { },
+                modifier = Modifier.padding(paddingValues)
             )
-
         } else {
-
+            if (users.itemCount > 0) {
+                SearchItemList(
+                    modifier = modifier.padding(paddingValues),
+                    users = users,
+                    onClick = {}//onScreenChange
+                )
+            } else {
+                NoItem(
+                    modifier = modifier.padding(paddingValues)
+                )
+            }
         }
+
 
     }
 }
-
-/*@Composable
-fun SearchBar(
-    searchText: String,
-    onSearchTextChanged: (String) -> Unit,
-    onCloseClicked: () -> Unit,
-    onSearchClicked: () -> Unit,
-    onArrowBackClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LaunchedEffect(Unit) {
-
-    }
-    TextField(
-        value = searchText,
-        onValueChange = onSearchTextChanged,
-        leadingIcon = {
-            if (searchText == "") {
-                SearchBarIcon(
-                    imageVector = Icons.Default.Search,
-                    modifier = Modifier,
-                    onClick = {}
-                )
-            } else {
-                SearchBarIcon(
-                    onClick = onArrowBackClicked,
-                    imageVector = Icons.Default.ArrowBack,
-                    modifier = Modifier
-                )
-            }
-        },
-        trailingIcon = {
-            if (searchText != "") {
-                Row {
-                    SearchBarIcon(
-                        onClick = onCloseClicked,
-                        imageVector = Icons.Default.Close,
-                        modifier = Modifier
-                    )
-                    SearchBarIcon(
-                        onClick = onSearchClicked,
-                        imageVector = Icons.Default.Search,
-                        modifier = Modifier
-                    )
-                }
-            }
-
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedContainerColor = MaterialTheme.colorScheme.surface
-        ),
-        placeholder = {
-            Text(text = "search")
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .onFocusChanged {
-                println("focus $it, ${it.isFocused}")
-            },
-        singleLine = true
-    )
-}*/
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,8 +112,9 @@ fun EmbeddedSearchBar(
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onActiveChanged: (Boolean) -> Unit,
+    onSearch: (String) -> Unit,
+    onSearchItemReset: () -> Unit,
     modifier: Modifier = Modifier,
-    onSearch: ((String) -> Unit)? = null,
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val activeChanged: (Boolean) -> Unit = { active ->
@@ -173,29 +128,19 @@ fun EmbeddedSearchBar(
             searchQuery = query
             onQueryChange(query)
         },
-        onSearch = onSearch ?: { activeChanged(false) },
+        onSearch = onSearch ,
         active = isSearchActive,
         onActiveChange = activeChanged,
-        modifier = if (isSearchActive) {
-            modifier
-                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
-                .onFocusChanged {
-                    println("aa : $it")
-                }
-        } else {
-            modifier
-                .padding(start = 12.dp, top = 2.dp, end = 12.dp, bottom = 12.dp)
-                .fillMaxWidth()
-                .animateContentSize(spring(stiffness = Spring.StiffnessHigh))
-                .onFocusChanged {
-                    println("bb : $it")
-                }
-        },
+        modifier = modifier,
         placeholder = { Text("Search") },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
-                    onClick = { activeChanged(false) },
+                    onClick = {
+                        searchQuery = ""
+                        onQueryChange("")
+                        activeChanged(false)
+                    },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -217,6 +162,7 @@ fun EmbeddedSearchBar(
                     onClick = {
                         searchQuery = ""
                         onQueryChange("")
+                        onSearchItemReset()
                     },
                 ) {
                     Icon(
@@ -245,25 +191,6 @@ fun EmbeddedSearchBar(
     ) {
         // Search suggestions or results
     }
-}
-
-
-@Composable
-private fun SearchBarIcon(
-    imageVector: ImageVector,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null
-        )
-    }
-
 }
 
 @Composable
@@ -309,8 +236,8 @@ private fun HomeItem(
                 model = (user.avatar),
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp)
-                    .widthIn(max = 80.dp)
+                    .heightIn(max = 80.dp, min = 20.dp)
+                    .widthIn(max = 80.dp, min = 20.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 contentDescription = null
@@ -333,7 +260,7 @@ private fun SearchResultItem(
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         onClick = onClick
     ) {
         Row(
@@ -341,15 +268,15 @@ private fun SearchResultItem(
                 .fillMaxWidth()
                 .heightIn(min = 80.dp)
                 .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             GlideImage(
                 model = (user.avatar),
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp)
-                    .widthIn(max = 80.dp)
+                    .height(80.dp)
+                    .width(80.dp)
                     .clip(
                         CircleShape
                     ),
@@ -381,4 +308,27 @@ private fun SearchResultItem(
         }
     }
 
+}
+
+@Composable
+private fun NoItem(
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "No Saved Item",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+
+    }
 }
