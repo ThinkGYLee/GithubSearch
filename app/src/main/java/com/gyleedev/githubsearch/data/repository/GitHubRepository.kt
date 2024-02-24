@@ -8,6 +8,7 @@ import com.gyleedev.githubsearch.data.database.dao.AccessTimeDao
 import com.gyleedev.githubsearch.data.database.dao.ReposDao
 import com.gyleedev.githubsearch.data.database.dao.UserDao
 import com.gyleedev.githubsearch.data.database.entity.AccessTime
+import com.gyleedev.githubsearch.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
@@ -16,8 +17,10 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.remote.GithubApiService
 import com.gyleedev.githubsearch.remote.response.toModel
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 interface GitHubRepository {
 
@@ -60,29 +63,33 @@ class GitHubRepositoryImpl @Inject constructor(
 
     //Home에서 user정보를 요청하는 함수
     override suspend fun getUserAtHome(id: String): UserModel? {
-        val user = userDao.getUserByGithubId(id).toModel()
-        return cachingUserAtHome(user, id)
+        return withContext(Dispatchers.IO) {
+            val user = userDao.getUserByGithubId(id)
+
+            cachingUserAtHome(user, id)
+
+        }
     }
 
     //home에서 사용할 user의 db값과 network에 존재하는 값을 캐싱
-    private suspend fun cachingUserAtHome(user: UserModel?, id: String): UserModel? {
+    private suspend fun cachingUserAtHome(user: UserEntity?, id: String): UserModel? {
         //유저정보가 존재할때
-        return if (user != null) {
-            user
-        } else {
-            //존재하지 않을 때
-            return githubApiService.getUser(id).toModel()
-        }
+        return user?.toModel() ?: //존재하지 않을 때
+        return githubApiService.getUser(id).toModel()
     }
 
     //마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTime? {
         return accessTimeDao.getTimeByGithubId(id)
     }
+
     //유저정보 가져오기
     override suspend fun getUser(id: String): UserModel? {
-        return userDao.getUser(id).toModel()
+        return withContext(Dispatchers.IO) {
+            userDao.getUser(id).toModel()
+        }
     }
+
     //유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
     override suspend fun getUserFromGithub(id: String): UserModel? {
         userDao.deleteUser(id)
@@ -91,6 +98,7 @@ class GitHubRepositoryImpl @Inject constructor(
         insertRepos(id, userEntityId)
         return user.toModel()
     }
+
     //레포정보 삽입
     private suspend fun insertRepos(githubId: String, userEntityId: Long) {
         reposDao.deleteRepos(githubId)
@@ -99,6 +107,7 @@ class GitHubRepositoryImpl @Inject constructor(
             reposDao.insertRepos(respond.map { it.toModel(githubId).toEntity(userEntityId) })
         }
     }
+
     //db에서 레포정보 가져오기
     override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>? {
         return reposDao.getReposByGithubId(githubId).map { it.toModel() }
