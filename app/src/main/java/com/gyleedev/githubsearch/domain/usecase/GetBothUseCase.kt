@@ -1,26 +1,42 @@
 package com.gyleedev.githubsearch.domain.usecase
 
 
+import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 class GetBothUseCase @Inject constructor(
-    private val userUseCase: GetUserUseCase,
-    private val repositoryUseCase: GetRepositoryUseCase
+    private val repository: GitHubRepository
 ) {
-    suspend operator fun invoke(user: String): List<DetailFeed> {
+    suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
-            val userInfo = async { userUseCase.execute(user) }
-            val repoInfo = async { repositoryUseCase.execute(user) }
+            val time = repository.getLastAccessById(id)
+
+            val user = async {
+                if (time != null) {
+                    if (Instant.now().toEpochMilli() - time.accessTime.toEpochMilli() < 3600000) {
+                        repository.getUser(id)
+                    } else {
+                        repository.getUserFromGithub(id)
+                    }
+                } else {
+                    repository.getUserFromGithub(id)
+                }
+            }
+            val userinfo = user.await()
+            val repo = async {
+                repository.getRepositories(id)
+            }
+
+
             // 2개중 하나
-            awaitAll(userInfo, repoInfo)
-            modelToFeed(userInfo.await(), repoInfo.await())
+            modelToFeed(userinfo, repo.await())
         }
     }
 }

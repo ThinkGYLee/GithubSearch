@@ -22,7 +22,6 @@ class UseCaseModule {
     @Provides
     @Singleton
     fun provideGetBothUseCase(
-        userUseCase: GetUserUseCase,
-        repositoryUseCase: GetRepositoryUseCase
-    ) = GetBothUseCase(userUseCase, repositoryUseCase)
+        repository: GitHubRepository
+    ) = GetBothUseCase(repository)
 }
