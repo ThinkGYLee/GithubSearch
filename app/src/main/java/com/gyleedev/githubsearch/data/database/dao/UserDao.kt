@@ -17,19 +17,19 @@ interface UserDao {
     @Query("SELECT * FROM user LIMIT 10 OFFSET (:page-1)*10")
     fun getUsers(page: Int): List<UserEntity>
 
-    @Query("SELECT * FROM user WHERE user_id = :id")
+    @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
     fun getUser(id: String): UserEntity
 
     @Query("SELECT * FROM user WHERE id = :id")
     fun getUserById(id: Long): UserEntity
 
-    @Query("SELECT * FROM user WHERE user_id = :userId")
+    @Query("SELECT * FROM user WHERE user_id = :userId COLLATE NOCASE")
     fun getUserByGithubId(userId: String): UserEntity
 
     @Insert
     fun insertUser(user: UserEntity): Long
 
-    @Query("DELETE FROM user WHERE user_id = :id")
+    @Query("DELETE FROM user WHERE user_id = :id  COLLATE NOCASE")
     fun deleteUser(id: String)
 
     @Insert

@@ -15,13 +15,13 @@ interface ReposDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRepo(repo:ReposEntity)
 
-    @Query("SELECT * FROM repos WHERE user_github_id = :githubId")
+    @Query("SELECT * FROM repos WHERE user_github_id = :githubId  COLLATE NOCASE")
     suspend fun getReposByGithubId(githubId: String): List<ReposEntity>
 
     @Query("SELECT * FROM repos WHERE favorite = :favorite")
     fun getFavoriteRepos(favorite: Boolean): List<ReposEntity>
 
-    @Query("DELETE FROM repos WHERE user_github_id = :githubId")
+    @Query("DELETE FROM repos WHERE user_github_id = :githubId  COLLATE NOCASE")
     suspend fun deleteRepos(githubId: String)
 
 }
