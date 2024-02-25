@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.ui.detail.DetailScreen
 import com.gyleedev.githubsearch.ui.home.HomeScreen
 
 enum class GithubSearchScreen(@StringRes val title: Int) {
@@ -57,12 +58,11 @@ fun GithubSearchApp(
                     }
                 )
             ) {
-                /*DetailScreen(
+                DetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding()
-                )*/
-
+                )
             }
 
 
