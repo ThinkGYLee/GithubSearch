@@ -32,8 +32,6 @@ interface GitHubRepository {
     suspend fun getUser(id: String): UserModel?
     suspend fun getUserFromGithub(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
-
-
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -97,7 +95,7 @@ class GitHubRepositoryImpl @Inject constructor(
         val user = githubApiService.getUser(id)
         val userEntityId = userDao.insertUser(user.toModel().toEntity())
         insertRepos(id, userEntityId)
-        insertAccessTime(id)
+        updateAccessTime(id)
         return user.toModel()
     }
 
@@ -115,14 +113,26 @@ class GitHubRepositoryImpl @Inject constructor(
         return reposDao.getReposByGithubId(githubId).map { it.toModel() }
     }
 
-    private fun insertAccessTime(id: String) {
-        accessTimeDao.insertTime(
-            AccessTime(
-                id = 0,
-                githubId = id,
-                accessTime = Instant.now()
+    private fun updateAccessTime(id: String) {
+        val accessTime = accessTimeDao.getTimeByGithubId(id)
+        if (accessTime != null) {
+            accessTimeDao.updateTime(
+                AccessTime(
+                    id = accessTime.id,
+                    githubId = accessTime.githubId,
+                    accessTime = Instant.now()
+                )
             )
-        )
+        } else {
+            accessTimeDao.insertTime(
+                AccessTime(
+                    id = 0,
+                    githubId = id,
+                    accessTime = Instant.now()
+                )
+            )
+        }
+
     }
 
 
