@@ -16,6 +16,7 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.remote.GithubApiService
 import com.gyleedev.githubsearch.remote.response.toModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -96,6 +97,7 @@ class GitHubRepositoryImpl @Inject constructor(
         val user = githubApiService.getUser(id)
         val userEntityId = userDao.insertUser(user.toModel().toEntity())
         insertRepos(id, userEntityId)
+        insertAccessTime(id)
         return user.toModel()
     }
 
@@ -111,6 +113,16 @@ class GitHubRepositoryImpl @Inject constructor(
     //db에서 레포정보 가져오기
     override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>? {
         return reposDao.getReposByGithubId(githubId).map { it.toModel() }
+    }
+
+    private fun insertAccessTime(id: String) {
+        accessTimeDao.insertTime(
+            AccessTime(
+                id = 0,
+                githubId = id,
+                accessTime = Instant.now()
+            )
+        )
     }
 
 
