@@ -85,7 +85,7 @@ fun HomeScreen(
         if (user.value != null) {
             SearchResultItem(
                 user = user.value!!,
-                onClick = { },
+                onClick = { moveToDetail(user.value!!.login) },
                 modifier = Modifier.padding(paddingValues)
             )
         } else {
@@ -93,7 +93,7 @@ fun HomeScreen(
                 SearchItemList(
                     modifier = modifier.padding(paddingValues),
                     users = users,
-                    onClick = {}//onScreenChange
+                    onClick = { moveToDetail(it) }//onScreenChange
                 )
             } else {
                 NoItem(
@@ -128,7 +128,7 @@ fun EmbeddedSearchBar(
             searchQuery = query
             onQueryChange(query)
         },
-        onSearch = onSearch ,
+        onSearch = onSearch,
         active = isSearchActive,
         onActiveChange = activeChanged,
         modifier = modifier,
@@ -317,7 +317,7 @@ private fun NoItem(
     Surface(
         modifier = modifier.fillMaxSize(),
 
-    ) {
+        ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
