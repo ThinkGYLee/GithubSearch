@@ -11,6 +11,7 @@ import com.gyleedev.githubsearch.data.database.entity.AccessTime
 import com.gyleedev.githubsearch.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
+import com.gyleedev.githubsearch.data.paging.FavoritePagingSource
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -34,6 +35,7 @@ interface GitHubRepository {
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
     suspend fun getDetailUser(githubId: String): UserModel?
     suspend fun updateUser(id: String): UserModel?
+    fun getFavorites(): Flow<PagingData<UserModel>>
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -50,6 +52,17 @@ class GitHubRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { UserPagingSource(userDao) }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toModel() }
+        }
+    }
+
+    override fun getFavorites(): Flow<PagingData<UserModel>> {
+        return Pager(config = PagingConfig(
+            pageSize =  10,
+            enablePlaceholders = false
+        ),
+            pagingSourceFactory = {FavoritePagingSource(userDao)}
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
