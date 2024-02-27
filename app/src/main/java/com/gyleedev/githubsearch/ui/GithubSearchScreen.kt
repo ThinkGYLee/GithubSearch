@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.ui.detail.DetailScreen
+import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.ui.home.HomeScreen
 
 
@@ -88,6 +89,15 @@ fun GithubSearchApp(
                     onClick = {navController.navigateUp()}
                 )
             }
+            composable(route = BottomNavItem.Favorite.screenRoute) {
+                FavoriteScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(),
+                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                )
+            }
+
         }
     }
 }
