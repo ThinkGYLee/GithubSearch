@@ -33,6 +33,7 @@ interface GitHubRepository {
     suspend fun getUserFromGithub(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
     suspend fun getDetailUser(githubId: String): UserModel?
+    suspend fun updateUser(id: String): UserModel?
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -52,8 +53,6 @@ class GitHubRepositoryImpl @Inject constructor(
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
-
-
     }
 
     override suspend fun getRepositories(user: String): List<RepositoryModel> {
@@ -148,6 +147,32 @@ class GitHubRepositoryImpl @Inject constructor(
                 getUserFromGithub(githubId)
             }
         }
+    }
+
+    override suspend fun updateUser(id: String): UserModel? {
+
+        val user = userDao.getUser(id)
+        userDao.updateUser(
+            UserEntity(
+                id = user.id,
+                userId = user.userId,
+                name = user.name,
+                followers = user.followers,
+                following = user.following,
+                company = user.company,
+                avatar = user.avatar,
+                email = user.email,
+                bio = user.bio,
+                repos = user.repos,
+                createdDate = user.createdDate,
+                updatedDate = user.updatedDate,
+                reposAddress = user.reposAddress,
+                blogUrl = user.blogUrl,
+                favorite = !user.favorite
+            )
+        )
+        return userDao.getUser(id).toModel()
+
     }
 
 
