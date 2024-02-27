@@ -84,7 +84,8 @@ fun GithubSearchApp(
                 DetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding()
+                        .padding(),
+                    onClick = {navController.navigateUp()}
                 )
             }
         }
