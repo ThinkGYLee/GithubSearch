@@ -18,6 +18,9 @@ interface UserDao {
     @Query("SELECT * FROM user LIMIT 10 OFFSET (:page-1)*10")
     fun getUsers(page: Int): List<UserEntity>
 
+    @Query("SELECT * FROM user WHERE favorite = :favorite LIMIT 10 OFFSET (:page-1)*10")
+    fun getFavorite(page: Int, favorite: Boolean = true): List<UserEntity>
+
     @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
     fun getUser(id: String): UserEntity
 
