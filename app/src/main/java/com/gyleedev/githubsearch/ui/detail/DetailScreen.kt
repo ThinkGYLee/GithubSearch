@@ -13,11 +13,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Apartment
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -43,21 +46,43 @@ import com.gyleedev.githubsearch.domain.model.DetailFeed
 fun DetailScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
+    onClick: () -> Unit
 ) {
     val list by viewModel.itemList.collectAsStateWithLifecycle()
+    val status by viewModel.favoriteStatus.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
+
             TopAppBar(
                 title = { Text(text = "") },
                 navigationIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "back"
-                    )
+                    IconButton(onClick = onClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "back"
+                        )
+                    }
                 },
-                modifier = Modifier
+                actions = {
+                    IconButton(onClick = { viewModel.updateFavoriteStatus() }) {
+                        if(status) {
+                            Icon(
+                                imageVector = Icons.Filled.Favorite,
+                                contentDescription = "favorite button",
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Filled.FavoriteBorder,
+                                contentDescription = "favorite button",
+                            )
+                        }
+
+                    }
+                },
+                modifier = Modifier,
             )
+
 
         },
         modifier = modifier
