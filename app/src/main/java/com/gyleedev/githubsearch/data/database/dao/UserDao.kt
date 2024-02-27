@@ -4,11 +4,12 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.gyleedev.githubsearch.data.database.entity.UserEntity
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM user ORDER BY id ASC")
+    @Query("SELECT * FROM user ORDER BY id DESC")
     fun allSelect(): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user ORDER BY id ASC")
@@ -40,4 +41,6 @@ interface UserDao {
 
     @Query("SELECT * FROM user WHERE favorite = :favorite")
     fun getFavoriteUsers(favorite: Boolean): List<UserEntity>
+    @Update
+    fun updateUser(user: UserEntity): Int
 }
