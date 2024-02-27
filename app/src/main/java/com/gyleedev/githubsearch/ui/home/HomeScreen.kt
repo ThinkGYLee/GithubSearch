@@ -48,12 +48,12 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 
 @Composable
 fun HomeScreen(
+    moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    moveToDetail: (String) -> Unit,
 ) {
     val users = viewModel.getUsers().collectAsLazyPagingItems()
-    val user = viewModel.userInfo.collectAsStateWithLifecycle()
+    val user by viewModel.userInfo.collectAsStateWithLifecycle()
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -69,9 +69,10 @@ fun HomeScreen(
                 onSearch = {
                     searchText = ""
                     viewModel.getUser()
-                    isSearchActive = !isSearchActive
                 },
                 onSearchItemReset = { viewModel.resetUser() },
+                moveToDetail = { user?.let { moveToDetail(it.login) } },
+                user = user,
                 modifier = Modifier
             )
 
@@ -82,24 +83,16 @@ fun HomeScreen(
     ) { paddingValues ->
 
 
-        if (user.value != null) {
-            SearchResultItem(
-                user = user.value!!,
-                onClick = { moveToDetail(user.value!!.login) },
-                modifier = Modifier.padding(paddingValues)
+        if (users.itemCount > 0) {
+            SearchItemList(
+                modifier = Modifier.padding(paddingValues),
+                users = users,
+                onClick = { moveToDetail(it) }
             )
         } else {
-            if (users.itemCount > 0) {
-                SearchItemList(
-                    modifier = modifier.padding(paddingValues),
-                    users = users,
-                    onClick = { moveToDetail(it) }//onScreenChange
-                )
-            } else {
-                NoItem(
-                    modifier = modifier.padding(paddingValues)
-                )
-            }
+            NoItem(
+                modifier = modifier.padding(paddingValues)
+            )
         }
 
 
@@ -114,8 +107,11 @@ fun EmbeddedSearchBar(
     onActiveChanged: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
     onSearchItemReset: () -> Unit,
+    moveToDetail: () -> Unit,
+    user: UserModel?,
     modifier: Modifier = Modifier,
 ) {
+
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val activeChanged: (Boolean) -> Unit = { active ->
         searchQuery = ""
@@ -189,7 +185,11 @@ fun EmbeddedSearchBar(
             WindowInsets(0.dp)
         }
     ) {
-        // Search suggestions or results
+        SearchResultItem(
+            user = user,
+            onClick = moveToDetail,
+            modifier = Modifier
+        )
     }
 }
 
@@ -202,7 +202,7 @@ private fun SearchItemList(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 12.dp)
     ) {
         items(users.itemCount, key = null, contentType = {}) { user ->
             users[user]?.let {
@@ -254,58 +254,63 @@ private fun HomeItem(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
-    user: UserModel,
+    user: UserModel?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            GlideImage(
-                model = (user.avatar),
+        if (user != null) {
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .height(80.dp)
-                    .width(80.dp)
-                    .clip(
-                        CircleShape
-                    ),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-            Column {
-                if (user.name != null) {
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Text(
-                    text = user.login,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    .fillMaxWidth()
+                    .heightIn(min = 80.dp)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                GlideImage(
+                    model = (user.avatar),
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .height(80.dp)
+                        .width(80.dp)
+                        .clip(
+                            CircleShape
+                        ),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null
                 )
-                if (user.bio != null) {
+                Column {
+                    if (user.name != null) {
+                        Text(
+                            text = user.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
                     Text(
-                        text = user.bio,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        text = user.login,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
+                    if (user.bio != null) {
+                        Text(
+                            text = user.bio,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
+
     }
 
 }

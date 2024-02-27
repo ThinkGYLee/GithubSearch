@@ -8,35 +8,16 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 
-class GetBothUseCase @Inject constructor(
+class DetailFeedUseCase @Inject constructor(
     private val repository: GitHubRepository
 ) {
     suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
-            val time = repository.getLastAccessById(id)
-
-            val user = async {
-                if (time != null) {
-                    if (Instant.now().toEpochMilli() - time.accessTime.toEpochMilli() < 3600000) {
-                        repository.getUser(id)
-                    } else {
-                        repository.getUserFromGithub(id)
-                    }
-                } else {
-                    repository.getUserFromGithub(id)
-                }
-            }
-            val userinfo = user.await()
-            val repo = async {
-                repository.getRepositories(id)
-            }
-
-
-            // 2개중 하나
-            modelToFeed(userinfo, repo.await())
+            val user = repository.getDetailUser(id)
+            val repo = repository.getRepositories(id)
+            modelToFeed(user, repo)
         }
     }
 }

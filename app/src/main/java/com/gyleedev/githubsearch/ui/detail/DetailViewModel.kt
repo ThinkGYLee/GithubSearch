@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.domain.usecase.GetBothUseCase
+import com.gyleedev.githubsearch.domain.usecase.DetailFeedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val useCase: GetBothUseCase,
+    private val useCase: DetailFeedUseCase,
     savedStateHandle: SavedStateHandle
 ): BaseViewModel() {
 

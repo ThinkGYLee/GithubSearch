@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -39,12 +40,11 @@ import com.gyleedev.githubsearch.domain.model.DetailFeed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), modifier: Modifier) {
-
-    val list = viewModel.itemList.collectAsStateWithLifecycle()
-    println("screen")
-    println(list.value)
-    println("screen")
+fun DetailScreen(
+    modifier: Modifier = Modifier,
+    viewModel: DetailViewModel = hiltViewModel(),
+) {
+    val list by viewModel.itemList.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -71,30 +71,25 @@ fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), modifier: Modifie
                 .padding(it)
                 .padding(vertical = 4.dp)
         ) {
-            items(list.value.size) { current ->
-                when (list.value[current]) {
+            items(list.size) { current ->
+                when (list[current]) {
                     is DetailFeed.UserProfile -> {
-                        println("userProfile")
-                        DetailUserTitleItem(list.value[current] as DetailFeed.UserProfile)
+                        DetailUserTitleItem(list[current] as DetailFeed.UserProfile)
                     }
 
                     is DetailFeed.UserDetail -> {
-                        println("userDetail")
-                        DetailUserInfoItem(user = list.value[current] as DetailFeed.UserDetail)
+                        DetailUserInfoItem(user = list[current] as DetailFeed.UserDetail)
                     }
 
                     is DetailFeed.RepoTitle -> {
-                        println("RepoTitle")
                         DetailRepoTitle()
                     }
 
                     is DetailFeed.RepoDetail -> {
-                        println("RepoDetail")
-                        DetailRepoItem(repos = list.value[current] as DetailFeed.RepoDetail)
+                        DetailRepoItem(repos = list[current] as DetailFeed.RepoDetail)
                     }
 
                     else -> {
-                        println("else")
                         DetailRepoNoItem()
                     }
                 }
@@ -108,7 +103,6 @@ fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), modifier: Modifie
 @Composable
 private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
     val data = user.userModel
-    println("data $data")
     Surface(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -161,7 +155,6 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
 @Composable
 private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
     val data = user.userModel
-    println("data $data")
     Surface(
         modifier = Modifier.fillMaxWidth(),
     ) {
