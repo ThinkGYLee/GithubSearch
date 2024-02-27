@@ -32,6 +32,7 @@ interface GitHubRepository {
     suspend fun getUser(id: String): UserModel?
     suspend fun getUserFromGithub(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
+    suspend fun getDetailUser(githubId: String): UserModel?
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -132,7 +133,21 @@ class GitHubRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
 
+    override suspend fun getDetailUser(githubId: String): UserModel? {
+        return withContext(Dispatchers.IO) {
+            val lastAccess = getLastAccessById(githubId)
+            if (lastAccess != null) {
+                if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
+                    getUser(githubId)
+                } else {
+                    getUserFromGithub(githubId)
+                }
+            } else {
+                getUserFromGithub(githubId)
+            }
+        }
     }
 
 
