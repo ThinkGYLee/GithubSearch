@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +42,12 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val users = viewModel.getUsers().collectAsLazyPagingItems()
+    val showDialog = remember { mutableStateOf(false) }
+    val user = remember {
+        mutableStateOf<UserModel?>(null)
+    }
+
+
 
     Scaffold(
         topBar = {
@@ -53,15 +63,42 @@ fun FavoriteScreen(
             FavoriteItemList(
                 modifier = Modifier.padding(paddingValues),
                 users = users,
-                onClick = { moveToDetail(it) }
+                onClick = { moveToDetail(it) },
+                onLongClick = {
+                    user.value = it
+                    showDialog.value = true
+                }
             )
         } else {
             NoItem(
                 modifier = modifier.padding(paddingValues)
             )
         }
+    }
 
-
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(text = "즐겨찾기를 해제하겠습니까?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog.value = false
+                        user.value?.let { viewModel.updateFavoriteStatus(it) }
+                    }) {
+                    Text("확인")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showDialog.value = false
+                        user.value = null
+                    }) {
+                    Text("취소")
+                }
+            }
+        )
     }
 }
 
@@ -69,7 +106,8 @@ fun FavoriteScreen(
 private fun FavoriteItemList(
     users: LazyPagingItems<UserModel>,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    onLongClick: (UserModel) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -77,8 +115,8 @@ private fun FavoriteItemList(
             .padding(vertical = 12.dp)
     ) {
         items(users.itemCount, key = null, contentType = {}) { user ->
-            users[user]?.let {
-                FavoriteItem(it, onClick = { onClick(it.login) }, onLongClick = { println("longclick")})
+            users[user]?.let { it ->
+                FavoriteItem(it, onClick = { onClick(it.login) }, onLongClick = { onLongClick(it) })
             }
         }
     }
@@ -89,12 +127,15 @@ private fun FavoriteItemList(
 private fun FavoriteItem(
     user: UserModel,
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    onLongClick: (UserModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
-        modifier = modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick),
+        modifier = modifier.combinedClickable(
+            onLongClick = { onLongClick(user) },
+            onClick = onClick
+        ),
     ) {
         Row(
             modifier = Modifier
