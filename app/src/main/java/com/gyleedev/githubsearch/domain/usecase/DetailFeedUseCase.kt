@@ -5,7 +5,6 @@ import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
-import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,6 +15,14 @@ class DetailFeedUseCase @Inject constructor(
     suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
             val user = repository.getDetailUser(id)
+            val repo = repository.getRepositories(id)
+            modelToFeed(user, repo)
+        }
+    }
+
+    suspend fun update(id: String): List<DetailFeed> {
+        return withContext(Dispatchers.IO) {
+            val user = repository.updateUser(id)
             val repo = repository.getRepositories(id)
             modelToFeed(user, repo)
         }
