@@ -15,25 +15,8 @@ class DetailFeedUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
-
-            val time = repository.getLastAccessById(id)
-
-            val user =
-                if (time != null) {
-                    if (Instant.now().toEpochMilli() - time.accessTime.toEpochMilli() < 3600000) {
-                        repository.getUser(id)
-                    } else {
-                        repository.getUserFromGithub(id)
-                    }
-                } else {
-                    repository.getUserFromGithub(id)
-                }
-
-
-            val repo =
-                repository.getRepositories(id)
-
-
+            val user = repository.getDetailUser(id)
+            val repo = repository.getRepositories(id)
             modelToFeed(user, repo)
         }
     }

@@ -23,5 +23,5 @@ class UseCaseModule {
     @Singleton
     fun provideGetBothUseCase(
         repository: GitHubRepository
-    ) = GetBothUseCase(repository)
+    ) = DetailFeedUseCase(repository)
 }
