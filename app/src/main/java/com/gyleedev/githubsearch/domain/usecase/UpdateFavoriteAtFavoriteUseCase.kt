@@ -6,14 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FavoriteUseCase @Inject constructor(
+class UpdateFavoriteAtFavoriteUseCase @Inject constructor(
     private val repository: GitHubRepository
 ) {
-    fun getFavorites(status: FilterStatus) = repository.getFavorites(status)
-
-    suspend fun update(id: String) {
+    suspend operator fun invoke(id: String) {
         return withContext(Dispatchers.IO) {
-            repository.updateUser(id)
+            repository.updateUserFavorite(id)
         }
     }
 }
