@@ -32,10 +32,9 @@ interface GitHubRepository {
     suspend fun getUserAtHome(id: String): UserModel?
     suspend fun getLastAccessById(id: String): AccessTime?
     suspend fun getUser(id: String): UserModel?
-    suspend fun getUserFromGithub(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
     suspend fun getDetailUser(githubId: String): UserModel?
-    suspend fun updateUser(id: String): UserModel?
+    suspend fun updateUserFavorite(id: String): UserModel?
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 }
 
@@ -78,7 +77,6 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun getUserAtHome(id: String): UserModel? {
         return withContext(Dispatchers.IO) {
             val user = userDao.getUserByGithubId(id)
-
             cachingUserAtHome(user, id)
 
         }
@@ -104,13 +102,48 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     //유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
-    override suspend fun getUserFromGithub(id: String): UserModel? {
-        userDao.deleteUser(id)
-        val user = githubApiService.getUser(id)
-        val userEntityId = userDao.insertUser(user.toModel().toEntity())
-        insertRepos(id, userEntityId)
+    private suspend fun insertUserFromGithub(id: String): UserModel? {
+        val userRemote = githubApiService.getUser(id)
+        val entityId = userDao.insertUser(userRemote.toModel().toEntity())
+        insertRepos(id, entityId)
         updateAccessTime(id)
-        return user.toModel()
+        return userRemote.toModel()
+    }
+
+
+    private suspend fun updateUserFromGithub(id: String): UserModel? {
+        val userRemote = githubApiService.getUser(id)
+        val userLocal = userDao.getUser(id)
+
+        val updateUser = UserEntity(
+            id = userLocal.id,
+            userId = userRemote.login,
+            name = userRemote.name,
+            followers = userRemote.followers,
+            following = userRemote.following,
+            avatar = userRemote.avatar,
+            company = userRemote.company,
+            email = userRemote.email,
+            bio = userRemote.bio,
+            blogUrl = userRemote.blogUrl,
+            createdDate = userRemote.createdDate,
+            updatedDate = userRemote.updatedDate,
+            repos = userRemote.repos,
+            reposAddress = userRemote.reposAddress,
+            favorite = userLocal.favorite
+        )
+
+        if (userLocal == null) {
+            userDao.insertUser(userRemote.toModel().toEntity())
+
+        } else {
+            userDao.updateUser(
+                updateUser
+            )
+        }
+        insertRepos(id, userLocal.id)
+        updateAccessTime(id)
+        return updateUser.toModel()
     }
 
     //레포정보 삽입
@@ -155,15 +188,15 @@ class GitHubRepositoryImpl @Inject constructor(
                 if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
                     getUser(githubId)
                 } else {
-                    getUserFromGithub(githubId)
+                    updateUserFromGithub(githubId)
                 }
             } else {
-                getUserFromGithub(githubId)
+                insertUserFromGithub(githubId)
             }
         }
     }
 
-    override suspend fun updateUser(id: String): UserModel? {
+    override suspend fun updateUserFavorite(id: String): UserModel? {
 
         val user = userDao.getUser(id)
         userDao.updateUser(
