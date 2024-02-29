@@ -45,5 +45,5 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE favorite = :favorite")
     fun getFavoriteUsers(favorite: Boolean): List<UserEntity>
     @Update
-    fun updateUser(user: UserEntity): Int
+    fun updateUser(user: UserEntity)
 }
