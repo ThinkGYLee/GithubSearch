@@ -33,6 +33,7 @@ import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.ui.detail.DetailScreen
 import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.ui.home.HomeScreen
+import com.gyleedev.githubsearch.ui.setting.SettingScreen
 
 
 sealed class BottomNavItem(
@@ -86,7 +87,7 @@ fun GithubSearchApp(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(),
-                    onClick = {navController.navigateUp()}
+                    onClick = { navController.navigateUp() }
                 )
             }
             composable(route = BottomNavItem.Favorite.screenRoute) {
@@ -95,6 +96,14 @@ fun GithubSearchApp(
                         .fillMaxSize()
                         .padding(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                )
+            }
+
+            composable(route = BottomNavItem.Setting.screenRoute) {
+                SettingScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(),
                 )
             }
 

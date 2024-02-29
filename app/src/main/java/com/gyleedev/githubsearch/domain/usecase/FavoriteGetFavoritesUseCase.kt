@@ -1,10 +1,11 @@
 package com.gyleedev.githubsearch.domain.usecase
 
 import com.gyleedev.githubsearch.data.repository.GitHubRepository
+import com.gyleedev.githubsearch.domain.model.FilterStatus
 import javax.inject.Inject
 
-class GetRepositoryUseCase @Inject constructor(
+class FavoriteGetFavoritesUseCase @Inject constructor(
     private val repository: GitHubRepository
 ) {
-    suspend fun execute(user: String) = repository.getRepositories(user)
+    operator fun invoke(status: FilterStatus) = repository.getFavorites(status)
 }

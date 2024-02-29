@@ -1,46 +1,54 @@
 package com.gyleedev.githubsearch.ui.favorite
 
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.usecase.FavoriteUseCase
+import com.gyleedev.githubsearch.domain.usecase.FavoriteGetFavoritesUseCase
+import com.gyleedev.githubsearch.domain.usecase.FavoriteUpdateFavoriteStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val useCase: FavoriteUseCase
+    private val updateFavoriteUseCase: FavoriteUpdateFavoriteStatusUseCase,
+    private val favoriteGetFavoritesUseCase: FavoriteGetFavoritesUseCase
 ) : BaseViewModel() {
 
-    var user: Flow<PagingData<UserModel>>
+    private val filterState = MutableStateFlow(FilterStatus.ALL)
 
-    init {
-        user = getUsers()
-    }
-
-    private fun getUsers(): Flow<PagingData<UserModel>> =
-        useCase.getFavorites(FilterStatus.ALL).cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val items = filterState
+        .flatMapLatest {
+            favoriteGetFavoritesUseCase(it)
+        }.cachedIn(viewModelScope)
 
     fun userFilterAll() {
-        user = getUsers()
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.ALL)
+        }
     }
 
     fun userFilterHasRepos() {
-        user = useCase.getFavorites(FilterStatus.REPO).cachedIn(viewModelScope)
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.REPO)
+        }
     }
 
     fun userFilterNoRepos() {
-        user = useCase.getFavorites(FilterStatus.NOREPO).cachedIn(viewModelScope)
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.NOREPO)
+        }
     }
 
     fun updateFavoriteStatus(user: UserModel) {
         viewModelScope.launch {
-            useCase.update(user.login)
+            updateFavoriteUseCase(user.login)
         }
     }
 }

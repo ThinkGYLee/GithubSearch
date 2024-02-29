@@ -4,16 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.domain.usecase.DetailFeedUseCase
+import com.gyleedev.githubsearch.domain.usecase.DetailGetFeedUseCase
+import com.gyleedev.githubsearch.domain.usecase.DetailUpdateFavoriteStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val useCase: DetailFeedUseCase,
+    private val detailGetFeedUseCase: DetailGetFeedUseCase,
+    private val detailUpdateFavoriteStatusUseCase: DetailUpdateFavoriteStatusUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -27,7 +29,6 @@ class DetailViewModel @Inject constructor(
         val id = savedStateHandle.get<String>("id")
         viewModelScope.launch {
             if (id != null) {
-                println("id $id")
                 getItems(id)
             }
         }
@@ -35,7 +36,7 @@ class DetailViewModel @Inject constructor(
 
     private fun getItems(user: String) {
         viewModelScope.launch {
-            _itemList.emit(useCase.invoke(user))
+            _itemList.emit(detailGetFeedUseCase(user))
             setInitialFavoriteStatus(_itemList.value)
         }
     }
@@ -55,9 +56,9 @@ class DetailViewModel @Inject constructor(
 
     fun updateFavoriteStatus() {
         viewModelScope.launch {
-            if (itemList.value[0] is DetailFeed.UserProfile) {
+            if (itemList.value.isNotEmpty() && itemList.value[0] is DetailFeed.UserProfile) {
                 val userProfile = itemList.value[0] as DetailFeed.UserProfile
-                _itemList.emit(useCase.update(userProfile.userModel.login))
+                _itemList.emit(detailUpdateFavoriteStatusUseCase(userProfile.userModel.login))
                 _favoriteStatus.emit(!_favoriteStatus.value)
             }
         }

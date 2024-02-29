@@ -3,7 +3,6 @@ package com.gyleedev.githubsearch.ui.detail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -53,7 +51,7 @@ fun DetailScreen(
 
     Scaffold(
         topBar = {
-
+            // TODO TopAppBar 앱 공통으로
             TopAppBar(
                 title = { Text(text = "") },
                 navigationIcon = {
@@ -65,8 +63,8 @@ fun DetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.updateFavoriteStatus() }) {
-                        if(status) {
+                    IconButton(onClick = viewModel::updateFavoriteStatus) {
+                        if (status) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
                                 contentDescription = "favorite button",
@@ -86,13 +84,10 @@ fun DetailScreen(
 
         },
         modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp)
     ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize()
                 .padding(it)
                 .padding(vertical = 4.dp)
         ) {
@@ -128,215 +123,204 @@ fun DetailScreen(
 @Composable
 private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
     val data = user.userModel
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            GlideImage(
-                model = (data.avatar),
-                contentDescription = null
+        GlideImage(
+            model = (data.avatar),
+            contentDescription = null
+        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = data.repos.toString(),
+                fontWeight = FontWeight.Bold
             )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = data.repos.toString(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "repos",
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = data.followers.toString(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "followers",
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = data.following.toString(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "following",
-                )
-            }
-
+            Text(
+                text = "repos",
+            )
         }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = data.followers.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "followers",
+            )
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = data.following.toString(),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "following",
+            )
+        }
+
     }
+
 }
 
 
 @Composable
 private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
     val data = user.userModel
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    // TODO Surface 다 빼
 
-        Column(modifier = Modifier.padding(12.dp)) {
-            data.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(12.dp)
-                )
-            }
+
+    Column(modifier = Modifier.padding(12.dp)) {
+        data.name?.let {
             Text(
-                text = data.login,
-                style = MaterialTheme.typography.titleLarge,
+                text = it,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(12.dp)
             )
-            data.bio?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(12.dp)
+        }
+        Text(
+            text = data.login,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(12.dp)
+        )
+        data.bio?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+
+        if (data.company != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Apartment,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp)
                 )
+                Text(text = data.company)
             }
+        }
 
-            if (data.company != null) {
-                Row(
+        if (data.email != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Mail,
+                    contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Apartment,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp)
-                    )
-                    Text(text = data.company)
-                }
+                        .width(24.dp)
+                        .height(24.dp)
+                )
+                Text(text = data.email)
             }
+        }
 
-            if (data.email != null) {
-                Row(
+        if (data.blogUrl != "") {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Link,
+                    contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Mail,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp)
-                    )
-                    Text(text = data.email)
-                }
-            }
-
-            if (data.blogUrl != "") {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Link,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp)
-                    )
-                    data.blogUrl?.let { Text(text = it) }
-                }
+                        .width(24.dp)
+                        .height(24.dp)
+                )
+                data.blogUrl?.let { Text(text = it) }
             }
         }
     }
+
 }
 
 @Composable
 private fun DetailRepoTitle() {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
 
-        Text(
-            text = "Repository",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
-        )
-    }
+
+    Text(
+        text = "Repository",
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+    )
+
 }
 
 @Composable
 private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
     val data = repos.repositoryModel
-    println("data $data")
-    Surface(
-        modifier = Modifier.fillMaxWidth()
-    ) {
 
-        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
-            data.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            data.description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Start,
+
+    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
+        data.name?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(vertical = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .width(24.dp)
-                        .height(24.dp),
-                    colorResource(id = R.color.yellow)
-                )
-                Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
-                data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
-            }
+            )
         }
+        data.description?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .width(24.dp)
+                    .height(24.dp),
+                colorResource(id = R.color.yellow)
+            )
+            Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
+            data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
+        }
+
     }
 }
 
 @Composable
 private fun DetailRepoNoItem() {
 
-    Surface(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "No Repository",
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-            style = MaterialTheme.typography.titleMedium
-        )
-    }
+
+    Text(
+        text = "No Repository",
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        style = MaterialTheme.typography.titleMedium
+    )
+
 }

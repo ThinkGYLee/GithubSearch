@@ -13,15 +13,30 @@ class UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetUserUseCase(repository: GitHubRepository) = GetUserUseCase(repository)
+    fun provideHomeGetUsersUseCase(repository: GitHubRepository) = HomeGetUsersUseCase(repository)
 
     @Provides
     @Singleton
-    fun provideGetRepoUseCase(repository: GitHubRepository) = GetRepositoryUseCase(repository)
+    fun providesHomeSearchUserUseCase(repository: GitHubRepository) =
+        HomeSearchUserUseCase(repository)
 
     @Provides
     @Singleton
-    fun provideGetBothUseCase(
-        repository: GitHubRepository
-    ) = DetailFeedUseCase(repository)
+    fun providesDetailGetFeedUseCase(repository: GitHubRepository) =
+        DetailGetFeedUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providesDetailUpdateFavoriteStatusUseCase(repository: GitHubRepository) =
+        DetailUpdateFavoriteStatusUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providesFavoriteGetFavoritesUseCase(repository: GitHubRepository) =
+        FavoriteGetFavoritesUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun providesFavoriteUpdateFavoriteStatusUseCase(repository: GitHubRepository) =
+        FavoriteUpdateFavoriteStatusUseCase(repository)
 }

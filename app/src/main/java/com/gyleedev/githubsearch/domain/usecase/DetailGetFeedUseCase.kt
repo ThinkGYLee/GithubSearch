@@ -1,19 +1,20 @@
 package com.gyleedev.githubsearch.domain.usecase
 
+
 import com.gyleedev.githubsearch.data.repository.GitHubRepository
-import com.gyleedev.githubsearch.domain.model.FilterStatus
+import com.gyleedev.githubsearch.domain.model.DetailFeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FavoriteUseCase @Inject constructor(
+class DetailGetFeedUseCase @Inject constructor(
     private val repository: GitHubRepository
 ) {
-    fun getFavorites(status: FilterStatus) = repository.getFavorites(status)
-
-    suspend fun update(id: String) {
+    suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
-            repository.updateUser(id)
+            val user = repository.getDetailUser(id)
+            val repo = repository.getReposFromDatabase(id)
+            ModelToFeed.modelToFeed(user, repo)
         }
     }
 }
