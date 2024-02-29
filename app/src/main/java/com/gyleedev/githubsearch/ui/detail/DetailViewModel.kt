@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.domain.usecase.DetailFeedUseCase
-import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteAtDetailUseCase
+import com.gyleedev.githubsearch.domain.usecase.DetailGetFeedUseCase
+import com.gyleedev.githubsearch.domain.usecase.DetailUpdateFavoriteStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val detailFeedUseCase: DetailFeedUseCase,
-    private val updateFavoriteAtDetailUseCase: UpdateFavoriteAtDetailUseCase,
+    private val detailGetFeedUseCase: DetailGetFeedUseCase,
+    private val detailUpdateFavoriteStatusUseCase: DetailUpdateFavoriteStatusUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -36,7 +36,7 @@ class DetailViewModel @Inject constructor(
 
     private fun getItems(user: String) {
         viewModelScope.launch {
-            _itemList.emit(detailFeedUseCase(user))
+            _itemList.emit(detailGetFeedUseCase(user))
             setInitialFavoriteStatus(_itemList.value)
         }
     }
@@ -58,7 +58,7 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             if (itemList.value.isNotEmpty() && itemList.value[0] is DetailFeed.UserProfile) {
                 val userProfile = itemList.value[0] as DetailFeed.UserProfile
-                _itemList.emit(updateFavoriteAtDetailUseCase(userProfile.userModel.login))
+                _itemList.emit(detailUpdateFavoriteStatusUseCase(userProfile.userModel.login))
                 _favoriteStatus.emit(!_favoriteStatus.value)
             }
         }
