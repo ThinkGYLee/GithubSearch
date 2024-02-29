@@ -13,16 +13,17 @@ import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
 import com.gyleedev.githubsearch.data.paging.FavoritePagingSource
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
+import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.remote.GithubApiService
 import com.gyleedev.githubsearch.remote.response.toModel
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import javax.inject.Inject
 
 interface GitHubRepository {
 
@@ -35,7 +36,7 @@ interface GitHubRepository {
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
     suspend fun getDetailUser(githubId: String): UserModel?
     suspend fun updateUser(id: String): UserModel?
-    fun getFavorites(): Flow<PagingData<UserModel>>
+    fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -57,12 +58,12 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getFavorites(): Flow<PagingData<UserModel>> {
+    override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> {
         return Pager(config = PagingConfig(
-            pageSize =  10,
+            pageSize = 10,
             enablePlaceholders = false
         ),
-            pagingSourceFactory = {FavoritePagingSource(userDao)}
+            pagingSourceFactory = { FavoritePagingSource(userDao, status) }
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
