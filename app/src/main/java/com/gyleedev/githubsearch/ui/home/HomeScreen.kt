@@ -1,8 +1,10 @@
 package com.gyleedev.githubsearch.ui.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +32,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +53,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.domain.model.UserModel
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
@@ -56,9 +62,20 @@ fun HomeScreen(
 ) {
     val users = viewModel.getUsers().collectAsLazyPagingItems()
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
+    val loading by viewModel.loading.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchState.collect { fetchState ->
+            viewModel.changeLoadingState()
+            Toast.makeText(context, "$fetchState", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
@@ -76,6 +93,7 @@ fun HomeScreen(
                 onSearchItemReset = { viewModel.resetUser() },
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
+                loading = loading,
                 modifier = Modifier
             )
         },
@@ -108,6 +126,7 @@ fun EmbeddedSearchBar(
     onSearchItemReset: () -> Unit,
     moveToDetail: () -> Unit,
     user: UserModel?,
+    loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -190,6 +209,19 @@ fun EmbeddedSearchBar(
             onClick = moveToDetail,
             modifier = Modifier
         )
+
+        if (loading) {
+            Surface(
+                modifier = modifier.fillMaxSize(),
+            ) {
+                Box(
+                    modifier = Modifier,
+                    Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier)
+                }
+            }
+        }
     }
 }
 
