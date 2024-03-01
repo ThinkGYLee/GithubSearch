@@ -75,13 +75,10 @@ fun DetailScreen(
                                 contentDescription = "favorite button",
                             )
                         }
-
                     }
                 },
                 modifier = Modifier,
             )
-
-
         },
         modifier = modifier
     ) {
@@ -116,7 +113,6 @@ fun DetailScreen(
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -136,6 +132,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
             model = (data.avatar),
             contentDescription = null
         )
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = data.repos.toString(),
@@ -145,6 +142,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
                 text = "repos",
             )
         }
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = data.followers.toString(),
@@ -164,17 +162,14 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
                 text = "following",
             )
         }
-
     }
-
 }
 
 
 @Composable
 private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
-    val data = user.userModel
-    // TODO Surface 다 빼
 
+    val data = user.userModel
 
     Column(modifier = Modifier.padding(12.dp)) {
         data.name?.let {
@@ -255,26 +250,21 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             }
         }
     }
-
 }
 
 @Composable
 private fun DetailRepoTitle() {
-
-
     Text(
         text = "Repository",
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
     )
-
 }
 
 @Composable
 private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
     val data = repos.repositoryModel
-
 
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
         data.name?.let {
@@ -307,14 +297,11 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
             Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
             data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
         }
-
     }
 }
 
 @Composable
 private fun DetailRepoNoItem() {
-
-
     Text(
         text = "No Repository",
         modifier = Modifier
@@ -322,5 +309,4 @@ private fun DetailRepoNoItem() {
             .padding(horizontal = 24.dp, vertical = 12.dp),
         style = MaterialTheme.typography.titleMedium
     )
-
 }
