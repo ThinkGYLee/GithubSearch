@@ -55,7 +55,7 @@ fun FavoriteScreen(
     modifier: Modifier = Modifier,
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
-    val users = viewModel.user.collectAsLazyPagingItems()
+    val users = viewModel.items.collectAsLazyPagingItems()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
     val user = remember {
@@ -72,28 +72,22 @@ fun FavoriteScreen(
                 title = { Text(text = "Favorite") },
                 actions = {
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
-
                         Icon(
                             imageVector = Icons.Filled.FilterList,
                             contentDescription = "favorite button",
                         )
-
-
                     }
                 },
                 modifier = Modifier,
             )
-
         },
         modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp)
     ) { paddingValues ->
-
-
         if (users.itemCount > 0) {
             FavoriteItemList(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
                 users = users,
                 onClick = { moveToDetail(it) },
                 onLongClick = {
@@ -168,6 +162,7 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
+        // TODO key, contentType
         items(users.itemCount, key = null, contentType = {}) { user ->
             users[user]?.let { it ->
                 FavoriteItem(it, onClick = { onClick(it.login) }, onLongClick = { onLongClick(it) })
@@ -184,60 +179,50 @@ private fun FavoriteItem(
     onLongClick: (UserModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier.combinedClickable(
-            onLongClick = { onLongClick(user) },
-            onClick = onClick
-        ),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            GlideImage(
-                model = (user.avatar),
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-            Text(
-                text = user.login,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .padding(12.dp)
+            .combinedClickable(
+                onLongClick = { onLongClick(user) },
+                onClick = onClick
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
 
+        ) {
+        GlideImage(
+            model = (user.avatar),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .heightIn(max = 80.dp, min = 20.dp)
+                .widthIn(max = 80.dp, min = 20.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop,
+            contentDescription = null
+        )
+        Text(
+            text = user.login,
+            fontWeight = FontWeight.Bold
+        )
+    }
 }
 
 @Composable
 private fun NoItem(
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    Column(
         modifier = modifier.fillMaxSize(),
-
-        ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "No Saved Item",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "No Saved Item",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
 
@@ -248,14 +233,9 @@ fun FilterDialog(
     onFilterChange: () -> Unit,
     onSelectedItemChange: (Int) -> Unit
 ) {
-
     val declarations = listOf("공개 repository가 있는 유저", "공개 repository가 없는 유저", "전체")
 
-
-
     AlertDialog(
-
-        // 다이얼로그 뷰 밖의 화면 클릭시, 인자로 받은 함수 실행하며 다이얼로그 상태 변경
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
@@ -294,17 +274,22 @@ fun FilterDialog(
 
 }
 
-// 다이얼로그에 들어가는 라디오버튼
 @Composable
-fun RadioButtons(selectedItemId: Int, declaration: List<String>, selectedItem: (String) -> Unit) {
-    val selectedValue = remember { mutableStateOf("") } // 선택된 라디오 버튼에 해당하는 내용
+fun RadioButtons(
+    selectedItemId: Int,
+    // TODO type
+    declaration: List<String>,
+    selectedItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val selectedValue = remember { mutableStateOf("") }
     val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
     val onChangeState: (String) -> Unit = {
         selectedValue.value = it
         selectedItem(selectedValue.value)
     }
 
-    Column(modifier = Modifier.padding(top = 10.dp)) {
+    Column(modifier = modifier.padding(top = 10.dp)) {
         declaration.forEach { item ->
             Column {
                 Row(

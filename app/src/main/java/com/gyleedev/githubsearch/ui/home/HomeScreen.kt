@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,6 +59,7 @@ fun HomeScreen(
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             EmbeddedSearchBar(
@@ -75,13 +78,11 @@ fun HomeScreen(
                 user = user,
                 modifier = Modifier
             )
-
         },
         modifier = modifier
             .fillMaxSize()
             .padding(4.dp)
     ) { paddingValues ->
-
 
         if (users.itemCount > 0) {
             SearchItemList(
@@ -94,8 +95,6 @@ fun HomeScreen(
                 modifier = modifier.padding(paddingValues)
             )
         }
-
-
     }
 }
 
@@ -111,13 +110,14 @@ fun EmbeddedSearchBar(
     user: UserModel?,
     modifier: Modifier = Modifier,
 ) {
-
     var searchQuery by rememberSaveable { mutableStateOf("") }
+
     val activeChanged: (Boolean) -> Unit = { active ->
         searchQuery = ""
         onQueryChange("")
         onActiveChanged(active)
     }
+
     SearchBar(
         query = searchQuery,
         onQueryChange = { query ->
@@ -230,7 +230,7 @@ private fun HomeItem(
                 .heightIn(min = 80.dp, max = 100.dp)
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             GlideImage(
                 model = (user.avatar),
@@ -286,6 +286,7 @@ private fun SearchResultItem(
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
+
                 Column {
                     if (user.name != null) {
                         Text(
@@ -300,6 +301,7 @@ private fun SearchResultItem(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
+
                     if (user.bio != null) {
                         Text(
                             text = user.bio,
@@ -310,9 +312,7 @@ private fun SearchResultItem(
                 }
             }
         }
-
     }
-
 }
 
 @Composable
@@ -321,8 +321,7 @@ private fun NoItem(
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
-
-        ) {
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -334,6 +333,5 @@ private fun NoItem(
                 fontWeight = FontWeight.Bold,
             )
         }
-
     }
 }
