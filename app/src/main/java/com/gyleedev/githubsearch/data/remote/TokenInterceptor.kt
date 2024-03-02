@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.remote
+package com.gyleedev.githubsearch.data.remote
 
 import com.gyleedev.githubsearch.BuildConfig
 import okhttp3.Interceptor

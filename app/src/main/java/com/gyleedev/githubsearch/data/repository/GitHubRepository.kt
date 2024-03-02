@@ -16,8 +16,8 @@ import com.gyleedev.githubsearch.data.paging.UserPagingSource
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.remote.GithubApiService
-import com.gyleedev.githubsearch.remote.response.toModel
+import com.gyleedev.githubsearch.data.remote.GithubApiService
+import com.gyleedev.githubsearch.data.remote.response.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -78,7 +78,6 @@ class GitHubRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val user = userDao.getUserByGithubId(id)
             cachingUserAtHome(user, id)
-
         }
     }
 

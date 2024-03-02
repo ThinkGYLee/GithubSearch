@@ -1,7 +1,7 @@
-package com.gyleedev.githubsearch.remote
+package com.gyleedev.githubsearch.data.remote
 
-import com.gyleedev.githubsearch.remote.response.RepoResponse
-import com.gyleedev.githubsearch.remote.response.UserResponse
+import com.gyleedev.githubsearch.data.remote.response.RepoResponse
+import com.gyleedev.githubsearch.data.remote.response.UserResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
