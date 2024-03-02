@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -34,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -246,7 +244,11 @@ fun FilterDialog(
         },
         text = {
             Column {
-                Text(text = "조건을 선택하세요", modifier = Modifier.padding(bottom = 5.dp))
+                Text(
+                    text = "조건을 선택하세요",
+                    modifier = Modifier.padding(bottom = 5.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 RadioButtons(
                     selectedItemId = selectedItemId,
                     declarations,
@@ -257,21 +259,19 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = "취소", color = Color.Black)
+                Text(text = "취소")
             }
         },
         confirmButton = {
-
             TextButton(
                 onClick = {
                     onFilterChange()
                     onChangeState(false)
                 }) {
-                Text(text = "확인", color = Color.Black)
+                Text(text = "확인")
             }
         }
     )
-
 }
 
 @Composable
@@ -294,19 +294,22 @@ fun RadioButtons(
             Column {
                 Row(
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
                         .selectable(
                             selected = isSelectedItem(item),
                             onClick = { onChangeState(item) },
                             role = Role.RadioButton
                         )
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = declaration[selectedItemId] == item,
                         onClick = null,
                         modifier = Modifier.padding(end = 5.dp)
                     )
-                    Text(text = item)
+                    Text(text = item, style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
