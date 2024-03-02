@@ -3,6 +3,7 @@ package com.gyleedev.githubsearch.ui.home
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -251,36 +252,31 @@ private fun HomeItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier,
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            GlideImage(
-                model = (user.avatar),
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-            Text(
-                text = user.login,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
 
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        GlideImage(
+            model = (user.avatar),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .heightIn(max = 80.dp, min = 20.dp)
+                .widthIn(max = 80.dp, min = 20.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop,
+            contentDescription = null
+        )
+        Text(
+            text = user.login,
+            fontWeight = FontWeight.Bold
+        )
+    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -290,57 +286,51 @@ private fun SearchResultItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        onClick = onClick
-    ) {
-        if (user != null) {
-            Row(
+
+    if (user != null) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .padding(12.dp)
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            GlideImage(
+                model = (user.avatar),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 80.dp)
-                    .padding(12.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                GlideImage(
-                    model = (user.avatar),
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .height(80.dp)
-                        .width(80.dp)
-                        .clip(
-                            CircleShape
-                        ),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
+                    .padding(horizontal = 8.dp)
+                    .height(80.dp)
+                    .width(80.dp)
+                    .clip(
+                        CircleShape
+                    ),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+
+            Column {
+                if (user.name != null) {
+                    Text(
+                        text = user.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Text(
+                    text = user.login,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
 
-                Column {
-                    if (user.name != null) {
-                        Text(
-                            text = user.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
+                if (user.bio != null) {
                     Text(
-                        text = user.login,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        text = user.bio,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
                     )
-
-                    if (user.bio != null) {
-                        Text(
-                            text = user.bio,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                 }
             }
         }
@@ -351,19 +341,15 @@ private fun SearchResultItem(
 private fun NoItem(
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    Column(
         modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "No Saved Item",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        Text(
+            text = "No Saved Item",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
