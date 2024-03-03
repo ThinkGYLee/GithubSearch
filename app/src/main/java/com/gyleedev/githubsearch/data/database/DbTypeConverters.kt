@@ -15,7 +15,7 @@ object DbTypeConverters {
 
     @TypeConverter
     @JvmStatic
-    fun fromInstant(value: Instant): String? {
+    fun fromInstant(value: Instant): String {
         return value.toString()
     }
 }
