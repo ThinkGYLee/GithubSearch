@@ -3,14 +3,12 @@ package com.gyleedev.githubsearch.ui.home
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.HomeGetUsersUseCase
 import com.gyleedev.githubsearch.domain.usecase.HomeSearchUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getUsersUseCase: HomeGetUsersUseCase,
-    private val searchUserUseCase: HomeSearchUserUseCase
+    getUsersUseCase: HomeGetUsersUseCase,
+    private val searchUserUseCase: HomeSearchUserUseCase,
 ) : BaseViewModel() {
     private val _searchId = MutableStateFlow("")
 
@@ -28,8 +26,8 @@ class HomeViewModel @Inject constructor(
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
-    fun getUsers(): Flow<PagingData<UserModel>> = getUsersUseCase().cachedIn(viewModelScope)
 
+    val users = getUsersUseCase().cachedIn(viewModelScope)
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun getUser() {
