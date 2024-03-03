@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -61,7 +61,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val users = viewModel.getUsers().collectAsLazyPagingItems()
+    val users = viewModel.users.collectAsLazyPagingItems()
+    users.refresh()
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
     val loading by viewModel.loading.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -76,7 +77,6 @@ fun HomeScreen(
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
-
 
     Scaffold(
         topBar = {
@@ -97,25 +97,44 @@ fun HomeScreen(
                 loading = loading,
                 modifier = Modifier
             )
-        },
-        modifier = modifier
+        }, modifier = modifier
             .fillMaxSize()
             .padding(4.dp)
     ) { paddingValues ->
+        when (users.loadState.refresh) {
+            is LoadState.Loading -> {
+                Surface(
+                    modifier = modifier.fillMaxSize(),
+                ) {
+                    Box(
+                        modifier = Modifier, Alignment.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier)
+                    }
+                }
+            }
 
-        if (users.itemCount > 0) {
-            SearchItemList(
-                modifier = Modifier.padding(paddingValues),
-                users = users,
-                onClick = { moveToDetail(it) }
-            )
-        } else {
-            NoItem(
-                modifier = modifier.padding(paddingValues)
-            )
+            is LoadState.Error -> {
+                NoItem(
+                    modifier = modifier.padding(paddingValues)
+                )
+            }
+
+            else -> {
+                if (users.itemCount > 0) {
+                    SearchItemList(modifier = modifier.padding(paddingValues),
+                        users = users,
+                        onClick = { moveToDetail(it) })
+                } else {
+                    NoItem(
+                        modifier = modifier.padding(paddingValues)
+                    )
+                }
+            }
         }
     }
 }
+
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -206,9 +225,7 @@ fun EmbeddedSearchBar(
         }
     ) {
         SearchResultItem(
-            user = user,
-            onClick = moveToDetail,
-            modifier = Modifier
+            user = user, onClick = moveToDetail, modifier = Modifier
         )
 
         if (loading) {
@@ -216,8 +233,7 @@ fun EmbeddedSearchBar(
                 modifier = modifier.fillMaxSize(),
             ) {
                 Box(
-                    modifier = Modifier,
-                    Alignment.Center
+                    modifier = Modifier, Alignment.Center
                 ) {
                     CircularProgressIndicator(modifier = Modifier)
                 }
@@ -228,19 +244,20 @@ fun EmbeddedSearchBar(
 
 @Composable
 private fun SearchItemList(
-    users: LazyPagingItems<UserModel>,
-    modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    users: LazyPagingItems<UserModel>, modifier: Modifier = Modifier, onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
-        items(users.itemCount, key = null, contentType = {}) { user ->
-            users[user]?.let {
-                HomeItem(it, onClick = { onClick(it.login) })
-            }
+        items(
+            users.itemCount,
+            key = { users[it]?.login!! },
+            contentType = { 0 }
+        ) { index ->
+            val user = users[index] as UserModel
+            HomeItem(user, onClick = { onClick(user.login) })
         }
     }
 }
@@ -248,11 +265,8 @@ private fun SearchItemList(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun HomeItem(
-    user: UserModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -266,15 +280,13 @@ private fun HomeItem(
             model = (user.avatar),
             modifier = Modifier
                 .padding(horizontal = 8.dp)
-                .heightIn(max = 80.dp, min = 20.dp)
-                .widthIn(max = 80.dp, min = 20.dp)
+                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
             contentDescription = null
         )
         Text(
-            text = user.login,
-            fontWeight = FontWeight.Bold
+            text = user.login, fontWeight = FontWeight.Bold
         )
     }
 }
@@ -282,11 +294,8 @@ private fun HomeItem(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
-    user: UserModel?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    user: UserModel?, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
-
     if (user != null) {
         Row(
             modifier = modifier
@@ -301,8 +310,7 @@ private fun SearchResultItem(
                 model = (user.avatar),
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .height(80.dp)
-                    .width(80.dp)
+                    .size(80.dp)
                     .clip(
                         CircleShape
                     ),
