@@ -253,7 +253,7 @@ fun FilterDialog(
                 )
                 RadioButtons(
                     selectedItemId = selectedItemId,
-                    declarations,
+                    RadioItems(declarations),
                     selectedItem = { string ->
                         declarations.indexOf(string).also { onSelectedItemChange(it) }
                     })
@@ -279,8 +279,7 @@ fun FilterDialog(
 @Composable
 fun RadioButtons(
     selectedItemId: Int,
-    // TODO type
-    declaration: List<String>,
+    items: RadioItems,
     selectedItem: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -292,6 +291,7 @@ fun RadioButtons(
     }
 
     Column(modifier = modifier.padding(top = 10.dp)) {
+        val declaration = items.list
         declaration.forEach { item ->
             Column {
                 Row(
@@ -317,3 +317,6 @@ fun RadioButtons(
         }
     }
 }
+data class RadioItems(
+    val list: List<String>
+)
