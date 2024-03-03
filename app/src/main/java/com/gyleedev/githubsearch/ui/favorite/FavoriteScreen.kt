@@ -54,6 +54,7 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val users = viewModel.items.collectAsLazyPagingItems()
+    users.refresh()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
     val user = remember {
@@ -62,7 +63,6 @@ fun FavoriteScreen(
     val selectedItem = remember {
         mutableIntStateOf(2)
     }
-
 
     Scaffold(
         topBar = {
@@ -160,11 +160,13 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
-        // TODO key, contentType
-        items(users.itemCount, key = null, contentType = {}) { user ->
-            users[user]?.let { it ->
-                FavoriteItem(it, onClick = { onClick(it.login) }, onLongClick = { onLongClick(it) })
-            }
+        items(users.itemCount, key = { users[it]!!.login }, contentType = {0}) { index ->
+            val user = users[index] as UserModel
+            FavoriteItem(
+                user,
+                onClick = { onClick(user.login) },
+                onLongClick = { onLongClick(it) }
+            )
         }
     }
 }
