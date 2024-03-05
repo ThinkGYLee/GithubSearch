@@ -1,24 +1,27 @@
 package com.gyleedev.githubsearch.ui.home
 
-import androidx.compose.foundation.background
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +32,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,24 +42,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val users = viewModel.getUsers().collectAsLazyPagingItems()
+    val users = viewModel.users.collectAsLazyPagingItems()
+    users.refresh()
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
+    val loading by viewModel.loading.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchState.collect { fetchState ->
+            viewModel.changeLoadingState()
+            Toast.makeText(context, "$fetchState", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -76,27 +96,47 @@ fun HomeScreen(
                 onSearchItemReset = { viewModel.resetUser() },
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
+                loading = loading,
                 modifier = Modifier
             )
-        },
-        modifier = modifier
+        }, modifier = modifier
             .fillMaxSize()
             .padding(4.dp)
     ) { paddingValues ->
+        when (users.loadState.refresh) {
+            is LoadState.Loading -> {
+                Surface(
+                    modifier = modifier.fillMaxSize(),
+                ) {
+                    Box(
+                        modifier = Modifier, Alignment.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier)
+                    }
+                }
+            }
 
-        if (users.itemCount > 0) {
-            SearchItemList(
-                modifier = Modifier.padding(paddingValues),
-                users = users,
-                onClick = { moveToDetail(it) }
-            )
-        } else {
-            NoItem(
-                modifier = modifier.padding(paddingValues)
-            )
+            is LoadState.Error -> {
+                NoItem(
+                    modifier = modifier.padding(paddingValues)
+                )
+            }
+
+            else -> {
+                if (users.itemCount > 0) {
+                    SearchItemList(modifier = modifier.padding(paddingValues),
+                        users = users,
+                        onClick = { moveToDetail(it) })
+                } else {
+                    NoItem(
+                        modifier = modifier.padding(paddingValues)
+                    )
+                }
+            }
         }
     }
 }
+
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,6 +148,7 @@ fun EmbeddedSearchBar(
     onSearchItemReset: () -> Unit,
     moveToDetail: () -> Unit,
     user: UserModel?,
+    loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -128,7 +169,7 @@ fun EmbeddedSearchBar(
         active = isSearchActive,
         onActiveChange = activeChanged,
         modifier = modifier,
-        placeholder = { Text("Search") },
+        placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
@@ -186,28 +227,39 @@ fun EmbeddedSearchBar(
         }
     ) {
         SearchResultItem(
-            user = user,
-            onClick = moveToDetail,
-            modifier = Modifier
+            user = user, onClick = moveToDetail, modifier = Modifier
         )
+
+        if (loading) {
+            Surface(
+                modifier = modifier.fillMaxSize(),
+            ) {
+                Box(
+                    modifier = Modifier, Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier)
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun SearchItemList(
-    users: LazyPagingItems<UserModel>,
-    modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    users: LazyPagingItems<UserModel>, modifier: Modifier = Modifier, onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
-        items(users.itemCount, key = null, contentType = {}) { user ->
-            users[user]?.let {
-                HomeItem(it, onClick = { onClick(it.login) })
-            }
+        items(
+            users.itemCount,
+            key = { users[it]?.login!! },
+            contentType = { 0 }
+        ) { index ->
+            val user = users[index] as UserModel
+            HomeItem(user, onClick = { onClick(user.login) })
         }
     }
 }
@@ -215,100 +267,80 @@ private fun SearchItemList(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun HomeItem(
-    user: UserModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier,
-        onClick = onClick
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
+        GlideImage(
+            model = (user.avatar),
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            GlideImage(
-                model = (user.avatar),
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-            Text(
-                text = user.login,
-                fontWeight = FontWeight.Bold
-            )
-        }
+                .padding(horizontal = 8.dp)
+                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop,
+            contentDescription = null
+        )
+        Text(
+            text = user.login, fontWeight = FontWeight.Bold
+        )
     }
-
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
-    user: UserModel?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    user: UserModel?, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        onClick = onClick
-    ) {
-        if (user != null) {
-            Row(
+    if (user != null) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .padding(12.dp)
+                .clickable(onClick = onClick),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            GlideImage(
+                model = (user.avatar),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 80.dp)
-                    .padding(12.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                GlideImage(
-                    model = (user.avatar),
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .height(80.dp)
-                        .width(80.dp)
-                        .clip(
-                            CircleShape
-                        ),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
+                    .padding(horizontal = 8.dp)
+                    .size(80.dp)
+                    .clip(
+                        CircleShape
+                    ),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+
+            Column {
+                if (user.name != null) {
+                    Text(
+                        text = user.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Text(
+                    text = user.login,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
 
-                Column {
-                    if (user.name != null) {
-                        Text(
-                            text = user.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
+                if (user.bio != null) {
                     Text(
-                        text = user.login,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        text = user.bio,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
                     )
-
-                    if (user.bio != null) {
-                        Text(
-                            text = user.bio,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                 }
             }
         }
@@ -319,19 +351,15 @@ private fun SearchResultItem(
 private fun NoItem(
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    Column(
         modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "No Saved Item",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-        }
+        Text(
+            text = stringResource(id = R.string.home_no_item),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }

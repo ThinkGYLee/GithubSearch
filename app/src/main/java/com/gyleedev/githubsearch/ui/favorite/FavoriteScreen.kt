@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -34,8 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +44,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 
@@ -56,6 +56,7 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val users = viewModel.items.collectAsLazyPagingItems()
+    users.refresh()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
     val user = remember {
@@ -65,16 +66,15 @@ fun FavoriteScreen(
         mutableIntStateOf(2)
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Favorite") },
+                title = { Text(text = stringResource(id = R.string.title_favorite)) },
                 actions = {
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = "favorite button",
+                            contentDescription = stringResource(id = R.string.icon_content_description_filter),
                         )
                     }
                 },
@@ -105,14 +105,14 @@ fun FavoriteScreen(
     if (showDeleteDialog.value) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog.value = false },
-            title = { Text(text = "즐겨찾기를 해제하겠습니까?") },
+            title = { Text(text = stringResource(id = R.string.text_delete_favorite_title)) },
             confirmButton = {
                 Button(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
                     }) {
-                    Text("확인")
+                    Text(stringResource(id = R.string.text_delete_favorite_confirm))
                 }
             },
             dismissButton = {
@@ -121,7 +121,7 @@ fun FavoriteScreen(
                         showDeleteDialog.value = false
                         user.value = null
                     }) {
-                    Text("취소")
+                    Text(stringResource(id = R.string.text_delete_favorite_cancel))
                 }
             }
         )
@@ -162,11 +162,13 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
-        // TODO key, contentType
-        items(users.itemCount, key = null, contentType = {}) { user ->
-            users[user]?.let { it ->
-                FavoriteItem(it, onClick = { onClick(it.login) }, onLongClick = { onLongClick(it) })
-            }
+        items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
+            val user = users[index] as UserModel
+            FavoriteItem(
+                user,
+                onClick = { onClick(user.login) },
+                onLongClick = { onLongClick(it) }
+            )
         }
     }
 }
@@ -219,7 +221,7 @@ private fun NoItem(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No Saved Item",
+            text = stringResource(id = R.string.favorite_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -233,23 +235,31 @@ fun FilterDialog(
     onFilterChange: () -> Unit,
     onSelectedItemChange: (Int) -> Unit
 ) {
-    val declarations = listOf("공개 repository가 있는 유저", "공개 repository가 없는 유저", "전체")
+    val declarations = listOf(
+        stringResource(id = R.string.filter_list_has_repos),
+        stringResource(id = R.string.filter_list_no_repos),
+        stringResource(id = R.string.filter_list_all)
+    )
 
     AlertDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
-                text = "필터",
+                text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         },
         text = {
             Column {
-                Text(text = "조건을 선택하세요", modifier = Modifier.padding(bottom = 5.dp))
+                Text(
+                    text = stringResource(id = R.string.text_filter_content),
+                    modifier = Modifier.padding(bottom = 5.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 RadioButtons(
                     selectedItemId = selectedItemId,
-                    declarations,
+                    RadioItems(declarations),
                     selectedItem = { string ->
                         declarations.indexOf(string).also { onSelectedItemChange(it) }
                     })
@@ -257,28 +267,25 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = "취소", color = Color.Black)
+                Text(text = stringResource(id = R.string.text_filter_cancel))
             }
         },
         confirmButton = {
-
             TextButton(
                 onClick = {
                     onFilterChange()
                     onChangeState(false)
                 }) {
-                Text(text = "확인", color = Color.Black)
+                Text(text = stringResource(id = R.string.text_filter_confirm))
             }
         }
     )
-
 }
 
 @Composable
 fun RadioButtons(
     selectedItemId: Int,
-    // TODO type
-    declaration: List<String>,
+    items: RadioItems,
     selectedItem: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -290,25 +297,33 @@ fun RadioButtons(
     }
 
     Column(modifier = modifier.padding(top = 10.dp)) {
+        val declaration = items.list
         declaration.forEach { item ->
             Column {
                 Row(
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
                         .selectable(
                             selected = isSelectedItem(item),
                             onClick = { onChangeState(item) },
                             role = Role.RadioButton
                         )
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = declaration[selectedItemId] == item,
                         onClick = null,
                         modifier = Modifier.padding(end = 5.dp)
                     )
-                    Text(text = item)
+                    Text(text = item, style = MaterialTheme.typography.labelMedium)
                 }
             }
         }
     }
 }
+
+data class RadioItems(
+    val list: List<String>
+)

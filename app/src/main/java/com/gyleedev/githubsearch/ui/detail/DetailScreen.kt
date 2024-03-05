@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,7 +59,7 @@ fun DetailScreen(
                     IconButton(onClick = onClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "back"
+                            contentDescription = stringResource(id = R.string.icon_content_description_arrow_back)
                         )
                     }
                 },
@@ -67,12 +68,12 @@ fun DetailScreen(
                         if (status) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
-                                contentDescription = "favorite button",
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled)
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = "favorite button",
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered)
                             )
                         }
                     }
@@ -139,7 +140,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "repos",
+                text = stringResource(id = R.string.detail_user_title_repos),
             )
         }
 
@@ -149,7 +150,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "followers",
+                text = stringResource(id = R.string.detail_user_title_follower),
             )
         }
 
@@ -159,7 +160,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "following",
+                text = stringResource(id = R.string.detail_user_title_following),
             )
         }
     }
@@ -255,7 +256,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
 @Composable
 private fun DetailRepoTitle() {
     Text(
-        text = "Repository",
+        text = stringResource(id = R.string.detail_repos_title_text),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
@@ -303,7 +304,7 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
 @Composable
 private fun DetailRepoNoItem() {
     Text(
-        text = "No Repository",
+        text = stringResource(id = R.string.detail_repo_no_item),
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 12.dp),

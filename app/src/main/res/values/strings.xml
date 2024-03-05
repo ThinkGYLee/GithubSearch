@@ -3,5 +3,28 @@
     <string name="title_detail">Detail</string>
     <string name="title_favorite">Favorite</string>
     <string name="title_search">Search</string>
-가    <string name="title_setting">Setting</string>
+    <string name="title_setting">Setting</string>
+    <string name="placeholder_searchbar">Search</string>
+    <string name="home_no_item">No Saved Items</string>
+    <string name="detail_user_title_repos">repos</string>
+    <string name="detail_user_title_follower">follower</string>
+    <string name="detail_user_title_following">following</string>
+    <string name="detail_repos_title_text">Repository</string>
+    <string name="detail_repo_no_item">No Repository</string>
+    <string name="icon_content_description_arrow_back">Arrow Back Icon</string>
+    <string name="icon_content_description_favorite_filled">Filled Favorite Icon</string>
+    <string name="icon_content_description_favorite_bordered">Bordered Favorite Icon</string>
+    <string name="icon_content_description_filter">Filter Icon</string>
+    <string name="text_delete_favorite_title">Remove From Favorite?</string>
+    <string name="text_delete_favorite_confirm">Yes</string>
+    <string name="text_delete_favorite_cancel">No</string>
+    <string name="favorite_no_item">No Favorite Item</string>
+    <string name="text_filter_title">Filter</string>
+    <string name="text_filter_content">Set Filter Conditions</string>
+    <string name="text_filter_confirm">Confirm</string>
+    <string name="text_filter_cancel">Cancel</string>
+    <string name="filter_list_all">All</string>
+    <string name="filter_list_has_repos">User Has Public Repository</string>
+    <string name="filter_list_no_repos">User Has No Repository</string>
+
 </resources>

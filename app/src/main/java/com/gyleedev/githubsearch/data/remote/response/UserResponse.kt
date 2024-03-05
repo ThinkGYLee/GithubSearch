@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.remote.response
+package com.gyleedev.githubsearch.data.remote.response
 
 import com.google.gson.annotations.SerializedName
 import com.gyleedev.githubsearch.domain.model.UserModel

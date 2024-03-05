@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.ui
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,13 +48,11 @@ sealed class BottomNavItem(
 }
 
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchApp(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
-
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
 
     Scaffold(
         bottomBar = {
@@ -72,7 +72,6 @@ fun GithubSearchApp(
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                 )
             }
-
 
             composable(
                 route = "${BottomNavItem.Detail.screenRoute}/{id}",
@@ -106,7 +105,6 @@ fun GithubSearchApp(
                         .padding(),
                 )
             }
-
         }
     }
 }

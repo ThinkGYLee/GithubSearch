@@ -11,7 +11,7 @@ import com.gyleedev.githubsearch.data.database.entity.AccessTime
 @Dao
 interface AccessTimeDao {
     @Query("SELECT * FROM access_time WHERE github_id = :id  COLLATE NOCASE")
-    fun getTimeByGithubId(id: String): AccessTime
+    fun getTimeByGithubId(id: String): AccessTime?
 
     @Insert
     fun insertTime(accessTime: AccessTime)

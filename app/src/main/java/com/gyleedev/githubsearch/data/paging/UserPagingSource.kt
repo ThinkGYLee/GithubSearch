@@ -13,19 +13,20 @@ class UserPagingSource(
 ) : PagingSource<Int, UserEntity>() {
     override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey
+            val anchorPage = state.closestPageToPosition(anchorPosition)
+            anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserEntity> {
         val page = params.key ?: 1
         return try {
-            var data: List<UserEntity>? = null
+            val data: List<UserEntity>?
             data = withContext(Dispatchers.IO) { dao.getUsers(page) }
             LoadResult.Page(
                 data = data,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = if (data.isEmpty()) null else page + 1
+                nextKey = if (data.size < 10) null else page + 1
             )
         } catch (exception: IOException) {
             LoadResult.Error(exception)
