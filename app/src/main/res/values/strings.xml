@@ -6,4 +6,12 @@
     <string name="title_setting">Setting</string>
     <string name="placeholder_searchbar">Search</string>
     <string name="home_no_item">No Saved Items</string>
+    <string name="detail_user_title_repos">repos</string>
+    <string name="detail_user_title_follower">follower</string>
+    <string name="detail_user_title_following">following</string>
+    <string name="detail_repos_title_text">Repository</string>
+    <string name="detail_repo_no_item">No Repository</string>
+    <string name="icon_content_description_arrow_back">Arrow Back Icon</string>
+    <string name="icon_content_description_favorite_filled">Filled Favorite Button</string>
+    <string name="icon_content_description_favorite_bordered">Bordered Favorite Button</string>
 </resources>
