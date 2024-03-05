@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +44,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 
@@ -67,12 +69,12 @@ fun FavoriteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Favorite") },
+                title = { Text(text = stringResource(id = R.string.title_favorite)) },
                 actions = {
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = "favorite button",
+                            contentDescription = stringResource(id = R.string.icon_content_description_filter),
                         )
                     }
                 },
@@ -103,14 +105,14 @@ fun FavoriteScreen(
     if (showDeleteDialog.value) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog.value = false },
-            title = { Text(text = "즐겨찾기를 해제하겠습니까?") },
+            title = { Text(text = stringResource(id = R.string.text_delete_favorite_title)) },
             confirmButton = {
                 Button(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
                     }) {
-                    Text("확인")
+                    Text(stringResource(id = R.string.text_delete_favorite_confirm))
                 }
             },
             dismissButton = {
@@ -119,7 +121,7 @@ fun FavoriteScreen(
                         showDeleteDialog.value = false
                         user.value = null
                     }) {
-                    Text("취소")
+                    Text(stringResource(id = R.string.text_delete_favorite_cancel))
                 }
             }
         )
@@ -160,7 +162,7 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp)
     ) {
-        items(users.itemCount, key = { users[it]!!.login }, contentType = {0}) { index ->
+        items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
             val user = users[index] as UserModel
             FavoriteItem(
                 user,
@@ -219,7 +221,7 @@ private fun NoItem(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No Saved Item",
+            text = stringResource(id = R.string.favorite_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -233,13 +235,17 @@ fun FilterDialog(
     onFilterChange: () -> Unit,
     onSelectedItemChange: (Int) -> Unit
 ) {
-    val declarations = listOf("공개 repository가 있는 유저", "공개 repository가 없는 유저", "전체")
+    val declarations = listOf(
+        stringResource(id = R.string.filter_list_has_repos),
+        stringResource(id = R.string.filter_list_no_repos),
+        stringResource(id = R.string.filter_list_all)
+    )
 
     AlertDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
-                text = "필터",
+                text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -247,7 +253,7 @@ fun FilterDialog(
         text = {
             Column {
                 Text(
-                    text = "조건을 선택하세요",
+                    text = stringResource(id = R.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -261,7 +267,7 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = "취소")
+                Text(text = stringResource(id = R.string.text_filter_cancel))
             }
         },
         confirmButton = {
@@ -270,7 +276,7 @@ fun FilterDialog(
                     onFilterChange()
                     onChangeState(false)
                 }) {
-                Text(text = "확인")
+                Text(text = stringResource(id = R.string.text_filter_confirm))
             }
         }
     )
@@ -317,6 +323,7 @@ fun RadioButtons(
         }
     }
 }
+
 data class RadioItems(
     val list: List<String>
 )
