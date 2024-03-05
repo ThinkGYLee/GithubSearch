@@ -103,6 +103,7 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(4.dp)
     ) { paddingValues ->
+
         when (users.loadState.refresh) {
             is LoadState.Loading -> {
                 Surface(
@@ -118,7 +119,7 @@ fun HomeScreen(
 
             is LoadState.Error -> {
                 NoItem(
-                    modifier = modifier.padding(paddingValues)
+                    modifier = modifier
                 )
             }
 
@@ -129,7 +130,7 @@ fun HomeScreen(
                         onClick = { moveToDetail(it) })
                 } else {
                     NoItem(
-                        modifier = modifier.padding(paddingValues)
+                        modifier = modifier
                     )
                 }
             }
