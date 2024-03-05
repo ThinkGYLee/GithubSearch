@@ -4,7 +4,9 @@ import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -53,22 +55,23 @@ sealed class BottomNavItem(
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
 ) {
-
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController = navController)
-        }
+            BottomNavigation(navController = navController, modifier = Modifier)
+        },
+        modifier = Modifier
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding() / 2)
+                .statusBarsPadding()
         ) {
+
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(),
+                    modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                 )
             }
@@ -83,17 +86,14 @@ fun GithubSearchApp(
                 )
             ) {
                 DetailScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(),
+                    modifier = Modifier.fillMaxSize(),
                     onClick = { navController.navigateUp() }
                 )
             }
+
             composable(route = BottomNavItem.Favorite.screenRoute) {
                 FavoriteScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(),
+                    modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                 )
             }
@@ -102,7 +102,6 @@ fun GithubSearchApp(
                 SettingScreen(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(),
                 )
             }
         }
@@ -110,7 +109,7 @@ fun GithubSearchApp(
 }
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Favorite,
@@ -119,7 +118,8 @@ fun BottomNavigation(navController: NavHostController) {
 
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground
+        contentColor = MaterialTheme.colorScheme.onBackground,
+        modifier = modifier.navigationBarsPadding()
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
