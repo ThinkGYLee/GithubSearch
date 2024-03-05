@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,6 +53,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -167,7 +169,7 @@ fun EmbeddedSearchBar(
         active = isSearchActive,
         onActiveChange = activeChanged,
         modifier = modifier,
-        placeholder = { Text("Search") },
+        placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
@@ -355,7 +357,7 @@ private fun NoItem(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No Saved Item",
+            text = stringResource(id = R.string.home_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )

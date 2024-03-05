@@ -3,5 +3,7 @@
     <string name="title_detail">Detail</string>
     <string name="title_favorite">Favorite</string>
     <string name="title_search">Search</string>
-가    <string name="title_setting">Setting</string>
+    <string name="title_setting">Setting</string>
+    <string name="placeholder_searchbar">Search</string>
+    <string name="home_no_item">No Saved Items</string>
 </resources>
