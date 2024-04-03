@@ -9,7 +9,7 @@ Github의 유저 정보를 검색하고 즐겨찾기에 등록하여 언제든�
 - IDE : Android Studio Iguana ([Download](https://developer.android.com/studio))
 - JDK : Java 17을 실행할 수 있는 JDK
 
-- Kotlin Language : 1.9.0
+- Kotlin Language : 1.9.22
 
 ### Language
 
