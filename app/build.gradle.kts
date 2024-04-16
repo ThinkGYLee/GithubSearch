@@ -25,6 +25,8 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "GPGKEY", getApiKey("gpgkey"))
+        buildConfigField("String", "GIT_ID", getApiKey("GITHUB_CLIENT_ID"))
+        buildConfigField("String", "GIT_SECRET", getApiKey("GITHUB_CLIENT_SECRET"))
     }
 
     buildTypes {
