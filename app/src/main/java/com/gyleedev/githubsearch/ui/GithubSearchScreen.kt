@@ -54,6 +54,7 @@ sealed class BottomNavItem(
 @Composable
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
+    onLoginClicked: () -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -101,7 +102,8 @@ fun GithubSearchApp(
             composable(route = BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    onClick = { onLoginClicked() }
                 )
             }
         }
