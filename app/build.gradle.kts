@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.gyleedev.githubsearch"
-        minSdk = 26
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -25,6 +25,8 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "GPGKEY", getApiKey("gpgkey"))
+        buildConfigField("String", "GIT_ID", getApiKey("GITHUB_CLIENT_ID"))
+        buildConfigField("String", "GIT_SECRET", getApiKey("GITHUB_CLIENT_SECRET"))
     }
 
     buildTypes {
@@ -119,7 +121,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:compiler:4.16.0")
@@ -131,6 +133,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation ("androidx.browser:browser:1.8.0")
 }
 
 fun getApiKey(propertyKey: String): String {

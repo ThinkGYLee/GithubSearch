@@ -11,9 +11,11 @@ import com.gyleedev.githubsearch.data.database.entity.AccessTime
 import com.gyleedev.githubsearch.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
-import com.gyleedev.githubsearch.data.paging.FavoritePagingSource
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
+import com.gyleedev.githubsearch.data.remote.AccessService
 import com.gyleedev.githubsearch.data.remote.GithubApiService
+import com.gyleedev.githubsearch.data.remote.NetworkModule
+import com.gyleedev.githubsearch.data.remote.response.GithubAccessResponse
 import com.gyleedev.githubsearch.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
@@ -22,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import java.time.Instant
 import javax.inject.Inject
 
@@ -34,13 +37,20 @@ interface GitHubRepository {
     suspend fun getDetailUser(githubId: String): UserModel?
     suspend fun updateUserFavorite(id: String): UserModel?
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
+
+    suspend fun getAccessToken(
+        id: String,
+        secret: String,
+        code: String
+    ): Response<GithubAccessResponse>
 }
 
 class GitHubRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val reposDao: ReposDao,
     private val accessTimeDao: AccessTimeDao,
-    private val githubApiService: GithubApiService
+    @NetworkModule.TypeApi private val githubApiService: GithubApiService,
+    @NetworkModule.TypeAccess private val accessService: AccessService
 ) : GitHubRepository {
 
     override fun getUsers(): Flow<PagingData<UserModel>> {
@@ -60,7 +70,9 @@ class GitHubRepositoryImpl @Inject constructor(
             pageSize = 10,
             enablePlaceholders = false
         ),
-            pagingSourceFactory = { FavoritePagingSource(userDao, status) }
+            pagingSourceFactory = {
+                userDao.getUsers(status)
+            }
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
@@ -200,4 +212,12 @@ class GitHubRepositoryImpl @Inject constructor(
         )
         return userDao.getUser(id).toModel()
     }
+
+    override suspend fun getAccessToken(
+        id: String,
+        secret: String,
+        code: String
+    ) = accessService.getAccessToken(clientId = id, clientSecret = secret, code = code)
+
+
 }

@@ -26,5 +26,6 @@
     <string name="filter_list_all">All</string>
     <string name="filter_list_has_repos">User Has Public Repository</string>
     <string name="filter_list_no_repos">User Has No Repository</string>
+    <string name="log_in_toast_message">login success</string>
 
 </resources>

@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 fun SettingScreen(
 
     modifier: Modifier = Modifier,
+    onClick: () -> Unit
 
     ) {
 
@@ -106,7 +107,7 @@ fun SettingScreen(
                                     .fillMaxWidth()
                                     .heightIn(min = 48.dp)
                                     .background(MaterialTheme.colorScheme.surfaceContainer)
-                                    .clickable { }
+                                    .clickable { onClick() }
                                     .padding(vertical = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
