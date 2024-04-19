@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.gyleedev.githubsearch"
-        minSdk = 26
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -133,7 +133,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation ("androidx.browser:browser:1.5.0")
+    implementation ("androidx.browser:browser:1.8.0")
 }
 
 fun getApiKey(propertyKey: String): String {
