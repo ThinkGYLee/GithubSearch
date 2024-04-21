@@ -16,8 +16,8 @@
     <string name="icon_content_description_favorite_bordered">Bordered Favorite Icon</string>
     <string name="icon_content_description_filter">Filter Icon</string>
     <string name="text_delete_favorite_title">Remove From Favorite?</string>
-    <string name="text_delete_favorite_confirm">Yes</string>
-    <string name="text_delete_favorite_cancel">No</string>
+    <string name="text_dialog_confirm">Yes</string>
+    <string name="text_dialog_cancel">No</string>
     <string name="favorite_no_item">No Favorite Item</string>
     <string name="text_filter_title">Filter</string>
     <string name="text_filter_content">Set Filter Conditions</string>
@@ -26,6 +26,13 @@
     <string name="filter_list_all">All</string>
     <string name="filter_list_has_repos">User Has Public Repository</string>
     <string name="filter_list_no_repos">User Has No Repository</string>
-    <string name="log_in_toast_message">login success</string>
-
+    <string name="log_in_success_message">login success</string>
+    <string name="log_in_fail_message">login failed try again</string>
+    <string name="search_result_no_user">no such user change the keyword</string>
+    <string name="socket_exception">network is weak</string>
+    <string name="http_exception">bad server status</string>
+    <string name="unknown_host_exception">check your network</string>
+    <string name="etc_exception">search failed</string>
+    <string name="title_request_authentication">Authentication Request</string>
+    <string name="content_request_authentication">Authentication is required to search more</string>
 </resources>
