@@ -30,7 +30,7 @@
     <string name="log_in_fail_message">login failed try again</string>
     <string name="search_result_no_user">no such user change the keyword</string>
     <string name="socket_exception">network is weak</string>
-    <string name="http_exception">bad server status</string>
+    <string name="http_exception">bad network status</string>
     <string name="unknown_host_exception">check your network</string>
     <string name="etc_exception">search failed</string>
     <string name="title_request_authentication">Authentication Request</string>
