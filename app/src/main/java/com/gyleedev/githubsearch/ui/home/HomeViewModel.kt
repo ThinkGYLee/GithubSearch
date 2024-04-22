@@ -4,21 +4,19 @@ import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.core.BaseViewModel
-import com.gyleedev.githubsearch.data.remote.response.GithubAccessResponse
 import com.gyleedev.githubsearch.data.repository.GitHubRepository
+import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.model.UserWrapper
 import com.gyleedev.githubsearch.domain.usecase.HomeGetUsersUseCase
 import com.gyleedev.githubsearch.domain.usecase.HomeSearchUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,42 +35,52 @@ class HomeViewModel @Inject constructor(
 
     val users = getUsersUseCase().cachedIn(viewModelScope)
 
-    private val _saveToken = MutableSharedFlow<String>()
-    val saveToken: SharedFlow<String> = _saveToken
+    private val _errorAlert = MutableSharedFlow<SearchStatus>()
+    val errorAlert: SharedFlow<SearchStatus> = _errorAlert
+
+    private val _requestAuthentication = MutableSharedFlow<Unit>()
+    val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun getUser() {
         viewModelScope.launch(exceptionHandler) {
-            changeLoadingState()
-            _userInfo.emit(searchUserUseCase(_searchId.value))
-            changeLoadingState()
+            when (val userWrapper = searchUserUseCase(_searchId.value)) {
+                is UserWrapper.FromDatabase -> {
+                    _userInfo.emit(userWrapper.data)
+                }
+
+                is UserWrapper.Success -> {
+                    _userInfo.emit(userWrapper.data)
+                }
+
+                is UserWrapper.Failure -> {
+                    alertResponseFail(userWrapper)
+                }
+            }
+            _loading.emit(false)
         }
     }
 
-    suspend fun getAccessToken(code: String) {
-        withContext(Dispatchers.IO) {
-            val response = repository.getAccessToken(
-                id = BuildConfig.GIT_ID,
-                secret = BuildConfig.GIT_SECRET,
-                code = code
-            )
+    private suspend fun alertResponseFail(userWrapper: UserWrapper) {
+        val wrapper = userWrapper as UserWrapper.Failure
+        when (wrapper.status) {
 
-            if (response.isSuccessful) {
-                response.body().let {
-                    if (it != null) {
-                        emitAccessToken(githubAccessResponse = it)
-                    }
-                }
+            SearchStatus.NEED_AUTHENTICATION -> {
+                _requestAuthentication.emit(Unit)
+            }
+
+            else -> {
+                _errorAlert.emit(wrapper.status)
             }
         }
     }
 
-    private suspend fun emitAccessToken(githubAccessResponse: GithubAccessResponse) {
-        _saveToken.emit(githubAccessResponse.accessToken)
-    }
-
     suspend fun changeLoadingState() {
         _loading.emit(!_loading.value)
+    }
+
+    suspend fun stopLoading() {
+        _loading.emit(false)
     }
 
     fun updateSearchId(id: String) {

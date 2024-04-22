@@ -1,9 +1,12 @@
 package com.gyleedev.githubsearch.data.remote
 
+import android.content.Context
 import com.gyleedev.githubsearch.BuildConfig
+import com.gyleedev.githubsearch.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -24,26 +27,32 @@ class NetworkModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class TypeApi
 
-    @Provides
-    fun provideBaseApiUrl() = "https://api.github.com"
+    private val apiUrl = "https://api.github.com"
+    private val accessUrl = "https://github.com"
 
     @Provides
-    fun provideBaseAccessUrl() = "https://github.com"
+    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
+        return PreferenceUtil(context)
+    }
+
 
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiOkHttpClient(): OkHttpClient = if (BuildConfig.DEBUG) {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        val tokenInterceptor = TokenInterceptor()
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        OkHttpClient.Builder()
-            .addInterceptor(tokenInterceptor)
-            .addNetworkInterceptor(loggingInterceptor)
-            .build()
-    } else {
-        OkHttpClient.Builder().build()
-    }
+    fun provideApiOkHttpClient(preferenceUtil: PreferenceUtil): OkHttpClient =
+        if (BuildConfig.DEBUG) {
+
+            val loggingInterceptor = HttpLoggingInterceptor()
+            val tokenInterceptor = TokenInterceptor(preferenceUtil)
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+            OkHttpClient.Builder()
+                .addInterceptor(tokenInterceptor)
+                .addNetworkInterceptor(loggingInterceptor)
+                .build()
+        } else {
+            OkHttpClient.Builder().build()
+        }
 
     @Singleton
     @Provides
@@ -51,7 +60,7 @@ class NetworkModule {
     fun provideApiRetrofit(@TypeApi okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(provideBaseApiUrl())
+            .baseUrl(apiUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -69,6 +78,7 @@ class NetworkModule {
     fun provideAccessOkHttpClient(): OkHttpClient = if (BuildConfig.DEBUG) {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .build()
@@ -82,7 +92,7 @@ class NetworkModule {
     fun provideAccessRetrofit(@TypeAccess okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(provideBaseAccessUrl())
+            .baseUrl(accessUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

@@ -112,7 +112,7 @@ fun FavoriteScreen(
                         showDeleteDialog.value = false
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
                     }) {
-                    Text(stringResource(id = R.string.text_delete_favorite_confirm))
+                    Text(stringResource(id = R.string.text_dialog_confirm))
                 }
             },
             dismissButton = {
@@ -121,7 +121,7 @@ fun FavoriteScreen(
                         showDeleteDialog.value = false
                         user.value = null
                     }) {
-                    Text(stringResource(id = R.string.text_delete_favorite_cancel))
+                    Text(stringResource(id = R.string.text_dialog_cancel))
                 }
             }
         )

@@ -1,8 +1,12 @@
 package com.gyleedev.githubsearch.ui.home
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +25,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,13 +59,17 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.domain.model.FetchState
+import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
+    requestToken: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -71,8 +81,58 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
-            viewModel.changeLoadingState()
-            Toast.makeText(context, "$fetchState", Toast.LENGTH_SHORT).show()
+            viewModel.stopLoading()
+            val message = when (fetchState) {
+                FetchState.WRONG_CONNECTION -> {
+                    context.getString(R.string.unknown_host_exception)
+                }
+
+                FetchState.BAD_INTERNET -> {
+                    context.getString(R.string.socket_exception)
+                }
+
+                FetchState.PARSE_ERROR -> {
+                    context.getString(R.string.http_exception)
+                }
+
+                FetchState.FAIL -> {
+                    context.getString(R.string.etc_exception)
+                }
+            }
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.errorAlert.collect { status ->
+            when (status) {
+                SearchStatus.NO_SUCH_USER -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.search_result_no_user),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                SearchStatus.BAD_NETWORK -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.http_exception),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {
+                    println("no information error $status")
+                }
+            }
+        }
+    }
+    var showRequestAuthenticationDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.requestAuthentication.collect {
+            showRequestAuthenticationDialog = true
         }
     }
 
@@ -135,7 +195,50 @@ fun HomeScreen(
                 }
             }
         }
+
+        if (showRequestAuthenticationDialog) {
+            AlertDialog(
+                onDismissRequest = { showRequestAuthenticationDialog = false },
+                title = { Text(text = stringResource(id = R.string.title_request_authentication)) },
+                text = { Text(text = stringResource(id = R.string.content_request_authentication)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showRequestAuthenticationDialog = false
+                            requestToken()
+                            login(context)
+                        }) {
+                        Text(stringResource(id = R.string.text_dialog_confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showRequestAuthenticationDialog = false
+                        }) {
+                        Text(stringResource(id = R.string.text_dialog_cancel))
+                    }
+                }
+            )
+        }
     }
+}
+
+fun login(context: Context) {
+    val clientId = BuildConfig.GIT_ID
+    val loginUrl = Uri.Builder().scheme("https").authority("github.com")
+        .appendPath("login")
+        .appendPath("oauth")
+        .appendPath("authorize")
+        .appendQueryParameter("client_id", clientId)
+        .build()
+
+    val customTabsIntent = CustomTabsIntent.Builder().build()
+
+    //아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
+    customTabsIntent.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    customTabsIntent.launchUrl(context, loginUrl)
+
 }
 
 

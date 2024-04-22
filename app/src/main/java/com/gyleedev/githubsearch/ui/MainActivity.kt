@@ -2,7 +2,6 @@ package com.gyleedev.githubsearch.ui
 
 import android.content.Context
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,10 +13,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresExtension
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
-import com.gyleedev.githubsearch.ui.home.HomeViewModel
 import com.gyleedev.githubsearch.ui.theme.GithubSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<MainViewModel>()
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,20 +41,17 @@ class MainActivity : ComponentActivity() {
             GithubSearchTheme {
                 GithubSearchApp(
                     onLoginClicked = {
-                        try {
-                            login(this)
-                        } catch (e: Error) {
-                            println("e")
-                        }
+                        login(this)
                     }
                 )
             }
         }
 
         lifecycleScope.launch {
-            viewModel.saveToken.collect {
-                updateToken(it)
-                showLoginMessage()
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.alertLoginSuccess.collect {
+                    showLoginResult(it)
+                }
             }
         }
     }
@@ -78,40 +75,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        println("onResume")
         // ViewModel에서 로그인한거 받아서 처리
         intent?.data?.getQueryParameter("code")?.let {
-            println("onResume code: $it")
-
-            // 엑세스 토큰 받아와야함
-            lifecycleScope.launch {
-                try {
-                    viewModel.getAccessToken(it)
-                } catch (e: Error) {
-                    println(e)
-                }
+            if (it.isNotEmpty()) {
+                viewModel.getAccessToken(it)
+            } else {
+                println("Error exists check your network status")
             }
         }
     }
 
-    private fun showLoginMessage() {
+    private fun showLoginResult(result: Boolean) {
+        val resultMessage = if (result) {
+            getString(R.string.log_in_success_message)
+        } else {
+            getString(R.string.log_in_fail_message)
+        }
+
         Toast.makeText(
             this@MainActivity,
-            getString(R.string.log_in_toast_message),
+            resultMessage,
             Toast.LENGTH_SHORT
         ).show()
-    }
-
-    private fun updateToken(token: String) {
-        val preference = getSharedPreferences("AccessToken", MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = preference.edit()
-        editor.putString("Token", token)
-        editor.apply()
-    }
-
-    private fun loadToken(): String {
-        val preference = getSharedPreferences("AccessToken", MODE_PRIVATE)
-        val tokenData = preference.getString("Token", "no Token")
-        return preference.getString("Token", "no Token") ?: "no Token"
     }
 }
