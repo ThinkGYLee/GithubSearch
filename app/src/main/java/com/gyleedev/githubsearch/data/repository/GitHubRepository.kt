@@ -19,7 +19,10 @@ import com.gyleedev.githubsearch.data.remote.response.GithubAccessResponse
 import com.gyleedev.githubsearch.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.util.exceptionToStatusUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +33,7 @@ import javax.inject.Inject
 
 interface GitHubRepository {
     fun getUsers(): Flow<PagingData<UserModel>>
-    suspend fun getUserAtHome(id: String): UserModel?
+    suspend fun getUserAtHome(id: String): UserWrapper
     suspend fun getLastAccessById(id: String): AccessTime?
     suspend fun getUser(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
@@ -79,18 +82,34 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     //Home에서 user정보를 요청하는 함수
-    override suspend fun getUserAtHome(id: String): UserModel {
+    override suspend fun getUserAtHome(id: String): UserWrapper {
         return withContext(Dispatchers.IO) {
-            val user = userDao.getUserByGithubId(id)
-            cachingUserAtHome(user, id)
+            try {
+                val user = userDao.getUserByGithubId(id)
+                UserWrapper.FromDatabase(data = user.toModel())
+            } catch (e: NullPointerException) {
+                getUserFromGithub(id)
+            }
         }
     }
 
-    //home에서 사용할 user의 db값과 network에 존재하는 값을 캐싱
-    private suspend fun cachingUserAtHome(user: UserEntity?, id: String): UserModel {
-        //유저정보가 존재할때
-        return user?.toModel() ?: //존재하지 않을 때
-        return githubApiService.getUser(id).toModel()
+    private suspend fun getUserFromGithub(id: String): UserWrapper {
+        return try {
+            val userResponse = githubApiService.getUser(id)
+            UserWrapper.Success(
+                status = SearchStatus.SUCCESS,
+                data = userResponse.toModel()
+            )
+        } catch (e: Exception) {
+            val status = exceptionToStatusUtil(e)
+            UserWrapper.Failure(
+                status = status
+            )
+        } catch (e: UnknownError) {
+            UserWrapper.Failure(
+                status = SearchStatus.BAD_NETWORK
+            )
+        }
     }
 
     //마지막 액세스 시간 가져오기
@@ -116,6 +135,7 @@ class GitHubRepositoryImpl @Inject constructor(
 
     private suspend fun updateUserFromGithub(id: String): UserModel {
         val userRemote = githubApiService.getUser(id)
+
         val userLocal = userDao.getUser(id)
 
         val updateUser = UserEntity(
