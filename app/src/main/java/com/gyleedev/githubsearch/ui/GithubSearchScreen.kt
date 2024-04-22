@@ -74,6 +74,7 @@ fun GithubSearchApp(
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                    requestToken = { onLoginClicked() }
                 )
             }
 
@@ -103,7 +104,7 @@ fun GithubSearchApp(
                 SettingScreen(
                     modifier = Modifier
                         .fillMaxSize(),
-                    onClick = { onLoginClicked() }
+                    onClick = { }
                 )
             }
         }
