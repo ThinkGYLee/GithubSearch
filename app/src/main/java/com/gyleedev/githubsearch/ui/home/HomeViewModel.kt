@@ -5,7 +5,6 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.core.BaseViewModel
-import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.model.UserWrapper
@@ -23,7 +22,6 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     getUsersUseCase: HomeGetUsersUseCase,
     private val searchUserUseCase: HomeSearchUserUseCase,
-    private val repository: GitHubRepository
 ) : BaseViewModel() {
     private val _searchId = MutableStateFlow("")
 
