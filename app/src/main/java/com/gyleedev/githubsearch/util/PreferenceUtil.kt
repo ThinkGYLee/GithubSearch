@@ -2,13 +2,8 @@ package com.gyleedev.githubsearch.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 
-@Module
-@InstallIn(SingletonComponent::class)
 class PreferenceUtil(@ApplicationContext context: Context) {
 
     private val accessPreference: SharedPreferences =
