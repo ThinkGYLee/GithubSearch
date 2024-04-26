@@ -37,8 +37,8 @@ interface GitHubRepository {
     suspend fun getLastAccessById(id: String): AccessTime?
     suspend fun getUser(id: String): UserModel?
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
-    suspend fun getDetailUser(githubId: String): UserModel?
-    suspend fun updateUserFavorite(id: String): UserModel?
+    suspend fun getDetailUser(githubId: String): UserWrapper
+    suspend fun updateUserFavorite(id: String): UserWrapper
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 
     suspend fun getAccessToken(
@@ -125,52 +125,91 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     //유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
-    private suspend fun insertUserFromGithub(id: String): UserModel {
-        val userRemote = githubApiService.getUser(id)
-        val entityId = userDao.insertUser(userRemote.toModel().toEntity())
-        insertRepos(id, entityId)
-        updateAccessTime(id)
-        return userRemote.toModel()
+    private suspend fun insertUserFromGithub(id: String): UserWrapper {
+        return try {
+            val userRemote = githubApiService.getUser(id)
+            val entityId = userDao.insertUser(userRemote.toModel().toEntity())
+            insertRepos(id, entityId)
+            updateAccessTime(id)
+            UserWrapper.Success(
+                status = SearchStatus.SUCCESS,
+                data = userRemote.toModel()
+            )
+        } catch (e: Exception) {
+            val status = exceptionToStatusUtil(e)
+            UserWrapper.Failure(
+                status = status
+            )
+        } catch (e: UnknownError) {
+            UserWrapper.Failure(
+                status = SearchStatus.BAD_NETWORK
+            )
+        }
     }
 
-    private suspend fun updateUserFromGithub(id: String): UserModel {
-        val userRemote = githubApiService.getUser(id)
+    private suspend fun updateUserFromGithub(id: String): UserWrapper {
 
-        val userLocal = userDao.getUser(id)
+        try {
+            val userResponse = githubApiService.getUser(id)
+            val userRemote = UserWrapper.Success(
+                status = SearchStatus.SUCCESS,
+                data = userResponse.toModel()
+            )
+            val userLocal = userDao.getUser(id)
 
-        val updateUser = UserEntity(
-            id = userLocal.id,
-            userId = userRemote.login,
-            name = userRemote.name,
-            followers = userRemote.followers,
-            following = userRemote.following,
-            avatar = userRemote.avatar,
-            company = userRemote.company,
-            email = userRemote.email,
-            bio = userRemote.bio,
-            blogUrl = userRemote.blogUrl,
-            createdDate = userRemote.createdDate,
-            updatedDate = userRemote.updatedDate,
-            repos = userRemote.repos,
-            reposAddress = userRemote.reposAddress,
-            favorite = userLocal.favorite
-        )
-        userDao.updateUser(updateUser)
-        insertRepos(id, userLocal.id)
-        updateAccessTime(id)
-        return updateUser.toModel()
+            val updateUser = UserEntity(
+                id = userLocal.id,
+                userId = userRemote.data.login,
+                name = userRemote.data.name,
+                followers = userRemote.data.followers,
+                following = userRemote.data.following,
+                avatar = userRemote.data.avatar,
+                company = userRemote.data.company,
+                email = userRemote.data.email,
+                bio = userRemote.data.bio,
+                blogUrl = userRemote.data.blogUrl,
+                createdDate = userRemote.data.createdDate,
+                updatedDate = userRemote.data.updatedDate,
+                repos = userRemote.data.repos,
+                reposAddress = userRemote.data.reposAddress,
+                favorite = userLocal.favorite
+            )
+            userDao.updateUser(updateUser)
+            if(userResponse.repos > 0) {
+                insertRepos(id, userLocal.id)
+            }
+            updateAccessTime(id)
+            return userRemote
+        } catch (e: Exception) {
+            val status = exceptionToStatusUtil(e)
+            return UserWrapper.Failure(
+                status = status
+            )
+        } catch (e: UnknownError) {
+            return UserWrapper.Failure(
+                status = SearchStatus.BAD_NETWORK
+            )
+        }
     }
 
     //레포정보 삽입
     private suspend fun insertRepos(githubId: String, userEntityId: Long) {
-        reposDao.deleteRepos(githubId)
-        val respond = githubApiService.getRepos(githubId)
-        reposDao.insertRepos(respond.map { it.toModel(githubId).toEntity(userEntityId) })
+        try {
+            val response = githubApiService.getRepos(githubId)
+            reposDao.deleteRepos(githubId)
+            reposDao.insertRepos(response.map { it.toModel(githubId).toEntity(userEntityId) })
+        } catch (e: Throwable) {
+            insertRepos(githubId, userEntityId)
+        }
     }
 
     //db에서 레포정보 가져오기
     override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel> {
-        return reposDao.getReposByGithubId(githubId).map { it.toModel() }
+        return try {
+            reposDao.getReposByGithubId(githubId).map { it.toModel() }
+        } catch (e: Throwable) {
+            getReposFromDatabase(githubId)
+        }
     }
 
     private fun updateAccessTime(id: String) {
@@ -194,12 +233,14 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDetailUser(githubId: String): UserModel {
+    override suspend fun getDetailUser(githubId: String): UserWrapper {
         return withContext(Dispatchers.IO) {
             val lastAccess = getLastAccessById(githubId)
             if (lastAccess != null) {
                 if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
-                    getUser(githubId)
+                    UserWrapper.FromDatabase(
+                        data = getUser(githubId)
+                    )
                 } else {
                     updateUserFromGithub(githubId)
                 }
@@ -209,28 +250,35 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserFavorite(id: String): UserModel {
-        val user = userDao.getUser(id)
-        userDao.updateUser(
-            UserEntity(
-                id = user.id,
-                userId = user.userId,
-                name = user.name,
-                followers = user.followers,
-                following = user.following,
-                company = user.company,
-                avatar = user.avatar,
-                email = user.email,
-                bio = user.bio,
-                repos = user.repos,
-                createdDate = user.createdDate,
-                updatedDate = user.updatedDate,
-                reposAddress = user.reposAddress,
-                blogUrl = user.blogUrl,
-                favorite = !user.favorite
+    override suspend fun updateUserFavorite(id: String): UserWrapper {
+        return try {
+            val user = userDao.getUser(id)
+            userDao.updateUser(
+                UserEntity(
+                    id = user.id,
+                    userId = user.userId,
+                    name = user.name,
+                    followers = user.followers,
+                    following = user.following,
+                    company = user.company,
+                    avatar = user.avatar,
+                    email = user.email,
+                    bio = user.bio,
+                    repos = user.repos,
+                    createdDate = user.createdDate,
+                    updatedDate = user.updatedDate,
+                    reposAddress = user.reposAddress,
+                    blogUrl = user.blogUrl,
+                    favorite = !user.favorite
+                )
             )
-        )
-        return userDao.getUser(id).toModel()
+            UserWrapper.FromDatabase(
+                data = userDao.getUser(id).toModel()
+            )
+        } catch (e: Throwable) {
+            updateUserFavorite(id)
+        }
+
     }
 
     override suspend fun getAccessToken(
@@ -238,6 +286,4 @@ class GitHubRepositoryImpl @Inject constructor(
         secret: String,
         code: String
     ) = accessService.getAccessToken(clientId = id, clientSecret = secret, code = code)
-
-
 }
