@@ -44,7 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.gyleedev.githubsearch.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,12 +56,12 @@ fun SettingScreen(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 
-    ) {
+) {
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Setting") },
+                title = { Text(text = stringResource(id = R.string.title_setting)) },
                 actions = {
                 },
                 modifier = Modifier,
