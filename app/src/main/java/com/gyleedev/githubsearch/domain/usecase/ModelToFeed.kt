@@ -21,9 +21,13 @@ object ModelToFeed {
 
         list.add(DetailFeed.RepoTitle)
 
-        if (checkNotNull(repoInfo).isNotEmpty()) {
-            list.addAll(repoInfo.map { DetailFeed.RepoDetail(it) })
-        } else {
+        if(repoInfo!=null) {
+            if(repoInfo.isNotEmpty()) {
+                list.addAll(repoInfo.map { DetailFeed.RepoDetail(it) })
+            } else {
+                list.add(DetailFeed.RepoNoItem)
+            }
+        }  else {
             list.add(DetailFeed.RepoNoItem)
         }
 
