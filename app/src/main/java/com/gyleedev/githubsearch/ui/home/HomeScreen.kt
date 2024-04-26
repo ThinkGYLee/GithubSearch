@@ -123,7 +123,11 @@ fun HomeScreen(
                 }
 
                 else -> {
-                    println("no information error $status")
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.etc_exception),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
