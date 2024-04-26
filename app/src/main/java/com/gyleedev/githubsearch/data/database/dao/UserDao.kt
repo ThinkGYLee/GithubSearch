@@ -14,13 +14,13 @@ interface UserDao {
     @Query("SELECT * FROM user LIMIT 10 OFFSET (:page-1)*10")
     fun getUsers(page: Int): List<UserEntity>
 
-    @Query("SELECT * FROM user ")
-    fun getUsers(): PagingSource<Int, UserEntity>
+    @Query("SELECT * FROM user WHERE favorite = true ")
+    fun getUsersAll(): PagingSource<Int, UserEntity>
 
-    @Query("SELECT * FROM user WHERE repos >0")
+    @Query("SELECT * FROM user WHERE favorite = true AND repos >0")
     fun getUsersRepo(): PagingSource<Int, UserEntity>
 
-    @Query("SELECT * FROM user WHERE repos =0")
+    @Query("SELECT * FROM user WHERE favorite = true AND repos =0")
     fun getUsersNonRepo(): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user WHERE favorite = :favorite LIMIT 10 OFFSET (:page-1)*10")
@@ -38,9 +38,9 @@ interface UserDao {
     @Update
     fun updateUser(user: UserEntity)
 
-    fun getUsers(status: FilterStatus): PagingSource<Int,UserEntity> {
-       return when (status) {
-            FilterStatus.ALL -> getUsers()
+    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> {
+        return when (status) {
+            FilterStatus.ALL -> getUsersAll()
             FilterStatus.REPO -> getUsersRepo()
             FilterStatus.NOREPO -> getUsersNonRepo()
         }
