@@ -57,6 +57,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.BuildConfig
@@ -163,9 +165,8 @@ fun HomeScreen(
                 loading = loading,
                 modifier = Modifier
             )
-        }, modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp)
+        },
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
@@ -335,7 +336,9 @@ fun EmbeddedSearchBar(
         }
     ) {
         SearchResultItem(
-            user = user, onClick = moveToDetail, modifier = Modifier
+            user = user,
+            onClick = moveToDetail,
+            modifier = Modifier
         )
 
         if (loading) {
@@ -354,7 +357,9 @@ fun EmbeddedSearchBar(
 
 @Composable
 private fun SearchItemList(
-    users: LazyPagingItems<UserModel>, modifier: Modifier = Modifier, onClick: (String) -> Unit
+    users: LazyPagingItems<UserModel>,
+    modifier: Modifier = Modifier,
+    onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -363,8 +368,8 @@ private fun SearchItemList(
     ) {
         items(
             users.itemCount,
-            key = { users[it]?.login!! },
-            contentType = { 0 }
+            key = users.itemKey { it.login },
+            contentType = users.itemContentType { 0 }
         ) { index ->
             val user = users[index] as UserModel
             HomeItem(user, onClick = { onClick(user.login) })
@@ -375,7 +380,9 @@ private fun SearchItemList(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun HomeItem(
-    user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -404,15 +411,17 @@ private fun HomeItem(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
-    user: UserModel?, onClick: () -> Unit, modifier: Modifier = Modifier
+    user: UserModel?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (user != null) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .heightIn(min = 80.dp)
-                .padding(12.dp)
-                .clickable(onClick = onClick),
+                .clickable(onClick = onClick)
+                .padding(12.dp),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
