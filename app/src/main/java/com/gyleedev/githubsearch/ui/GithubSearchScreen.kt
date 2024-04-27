@@ -104,7 +104,6 @@ fun GithubSearchApp(
                 SettingScreen(
                     modifier = Modifier
                         .fillMaxSize(),
-                    onClick = { }
                 )
             }
         }
