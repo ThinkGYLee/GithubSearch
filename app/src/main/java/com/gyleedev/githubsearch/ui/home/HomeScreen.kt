@@ -163,7 +163,7 @@ fun HomeScreen(
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
-                modifier = Modifier
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
         },
         modifier = modifier.fillMaxSize()
