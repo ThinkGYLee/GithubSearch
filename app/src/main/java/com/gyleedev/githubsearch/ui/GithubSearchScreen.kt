@@ -121,7 +121,8 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.navigationBarsPadding()
+        modifier = modifier.navigationBarsPadding(),
+        elevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
