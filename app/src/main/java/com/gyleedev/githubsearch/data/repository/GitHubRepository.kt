@@ -46,6 +46,8 @@ interface GitHubRepository {
         secret: String,
         code: String
     ): Response<GithubAccessResponse>
+
+    suspend fun resetApplication()
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -286,4 +288,11 @@ class GitHubRepositoryImpl @Inject constructor(
         secret: String,
         code: String
     ) = accessService.getAccessToken(clientId = id, clientSecret = secret, code = code)
+
+    override suspend fun resetApplication() {
+        withContext(Dispatchers.IO) {
+            userDao.resetUsers()
+            accessTimeDao.resetTime()
+        }
+    }
 }
