@@ -21,4 +21,7 @@ interface AccessTimeDao {
 
     @Update
     fun updateTime(accessTime: AccessTime)
+
+    @Query("DELETE FROM access_time")
+    fun resetTime()
 }
