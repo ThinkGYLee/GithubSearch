@@ -1,6 +1,5 @@
 package com.gyleedev.githubsearch.domain.usecase
 
-
 import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.model.UserWrapper
@@ -9,11 +8,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class DetailGetFeedUseCase @Inject constructor(
-    private val repository: GitHubRepository
+    private val repository: GitHubRepository,
 ) {
     suspend operator fun invoke(id: String): List<DetailFeed> {
         return withContext(Dispatchers.IO) {
-
             val userModel = when (val user = repository.getDetailUser(id)) {
                 is UserWrapper.FromDatabase -> {
                     user.data

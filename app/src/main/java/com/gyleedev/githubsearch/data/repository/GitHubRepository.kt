@@ -44,7 +44,7 @@ interface GitHubRepository {
     suspend fun getAccessToken(
         id: String,
         secret: String,
-        code: String
+        code: String,
     ): Response<GithubAccessResponse>
 }
 
@@ -53,35 +53,36 @@ class GitHubRepositoryImpl @Inject constructor(
     private val reposDao: ReposDao,
     private val accessTimeDao: AccessTimeDao,
     @NetworkModule.TypeApi private val githubApiService: GithubApiService,
-    @NetworkModule.TypeAccess private val accessService: AccessService
+    @NetworkModule.TypeAccess private val accessService: AccessService,
 ) : GitHubRepository {
 
     override fun getUsers(): Flow<PagingData<UserModel>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
-                enablePlaceholders = false
+                enablePlaceholders = false,
             ),
-            pagingSourceFactory = { UserPagingSource(userDao) }
+            pagingSourceFactory = { UserPagingSource(userDao) },
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
     }
 
     override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> {
-        return Pager(config = PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false
-        ),
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false,
+            ),
             pagingSourceFactory = {
                 userDao.getUsers(status)
-            }
+            },
         ).flow.map { pagingData ->
             pagingData.map { it.toModel() }
         }
     }
 
-    //Home에서 user정보를 요청하는 함수
+    // Home에서 user정보를 요청하는 함수
     override suspend fun getUserAtHome(id: String): UserWrapper {
         return withContext(Dispatchers.IO) {
             try {
@@ -98,33 +99,33 @@ class GitHubRepositoryImpl @Inject constructor(
             val userResponse = githubApiService.getUser(id)
             UserWrapper.Success(
                 status = SearchStatus.SUCCESS,
-                data = userResponse.toModel()
+                data = userResponse.toModel(),
             )
         } catch (e: Exception) {
             val status = exceptionToStatusUtil(e)
             UserWrapper.Failure(
-                status = status
+                status = status,
             )
         } catch (e: UnknownError) {
             UserWrapper.Failure(
-                status = SearchStatus.BAD_NETWORK
+                status = SearchStatus.BAD_NETWORK,
             )
         }
     }
 
-    //마지막 액세스 시간 가져오기
+    // 마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTime? {
         return accessTimeDao.getTimeByGithubId(id)
     }
 
-    //유저정보 가져오기
+    // 유저정보 가져오기
     override suspend fun getUser(id: String): UserModel {
         return withContext(Dispatchers.IO) {
             userDao.getUser(id).toModel()
         }
     }
 
-    //유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
+    // 유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
     private suspend fun insertUserFromGithub(id: String): UserWrapper {
         return try {
             val userRemote = githubApiService.getUser(id)
@@ -133,27 +134,26 @@ class GitHubRepositoryImpl @Inject constructor(
             updateAccessTime(id)
             UserWrapper.Success(
                 status = SearchStatus.SUCCESS,
-                data = userRemote.toModel()
+                data = userRemote.toModel(),
             )
         } catch (e: Exception) {
             val status = exceptionToStatusUtil(e)
             UserWrapper.Failure(
-                status = status
+                status = status,
             )
         } catch (e: UnknownError) {
             UserWrapper.Failure(
-                status = SearchStatus.BAD_NETWORK
+                status = SearchStatus.BAD_NETWORK,
             )
         }
     }
 
     private suspend fun updateUserFromGithub(id: String): UserWrapper {
-
         try {
             val userResponse = githubApiService.getUser(id)
             val userRemote = UserWrapper.Success(
                 status = SearchStatus.SUCCESS,
-                data = userResponse.toModel()
+                data = userResponse.toModel(),
             )
             val userLocal = userDao.getUser(id)
 
@@ -172,10 +172,10 @@ class GitHubRepositoryImpl @Inject constructor(
                 updatedDate = userRemote.data.updatedDate,
                 repos = userRemote.data.repos,
                 reposAddress = userRemote.data.reposAddress,
-                favorite = userLocal.favorite
+                favorite = userLocal.favorite,
             )
             userDao.updateUser(updateUser)
-            if(userResponse.repos > 0) {
+            if (userResponse.repos > 0) {
                 insertRepos(id, userLocal.id)
             }
             updateAccessTime(id)
@@ -183,16 +183,16 @@ class GitHubRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             val status = exceptionToStatusUtil(e)
             return UserWrapper.Failure(
-                status = status
+                status = status,
             )
         } catch (e: UnknownError) {
             return UserWrapper.Failure(
-                status = SearchStatus.BAD_NETWORK
+                status = SearchStatus.BAD_NETWORK,
             )
         }
     }
 
-    //레포정보 삽입
+    // 레포정보 삽입
     private suspend fun insertRepos(githubId: String, userEntityId: Long) {
         try {
             val response = githubApiService.getRepos(githubId)
@@ -203,7 +203,7 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    //db에서 레포정보 가져오기
+    // db에서 레포정보 가져오기
     override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel> {
         return try {
             reposDao.getReposByGithubId(githubId).map { it.toModel() }
@@ -219,16 +219,16 @@ class GitHubRepositoryImpl @Inject constructor(
                 AccessTime(
                     id = accessTime.id,
                     githubId = accessTime.githubId,
-                    accessTime = Instant.now()
-                )
+                    accessTime = Instant.now(),
+                ),
             )
         } else {
             accessTimeDao.insertTime(
                 AccessTime(
                     id = 0,
                     githubId = id,
-                    accessTime = Instant.now()
-                )
+                    accessTime = Instant.now(),
+                ),
             )
         }
     }
@@ -239,7 +239,7 @@ class GitHubRepositoryImpl @Inject constructor(
             if (lastAccess != null) {
                 if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
                     UserWrapper.FromDatabase(
-                        data = getUser(githubId)
+                        data = getUser(githubId),
                     )
                 } else {
                     updateUserFromGithub(githubId)
@@ -269,21 +269,20 @@ class GitHubRepositoryImpl @Inject constructor(
                     updatedDate = user.updatedDate,
                     reposAddress = user.reposAddress,
                     blogUrl = user.blogUrl,
-                    favorite = !user.favorite
-                )
+                    favorite = !user.favorite,
+                ),
             )
             UserWrapper.FromDatabase(
-                data = userDao.getUser(id).toModel()
+                data = userDao.getUser(id).toModel(),
             )
         } catch (e: Throwable) {
             updateUserFavorite(id)
         }
-
     }
 
     override suspend fun getAccessToken(
         id: String,
         secret: String,
-        code: String
+        code: String,
     ) = accessService.getAccessToken(clientId = id, clientSecret = secret, code = code)
 }

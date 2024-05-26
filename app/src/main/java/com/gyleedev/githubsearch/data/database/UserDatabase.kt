@@ -14,12 +14,11 @@ import com.gyleedev.githubsearch.data.database.entity.UserEntity
     entities = [
         UserEntity::class,
         ReposEntity::class,
-        AccessTime::class
+        AccessTime::class,
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = true,
 )
-
 @TypeConverters(DbTypeConverters::class)
 abstract class UserDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

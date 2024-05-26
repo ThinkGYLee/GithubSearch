@@ -7,7 +7,7 @@ data class RepoResponse(
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String,
     @SerializedName("language") val language: String,
-    @SerializedName("stargazers_count") val stargazer: Int
+    @SerializedName("stargazers_count") val stargazer: Int,
 )
 
 fun RepoResponse.toModel(id: String): RepositoryModel {
@@ -17,6 +17,6 @@ fun RepoResponse.toModel(id: String): RepositoryModel {
         description = description,
         language = language,
         stargazer = stargazer,
-        favorite = false
+        favorite = false,
     )
 }

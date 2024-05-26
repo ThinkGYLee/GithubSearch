@@ -62,7 +62,6 @@ class HomeViewModel @Inject constructor(
     private suspend fun alertResponseFail(userWrapper: UserWrapper) {
         val wrapper = userWrapper as UserWrapper.Failure
         when (wrapper.status) {
-
             SearchStatus.NEED_AUTHENTICATION -> {
                 _requestAuthentication.emit(Unit)
             }

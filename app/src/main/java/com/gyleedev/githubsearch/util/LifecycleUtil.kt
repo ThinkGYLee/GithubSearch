@@ -9,10 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-
 fun Fragment.launchWithLifecycle(
     state: Lifecycle.State = Lifecycle.State.STARTED,
-    block: suspend CoroutineScope.() -> Unit
+    block: suspend CoroutineScope.() -> Unit,
 ) {
     lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(state, block)
@@ -22,7 +21,7 @@ fun Fragment.launchWithLifecycle(
 fun <T> Fragment.launchWithLifecycle(
     flow: Flow<T>,
     state: Lifecycle.State = Lifecycle.State.STARTED,
-    block: suspend (T) -> Unit
+    block: suspend (T) -> Unit,
 ) {
     lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(state) {
@@ -35,7 +34,7 @@ fun <T> Fragment.launchWithLifecycle(
 
 fun <T> AppCompatActivity.launchWithLifecycle(
     flow: Flow<T>,
-    block: suspend (T) -> Unit
+    block: suspend (T) -> Unit,
 ) {
     lifecycleScope.launch {
         flow.collect {

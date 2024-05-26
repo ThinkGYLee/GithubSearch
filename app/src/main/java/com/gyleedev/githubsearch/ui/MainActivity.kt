@@ -22,7 +22,6 @@ import com.gyleedev.githubsearch.ui.theme.GithubSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -34,15 +33,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
                 darkScrim = android.graphics.Color.TRANSPARENT,
-                lightScrim = android.graphics.Color.TRANSPARENT
-            )
+                lightScrim = android.graphics.Color.TRANSPARENT,
+            ),
         )
         setContent {
             GithubSearchTheme {
                 GithubSearchApp(
                     onLoginClicked = {
                         login(this)
-                    }
+                    },
                 )
             }
         }
@@ -67,11 +66,10 @@ class MainActivity : ComponentActivity() {
 
         val customTabsIntent = CustomTabsIntent.Builder().build()
 
-        //아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
+        // 아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
         customTabsIntent.intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
         customTabsIntent.launchUrl(context, loginUrl)
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -95,7 +93,7 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(
             this@MainActivity,
             resultMessage,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_SHORT,
         ).show()
     }
 }

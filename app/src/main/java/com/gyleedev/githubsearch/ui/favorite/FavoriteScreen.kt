@@ -47,7 +47,6 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteScreen(
@@ -81,7 +80,7 @@ fun FavoriteScreen(
                 modifier = Modifier,
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { paddingValues ->
         if (users.itemCount > 0) {
             FavoriteItemList(
@@ -93,11 +92,11 @@ fun FavoriteScreen(
                 onLongClick = {
                     user.value = it
                     showDeleteDialog.value = true
-                }
+                },
             )
         } else {
             NoItem(
-                modifier = modifier.padding(paddingValues)
+                modifier = modifier.padding(paddingValues),
             )
         }
     }
@@ -111,7 +110,8 @@ fun FavoriteScreen(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
-                    }) {
+                    },
+                ) {
                     Text(stringResource(id = R.string.text_dialog_confirm))
                 }
             },
@@ -120,10 +120,11 @@ fun FavoriteScreen(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value = null
-                    }) {
+                    },
+                ) {
                     Text(stringResource(id = R.string.text_dialog_cancel))
                 }
-            }
+            },
         )
     }
 
@@ -146,7 +147,8 @@ fun FavoriteScreen(
                 }
             },
             selectedItemId = selectedItem.intValue,
-            onSelectedItemChange = { selectedItem.intValue = it })
+            onSelectedItemChange = { selectedItem.intValue = it },
+        )
     }
 }
 
@@ -155,19 +157,19 @@ private fun FavoriteItemList(
     users: LazyPagingItems<UserModel>,
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit,
-    onLongClick: (UserModel) -> Unit
+    onLongClick: (UserModel) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(vertical = 12.dp)
+            .padding(vertical = 12.dp),
     ) {
         items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
             val user = users[index] as UserModel
             FavoriteItem(
                 user,
                 onClick = { onClick(user.login) },
-                onLongClick = { onLongClick(it) }
+                onLongClick = { onLongClick(it) },
             )
         }
     }
@@ -179,7 +181,7 @@ private fun FavoriteItem(
     user: UserModel,
     onClick: () -> Unit,
     onLongClick: (UserModel) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -188,12 +190,12 @@ private fun FavoriteItem(
             .padding(12.dp)
             .combinedClickable(
                 onLongClick = { onLongClick(user) },
-                onClick = onClick
+                onClick = onClick,
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
 
-        ) {
+    ) {
         GlideImage(
             model = (user.avatar),
             modifier = Modifier
@@ -202,23 +204,23 @@ private fun FavoriteItem(
                 .widthIn(max = 80.dp, min = 20.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
-            contentDescription = null
+            contentDescription = null,
         )
         Text(
             text = user.login,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
 }
 
 @Composable
 private fun NoItem(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = stringResource(id = R.string.favorite_no_item),
@@ -233,12 +235,12 @@ fun FilterDialog(
     selectedItemId: Int,
     onChangeState: (Boolean) -> Unit,
     onFilterChange: () -> Unit,
-    onSelectedItemChange: (Int) -> Unit
+    onSelectedItemChange: (Int) -> Unit,
 ) {
     val declarations = listOf(
         stringResource(id = R.string.filter_list_has_repos),
         stringResource(id = R.string.filter_list_no_repos),
-        stringResource(id = R.string.filter_list_all)
+        stringResource(id = R.string.filter_list_all),
     )
 
     AlertDialog(
@@ -247,7 +249,7 @@ fun FilterDialog(
             Text(
                 text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         },
         text = {
@@ -255,14 +257,15 @@ fun FilterDialog(
                 Text(
                     text = stringResource(id = R.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 RadioButtons(
                     selectedItemId = selectedItemId,
                     RadioItems(declarations),
                     selectedItem = { string ->
                         declarations.indexOf(string).also { onSelectedItemChange(it) }
-                    })
+                    },
+                )
             }
         },
         dismissButton = {
@@ -275,10 +278,11 @@ fun FilterDialog(
                 onClick = {
                     onFilterChange()
                     onChangeState(false)
-                }) {
+                },
+            ) {
                 Text(text = stringResource(id = R.string.text_filter_confirm))
             }
-        }
+        },
     )
 }
 
@@ -307,15 +311,15 @@ fun RadioButtons(
                         .selectable(
                             selected = isSelectedItem(item),
                             onClick = { onChangeState(item) },
-                            role = Role.RadioButton
+                            role = Role.RadioButton,
                         )
                         .padding(bottom = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
                         selected = declaration[selectedItemId] == item,
                         onClick = null,
-                        modifier = Modifier.padding(end = 5.dp)
+                        modifier = Modifier.padding(end = 5.dp),
                     )
                     Text(text = item, style = MaterialTheme.typography.labelMedium)
                 }
@@ -325,5 +329,5 @@ fun RadioButtons(
 }
 
 data class RadioItems(
-    val list: List<String>
+    val list: List<String>,
 )

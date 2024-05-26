@@ -16,7 +16,7 @@ import javax.inject.Inject
 class DetailViewModel @Inject constructor(
     private val detailGetFeedUseCase: DetailGetFeedUseCase,
     private val detailUpdateFavoriteStatusUseCase: DetailUpdateFavoriteStatusUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
     private val _itemList = MutableStateFlow<List<DetailFeed>>(emptyList())
@@ -63,5 +63,4 @@ class DetailViewModel @Inject constructor(
             }
         }
     }
-
 }

@@ -1,6 +1,5 @@
 package com.gyleedev.githubsearch.ui.setting
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -46,16 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
 
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 
-    ) {
-
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,10 +61,9 @@ fun SettingScreen(
                 },
                 modifier = Modifier,
             )
-
         },
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) { paddingValues ->
         var mode by rememberSaveable {
             mutableStateOf(false)
@@ -77,9 +73,8 @@ fun SettingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
-
             list.forEach {
                 when (it.type) {
                     SettingItemEnum.HEADER -> {
@@ -89,15 +84,14 @@ fun SettingScreen(
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp)
                                     .height(48.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
                                     text = it.value,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = MaterialTheme.typography.titleLarge,
                                 )
                             }
                         }
-
                     }
 
                     SettingItemEnum.CONTENT -> {
@@ -109,30 +103,29 @@ fun SettingScreen(
                                     .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .clickable { onClick() }
                                     .padding(vertical = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 it.iconImage?.let { it1 ->
                                     Icon(
                                         imageVector = it1,
                                         contentDescription = it.value,
-                                        modifier = Modifier.padding(start = 16.dp)
+                                        modifier = Modifier.padding(start = 16.dp),
                                     )
                                 }
                                 Text(
                                     text = it.value,
                                     style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp),
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .padding(end = 8.dp)
+                                        .padding(end = 8.dp),
                                 )
                             }
                         }
-
                     }
 
                     else -> {
@@ -144,25 +137,25 @@ fun SettingScreen(
                                     .heightIn(min = 48.dp)
                                     .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .clickable { }
-                                    .padding(vertical = 8.dp)
+                                    .padding(vertical = 8.dp),
                             ) {
                                 it.iconImage?.let { it1 ->
                                     Icon(
                                         imageVector = it1,
                                         contentDescription = it.value,
-                                        modifier = Modifier.padding(start = 16.dp)
+                                        modifier = Modifier.padding(start = 16.dp),
                                     )
                                 }
                                 Text(
                                     text = it.value,
                                     style = MaterialTheme.typography.titleLarge,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp),
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Switch(
                                     checked = mode,
                                     onCheckedChange = { mode = !mode },
-                                    modifier = Modifier.padding(end = 16.dp)
+                                    modifier = Modifier.padding(end = 16.dp),
                                 )
                             }
                         }
@@ -176,122 +169,119 @@ fun SettingScreen(
 enum class SettingItemEnum {
     HEADER,
     CONTENT,
-    THEME
+    THEME,
 }
-
 
 data class SettingItem(
     val type: SettingItemEnum,
     val value: String,
-    val iconImage: ImageVector?
+    val iconImage: ImageVector?,
 )
 
 val list = listOf(
     SettingItem(
         SettingItemEnum.HEADER,
         "Account",
-        null
+        null,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Profile&Accounts",
-        Icons.Outlined.AccountCircle
+        Icons.Outlined.AccountCircle,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Security",
-        Icons.Outlined.Security
+        Icons.Outlined.Security,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Privacy&Security",
-        Icons.Outlined.Lock
+        Icons.Outlined.Lock,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Billing&Subscription",
-        Icons.Outlined.Payment
+        Icons.Outlined.Payment,
     ),
     SettingItem(
         SettingItemEnum.HEADER,
         "Personalization",
-        null
+        null,
     ),
     SettingItem(
         SettingItemEnum.THEME,
         "Dark Mode",
-        Icons.Outlined.DarkMode
+        Icons.Outlined.DarkMode,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Appearance",
-        Icons.Outlined.Palette
+        Icons.Outlined.Palette,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Language",
-        Icons.Outlined.Language
+        Icons.Outlined.Language,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Themes Organize",
-        Icons.Outlined.Description
+        Icons.Outlined.Description,
     ),
     SettingItem(
         SettingItemEnum.HEADER,
         "Data&Storage",
-        null
+        null,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Data&Storage",
-        Icons.Outlined.Storage
+        Icons.Outlined.Storage,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Backup&Restore",
-        Icons.Outlined.Backup
+        Icons.Outlined.Backup,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Connections",
-        Icons.Outlined.ConnectingAirports
+        Icons.Outlined.ConnectingAirports,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "ManageContent",
-        Icons.Outlined.FolderOpen
+        Icons.Outlined.FolderOpen,
     ),
     SettingItem(
         SettingItemEnum.HEADER,
         "Accessibility",
-        null
+        null,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Help&Feedback",
-        Icons.Outlined.Feedback
+        Icons.Outlined.Feedback,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Permissions",
-        Icons.Outlined.SafetyCheck
+        Icons.Outlined.SafetyCheck,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "About",
-        Icons.AutoMirrored.Outlined.Help
+        Icons.AutoMirrored.Outlined.Help,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Terms&Service",
-        Icons.Outlined.Description
+        Icons.Outlined.Description,
     ),
     SettingItem(
         SettingItemEnum.CONTENT,
         "Support us",
-        Icons.Outlined.Favorite
+        Icons.Outlined.Favorite,
     ),
 )
-
-

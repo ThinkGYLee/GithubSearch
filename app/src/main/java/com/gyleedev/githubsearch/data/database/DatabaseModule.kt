@@ -22,7 +22,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             UserDatabase::class.java,
-            "database"
+            "database",
         ).build()
     }
 
@@ -37,5 +37,4 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun providesAccessTimeDao(userDatabase: UserDatabase): AccessTimeDao = userDatabase.accessTimeDao()
-
 }

@@ -39,9 +39,10 @@ import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.ui.home.HomeScreen
 import com.gyleedev.githubsearch.ui.setting.SettingScreen
 
-
 sealed class BottomNavItem(
-    val title: Int, val icons: ImageVector, val screenRoute: String
+    val title: Int,
+    val icons: ImageVector,
+    val screenRoute: String,
 ) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
@@ -49,32 +50,30 @@ sealed class BottomNavItem(
     data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
 }
 
-
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
-    onLoginClicked: () -> Unit
+    onLoginClicked: () -> Unit,
 ) {
     Scaffold(
         bottomBar = {
             BottomNavigation(navController = navController, modifier = Modifier)
         },
-        modifier = Modifier
+        modifier = Modifier,
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = Modifier
                 .padding(bottom = innerPadding.calculateBottomPadding() / 2)
-                .statusBarsPadding()
+                .statusBarsPadding(),
         ) {
-
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestToken = { onLoginClicked() }
+                    requestToken = { onLoginClicked() },
                 )
             }
 
@@ -84,12 +83,12 @@ fun GithubSearchApp(
                     navArgument("id") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { navController.navigateUp() }
+                    onClick = { navController.navigateUp() },
                 )
             }
 
@@ -104,7 +103,7 @@ fun GithubSearchApp(
                 SettingScreen(
                     modifier = Modifier
                         .fillMaxSize(),
-                    onClick = { }
+                    onClick = { },
                 )
             }
         }
@@ -122,7 +121,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.navigationBarsPadding()
+        modifier = modifier.navigationBarsPadding(),
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -135,7 +134,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                         contentDescription = stringResource(id = item.title),
                         modifier = Modifier
                             .width(26.dp)
-                            .height(26.dp)
+                            .height(26.dp),
                     )
                 },
                 label = { Text(stringResource(id = item.title), fontSize = 9.sp) },
@@ -151,7 +150,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
             )
         }
     }

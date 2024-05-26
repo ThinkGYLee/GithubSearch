@@ -14,9 +14,9 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
             entity = UserEntity::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("user_entity_id"),
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 
 )
 data class ReposEntity(
@@ -46,7 +46,7 @@ fun ReposEntity.toModel(): RepositoryModel {
         description = description,
         language = language,
         stargazer = stargazer,
-        favorite = favorite
+        favorite = favorite,
     )
 }
 
@@ -59,6 +59,6 @@ fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity {
         name = name,
         stargazer = stargazer,
         language = language,
-        favorite = favorite
+        favorite = favorite,
     )
 }

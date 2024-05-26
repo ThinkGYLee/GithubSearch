@@ -39,13 +39,12 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val list by viewModel.itemList.collectAsStateWithLifecycle()
     val status by viewModel.favoriteStatus.collectAsStateWithLifecycle()
@@ -59,7 +58,7 @@ fun DetailScreen(
                     IconButton(onClick = onClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.icon_content_description_arrow_back)
+                            contentDescription = stringResource(id = R.string.icon_content_description_arrow_back),
                         )
                     }
                 },
@@ -68,12 +67,12 @@ fun DetailScreen(
                         if (status) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
-                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled)
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered)
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
                             )
                         }
                     }
@@ -81,13 +80,13 @@ fun DetailScreen(
                 modifier = Modifier,
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(vertical = 4.dp)
+                .padding(vertical = 4.dp),
         ) {
             items(list.size) { current ->
                 when (list[current]) {
@@ -127,17 +126,17 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
             .height(100.dp)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
         GlideImage(
             model = (data.avatar),
-            contentDescription = null
+            contentDescription = null,
         )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = data.repos.toString(),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = stringResource(id = R.string.detail_user_title_repos),
@@ -147,7 +146,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = data.followers.toString(),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = stringResource(id = R.string.detail_user_title_follower),
@@ -157,7 +156,7 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = data.following.toString(),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = stringResource(id = R.string.detail_user_title_following),
@@ -166,10 +165,8 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
     }
 }
 
-
 @Composable
 private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
-
     val data = user.userModel
 
     Column(modifier = Modifier.padding(12.dp)) {
@@ -178,19 +175,19 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp),
             )
         }
         Text(
             text = data.login,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
         )
         data.bio?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.dp),
             )
         }
 
@@ -200,14 +197,14 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                     .fillMaxWidth()
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Apartment,
                     contentDescription = null,
                     modifier = Modifier
                         .width(24.dp)
-                        .height(24.dp)
+                        .height(24.dp),
                 )
                 Text(text = data.company)
             }
@@ -219,14 +216,14 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                     .fillMaxWidth()
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Mail,
                     contentDescription = null,
                     modifier = Modifier
                         .width(24.dp)
-                        .height(24.dp)
+                        .height(24.dp),
                 )
                 Text(text = data.email)
             }
@@ -238,14 +235,14 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                     .fillMaxWidth()
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Link,
                     contentDescription = null,
                     modifier = Modifier
                         .width(24.dp)
-                        .height(24.dp)
+                        .height(24.dp),
                 )
                 data.blogUrl?.let { Text(text = it) }
             }
@@ -259,7 +256,7 @@ private fun DetailRepoTitle() {
         text = stringResource(id = R.string.detail_repos_title_text),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
     )
 }
 
@@ -272,19 +269,19 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
             Text(
                 text = it,
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 4.dp),
             )
         }
         data.description?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 4.dp),
             )
         }
         Row(
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 4.dp),
         ) {
             Icon(
                 imageVector = Icons.Filled.Star,
@@ -293,7 +290,7 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
                     .padding(vertical = 8.dp)
                     .width(24.dp)
                     .height(24.dp),
-                colorResource(id = R.color.yellow)
+                colorResource(id = R.color.yellow),
             )
             Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
             data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
@@ -308,6 +305,6 @@ private fun DetailRepoNoItem() {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 12.dp),
-        style = MaterialTheme.typography.titleMedium
+        style = MaterialTheme.typography.titleMedium,
     )
 }
