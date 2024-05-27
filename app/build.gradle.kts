@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import org.jetbrains.kotlin.konan.properties.hasProperty
 
 plugins {
     id("com.android.application")
@@ -137,10 +136,5 @@ dependencies {
 
 fun getApiKey(propertyKey: String): String {
     val local = gradleLocalProperties(rootDir, providers)
-
-    return if (local.hasProperty(propertyKey)) {
-        local.getProperty(propertyKey)
-    } else {
-        System.getenv(propertyKey)
-    }
+    return local.getProperty(propertyKey)
 }
