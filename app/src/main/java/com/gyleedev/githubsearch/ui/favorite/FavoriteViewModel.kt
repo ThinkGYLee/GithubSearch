@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
     private val updateFavoriteUseCase: FavoriteUpdateFavoriteStatusUseCase,
-    private val favoriteGetFavoritesUseCase: FavoriteGetFavoritesUseCase
+    private val favoriteGetFavoritesUseCase: FavoriteGetFavoritesUseCase,
 ) : BaseViewModel() {
 
     private val filterState = MutableStateFlow(FilterStatus.ALL)

@@ -7,9 +7,8 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 object ModelToFeed {
     fun modelToFeed(
         userInfo: UserModel?,
-        repoInfo: List<RepositoryModel>?
+        repoInfo: List<RepositoryModel>?,
     ): List<DetailFeed> {
-
         val list = mutableListOf<DetailFeed>()
 
         if (userInfo != null) {
@@ -21,13 +20,13 @@ object ModelToFeed {
 
         list.add(DetailFeed.RepoTitle)
 
-        if(repoInfo!=null) {
-            if(repoInfo.isNotEmpty()) {
+        if (repoInfo != null) {
+            if (repoInfo.isNotEmpty()) {
                 list.addAll(repoInfo.map { DetailFeed.RepoDetail(it) })
             } else {
                 list.add(DetailFeed.RepoNoItem)
             }
-        }  else {
+        } else {
             list.add(DetailFeed.RepoNoItem)
         }
 

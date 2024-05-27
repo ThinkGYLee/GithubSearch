@@ -5,7 +5,6 @@ import com.gyleedev.githubsearch.data.remote.response.UserResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-
 interface GithubApiService {
 
     @GET("users/{user}")

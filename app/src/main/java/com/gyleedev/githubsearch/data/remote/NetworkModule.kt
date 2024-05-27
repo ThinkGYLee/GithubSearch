@@ -35,13 +35,11 @@ class NetworkModule {
         return PreferenceUtil(context)
     }
 
-
     @Singleton
     @Provides
     @TypeApi
     fun provideApiOkHttpClient(preferenceUtil: PreferenceUtil): OkHttpClient =
         if (BuildConfig.DEBUG) {
-
             val loggingInterceptor = HttpLoggingInterceptor()
             val tokenInterceptor = TokenInterceptor(preferenceUtil)
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -103,5 +101,4 @@ class NetworkModule {
     fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService {
         return retrofit.create(AccessService::class.java)
     }
-
 }

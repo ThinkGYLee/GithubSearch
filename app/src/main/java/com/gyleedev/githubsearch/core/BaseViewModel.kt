@@ -6,12 +6,12 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.domain.model.FetchState
-import java.net.SocketException
-import java.net.UnknownHostException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import java.net.SocketException
+import java.net.UnknownHostException
 
 abstract class BaseViewModel : ViewModel() {
     private val _fetchState = MutableSharedFlow<FetchState>()

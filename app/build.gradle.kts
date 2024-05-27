@@ -1,4 +1,7 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.konan.properties.hasProperty
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -24,9 +27,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "GPGKEY", getApiKey("gpgkey"))
-        buildConfigField("String", "GIT_ID", getApiKey("GITHUB_CLIENT_ID"))
-        buildConfigField("String", "GIT_SECRET", getApiKey("GITHUB_CLIENT_SECRET"))
+
+        buildConfigField("String", "CLIENT_ID", "\"${getApiKey("CLIENT_ID")}\"")
+        buildConfigField("String", "CLIENT_SECRET", "\"${getApiKey("CLIENT_SECRET")}\"")
     }
 
     buildTypes {
@@ -34,7 +37,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -71,7 +74,6 @@ dependencies {
     val nav_version = "2.7.6"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
-
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -133,9 +135,39 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation ("androidx.browser:browser:1.8.0")
+    implementation("androidx.browser:browser:1.8.0")
 }
 
 fun getApiKey(propertyKey: String): String {
-    return gradleLocalProperties(rootDir, providers).getProperty(propertyKey)
+    return getProps(propertyKey)
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> getProps(key: String): T {
+    val localProps = gradleLocalProperties(rootDir)
+    return when {
+        localProps.hasProperty(key) -> {
+            localProps[key] as T
+        }
+
+        project.hasProperty(key) -> {
+            project.property(key) as T
+        }
+
+        else -> {
+            System.getenv(key) as T
+        }
+    }
+}
+
+fun gradleLocalProperties(projectRootDir: File): Properties {
+    val properties = Properties()
+    val localProperties = File(projectRootDir, "local.properties")
+
+    if (localProperties.isFile) {
+        InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
+            properties.load(reader)
+        }
+    }
+    return properties
 }

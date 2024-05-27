@@ -34,6 +34,6 @@ fun UserResponse.toModel(): UserModel {
         updatedDate = updatedDate,
         reposAddress = reposAddress,
         blogUrl = blogUrl,
-        favorite = false
+        favorite = false,
     )
 }

@@ -110,7 +110,7 @@ fun HomeScreen(
                     Toast.makeText(
                         context,
                         context.getString(R.string.search_result_no_user),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
 
@@ -118,7 +118,7 @@ fun HomeScreen(
                     Toast.makeText(
                         context,
                         context.getString(R.string.http_exception),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
 
@@ -135,7 +135,6 @@ fun HomeScreen(
             showRequestAuthenticationDialog = true
         }
     }
-
 
     var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -157,11 +156,12 @@ fun HomeScreen(
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
-                modifier = Modifier
+                modifier = Modifier,
             )
-        }, modifier = modifier
+        },
+        modifier = modifier
             .fillMaxSize()
-            .padding(4.dp)
+            .padding(4.dp),
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
@@ -170,7 +170,8 @@ fun HomeScreen(
                     modifier = modifier.fillMaxSize(),
                 ) {
                     Box(
-                        modifier = Modifier, Alignment.Center
+                        modifier = Modifier,
+                        Alignment.Center,
                     ) {
                         CircularProgressIndicator(modifier = Modifier)
                     }
@@ -179,18 +180,20 @@ fun HomeScreen(
 
             is LoadState.Error -> {
                 NoItem(
-                    modifier = modifier
+                    modifier = modifier,
                 )
             }
 
             else -> {
                 if (users.itemCount > 0) {
-                    SearchItemList(modifier = modifier.padding(paddingValues),
+                    SearchItemList(
+                        modifier = modifier.padding(paddingValues),
                         users = users,
-                        onClick = { moveToDetail(it) })
+                        onClick = { moveToDetail(it) },
+                    )
                 } else {
                     NoItem(
-                        modifier = modifier
+                        modifier = modifier,
                     )
                 }
             }
@@ -207,7 +210,8 @@ fun HomeScreen(
                             showRequestAuthenticationDialog = false
                             requestToken()
                             login(context)
-                        }) {
+                        },
+                    ) {
                         Text(stringResource(id = R.string.text_dialog_confirm))
                     }
                 },
@@ -215,17 +219,18 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
-                        }) {
+                        },
+                    ) {
                         Text(stringResource(id = R.string.text_dialog_cancel))
                     }
-                }
+                },
             )
         }
     }
 }
 
 fun login(context: Context) {
-    val clientId = BuildConfig.GIT_ID
+    val clientId = BuildConfig.CLIENT_ID
     val loginUrl = Uri.Builder().scheme("https").authority("github.com")
         .appendPath("login")
         .appendPath("oauth")
@@ -235,12 +240,10 @@ fun login(context: Context) {
 
     val customTabsIntent = CustomTabsIntent.Builder().build()
 
-    //아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
+    // 아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
     customTabsIntent.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     customTabsIntent.launchUrl(context, loginUrl)
-
 }
-
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -328,10 +331,12 @@ fun EmbeddedSearchBar(
             SearchBarDefaults.windowInsets
         } else {
             WindowInsets(0.dp)
-        }
+        },
     ) {
         SearchResultItem(
-            user = user, onClick = moveToDetail, modifier = Modifier
+            user = user,
+            onClick = moveToDetail,
+            modifier = Modifier,
         )
 
         if (loading) {
@@ -339,7 +344,8 @@ fun EmbeddedSearchBar(
                 modifier = modifier.fillMaxSize(),
             ) {
                 Box(
-                    modifier = Modifier, Alignment.Center
+                    modifier = Modifier,
+                    Alignment.Center,
                 ) {
                     CircularProgressIndicator(modifier = Modifier)
                 }
@@ -350,17 +356,19 @@ fun EmbeddedSearchBar(
 
 @Composable
 private fun SearchItemList(
-    users: LazyPagingItems<UserModel>, modifier: Modifier = Modifier, onClick: (String) -> Unit
+    users: LazyPagingItems<UserModel>,
+    modifier: Modifier = Modifier,
+    onClick: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(vertical = 12.dp)
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
             key = { users[it]?.login!! },
-            contentType = { 0 }
+            contentType = { 0 },
         ) { index ->
             val user = users[index] as UserModel
             HomeItem(user, onClick = { onClick(user.login) })
@@ -371,7 +379,9 @@ private fun SearchItemList(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun HomeItem(
-    user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -389,10 +399,11 @@ private fun HomeItem(
                 .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
-            contentDescription = null
+            contentDescription = null,
         )
         Text(
-            text = user.login, fontWeight = FontWeight.Bold
+            text = user.login,
+            fontWeight = FontWeight.Bold,
         )
     }
 }
@@ -400,7 +411,9 @@ private fun HomeItem(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
-    user: UserModel?, onClick: () -> Unit, modifier: Modifier = Modifier
+    user: UserModel?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (user != null) {
         Row(
@@ -410,7 +423,7 @@ private fun SearchResultItem(
                 .padding(12.dp)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             GlideImage(
                 model = (user.avatar),
@@ -418,10 +431,10 @@ private fun SearchResultItem(
                     .padding(horizontal = 8.dp)
                     .size(80.dp)
                     .clip(
-                        CircleShape
+                        CircleShape,
                     ),
                 contentScale = ContentScale.Crop,
-                contentDescription = null
+                contentDescription = null,
             )
 
             Column {
@@ -429,21 +442,21 @@ private fun SearchResultItem(
                     Text(
                         text = user.name,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
 
                 Text(
                     text = user.login,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp),
                 )
 
                 if (user.bio != null) {
                     Text(
                         text = user.bio,
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -453,12 +466,12 @@ private fun SearchResultItem(
 
 @Composable
 private fun NoItem(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = stringResource(id = R.string.home_no_item),
