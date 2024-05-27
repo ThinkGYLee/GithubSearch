@@ -230,7 +230,7 @@ fun HomeScreen(
 }
 
 fun login(context: Context) {
-    val clientId = BuildConfig.GIT_ID
+    val clientId = BuildConfig.CLIENT_ID
     val loginUrl = Uri.Builder().scheme("https").authority("github.com")
         .appendPath("login")
         .appendPath("oauth")

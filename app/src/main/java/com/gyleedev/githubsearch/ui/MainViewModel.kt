@@ -23,8 +23,8 @@ class MainViewModel @Inject constructor(
     fun getAccessToken(code: String) {
         viewModelScope.launch {
             val response = repository.getAccessToken(
-                id = BuildConfig.GIT_ID,
-                secret = BuildConfig.GIT_SECRET,
+                id = BuildConfig.CLIENT_ID,
+                secret = BuildConfig.CLIENT_SECRET,
                 code = code,
             )
 
