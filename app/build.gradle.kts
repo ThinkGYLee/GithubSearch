@@ -25,8 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "CLIENT_ID", getApiKey("GITHUB_CLIENT_ID"))
-        buildConfigField("String", "CLIENT_SECRET", getApiKey("GITHUB_CLIENT_SECRET"))
+        buildConfigField("String", "CLIENT_ID", getApiKey("CLIENT_ID"))
+        buildConfigField("String", "CLIENT_SECRET", getApiKey("CLIENT_SECRET"))
     }
 
     buildTypes {
