@@ -1,4 +1,7 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.konan.properties.hasProperty
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -135,6 +138,35 @@ dependencies {
 }
 
 fun getApiKey(propertyKey: String): String {
-    val local = gradleLocalProperties(rootDir, providers)
-    return local.getProperty(propertyKey)
+    return getProps(propertyKey)
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T> getProps(key: String): T {
+    val localProps = gradleLocalProperties(rootDir)
+    return when {
+        localProps.hasProperty(key) -> {
+            localProps[key] as T
+        }
+
+        project.hasProperty(key) -> {
+            project.property(key) as T
+        }
+
+        else -> {
+            System.getenv(key) as T
+        }
+    }
+}
+
+fun gradleLocalProperties(projectRootDir: File): Properties {
+    val properties = Properties()
+    val localProperties = File(projectRootDir, "local.properties")
+
+    if (localProperties.isFile) {
+        InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
+            properties.load(reader)
+        }
+    }
+    return properties
 }
