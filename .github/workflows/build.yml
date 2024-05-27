@@ -12,8 +12,8 @@ jobs:
     name: "Build"
     runs-on: ubuntu-latest
     env:
-      GITHUB_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      GITHUB_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
     permissions:
       contents: write
