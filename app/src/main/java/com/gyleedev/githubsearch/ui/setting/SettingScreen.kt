@@ -53,6 +53,9 @@ fun SettingScreen(
     onClick: () -> Unit,
 
 ) {
+
+    //TODO 묶을 영역 확실하게 카드로 묶고 이벤트 제대로 구현할 것
+    //다크모드, 언어, login, 버전, 개인 정책이 기본
     Scaffold(
         topBar = {
             TopAppBar(
