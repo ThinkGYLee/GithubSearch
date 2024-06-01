@@ -60,14 +60,14 @@ fun GithubSearchApp(
         bottomBar = {
             BottomNavigation(navController = navController, modifier = Modifier)
         },
-        modifier = Modifier,
+        modifier = Modifier.navigationBarsPadding(),
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = Modifier
                 .padding(bottom = innerPadding.calculateBottomPadding() / 2)
-                .statusBarsPadding(),
+                .statusBarsPadding()
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
@@ -121,7 +121,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.navigationBarsPadding(),
+        modifier = modifier,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
