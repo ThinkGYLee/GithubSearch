@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.data.database.dao.AccessTimeDao
 import com.gyleedev.githubsearch.data.database.dao.ReposDao
 import com.gyleedev.githubsearch.data.database.dao.UserDao
@@ -15,13 +16,16 @@ import com.gyleedev.githubsearch.data.paging.UserPagingSource
 import com.gyleedev.githubsearch.data.remote.AccessService
 import com.gyleedev.githubsearch.data.remote.GithubApiService
 import com.gyleedev.githubsearch.data.remote.NetworkModule
+import com.gyleedev.githubsearch.data.remote.RevokeService
 import com.gyleedev.githubsearch.data.remote.response.GithubAccessResponse
 import com.gyleedev.githubsearch.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.domain.model.RevokeRequestBody
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.util.PreferenceUtil
 import com.gyleedev.githubsearch.util.exceptionToStatusUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +50,10 @@ interface GitHubRepository {
         secret: String,
         code: String,
     ): Response<GithubAccessResponse>
+
+    suspend fun resetData()
+
+    suspend fun revokeApplication()
 }
 
 class GitHubRepositoryImpl @Inject constructor(
@@ -54,6 +62,8 @@ class GitHubRepositoryImpl @Inject constructor(
     private val accessTimeDao: AccessTimeDao,
     @NetworkModule.TypeApi private val githubApiService: GithubApiService,
     @NetworkModule.TypeAccess private val accessService: AccessService,
+    @NetworkModule.TypeRevoke private val revokeService: RevokeService,
+    private val preferenceUtil: PreferenceUtil,
 ) : GitHubRepository {
 
     override fun getUsers(): Flow<PagingData<UserModel>> {
@@ -285,4 +295,22 @@ class GitHubRepositoryImpl @Inject constructor(
         secret: String,
         code: String,
     ) = accessService.getAccessToken(clientId = id, clientSecret = secret, code = code)
+
+    override suspend fun resetData() {
+        accessTimeDao.resetAccessTime()
+        userDao.resetUser()
+        reposDao.resetRepos()
+    }
+
+    override suspend fun revokeApplication() {
+        val accessToken = preferenceUtil.getString(defValue = "")
+        try {
+            revokeService.revoke(
+                clientId = BuildConfig.CLIENT_ID,
+                accessToken = RevokeRequestBody(accessToken),
+            )
+        } catch (e: Exception) {
+            println(e)
+        }
+    }
 }
