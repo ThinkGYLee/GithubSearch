@@ -27,6 +27,10 @@ class NetworkModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class TypeApi
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class TypeRevoke
+
     private val apiUrl = "https://api.github.com"
     private val accessUrl = "https://github.com"
 
@@ -100,5 +104,40 @@ class NetworkModule {
     @TypeAccess
     fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService {
         return retrofit.create(AccessService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeOkHttpClient(): OkHttpClient =
+        if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor()
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+            val revokeInterceptor = RevokeInterceptor()
+            OkHttpClient.Builder()
+                .addNetworkInterceptor(loggingInterceptor)
+                .addInterceptor(revokeInterceptor)
+                .build()
+        } else {
+            OkHttpClient.Builder().build()
+        }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeRetrofit(@TypeRevoke okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(apiUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeGithubApi(@TypeRevoke retrofit: Retrofit): RevokeService {
+        return retrofit.create(RevokeService::class.java)
     }
 }
