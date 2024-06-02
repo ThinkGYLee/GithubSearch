@@ -48,7 +48,7 @@ import com.gyleedev.githubsearch.R
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    requestToken: () -> Unit,
+    requestAuthentication: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
     // TODO 묶을 영역 확실하게 카드로 묶고 이벤트 제대로 구현할 것
@@ -219,7 +219,7 @@ fun SettingScreen(
         if (showLoginDialog.value) {
             TwoButtonDialog(
                 onDismissRequest = { showLoginDialog.value = false },
-                onEventRequest = { requestToken() },
+                onEventRequest = { requestAuthentication() },
                 modifier = Modifier,
                 type = false,
             )

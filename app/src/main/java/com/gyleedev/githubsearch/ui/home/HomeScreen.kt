@@ -69,7 +69,7 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 @Composable
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
-    requestToken: () -> Unit,
+    requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -207,7 +207,7 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
-                            requestToken()
+                            requestAuthentication()
                             login(context)
                         },
                     ) {

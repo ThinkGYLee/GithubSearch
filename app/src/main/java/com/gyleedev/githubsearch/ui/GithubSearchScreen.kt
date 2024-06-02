@@ -54,7 +54,7 @@ sealed class BottomNavItem(
 @Composable
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
-    onLoginClicked: () -> Unit,
+    onAuthenticationRequest: () -> Unit,
 ) {
     Scaffold(
         bottomBar = {
@@ -66,14 +66,14 @@ fun GithubSearchApp(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = Modifier
-                .padding(bottom = innerPadding.calculateBottomPadding() / 2)
-                .statusBarsPadding()
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .statusBarsPadding(),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestToken = { onLoginClicked() },
+                    requestAuthentication = { onAuthenticationRequest() },
                 )
             }
 
@@ -101,9 +101,9 @@ fun GithubSearchApp(
 
             composable(route = BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
+                    requestAuthentication = { onAuthenticationRequest() },
                     modifier = Modifier
                         .fillMaxSize(),
-                    onClick = { },
                 )
             }
         }

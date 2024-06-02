@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GithubSearchTheme {
                 GithubSearchApp(
-                    onLoginClicked = {
+                    onAuthenticationRequest = {
                         login(this)
                     },
                 )
