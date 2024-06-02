@@ -45,4 +45,7 @@ interface UserDao {
             FilterStatus.NOREPO -> getUsersNonRepo()
         }
     }
+
+    @Query("DELETE FROM user")
+    fun resetUser()
 }

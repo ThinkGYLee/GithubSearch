@@ -16,4 +16,7 @@ interface ReposDao {
 
     @Query("DELETE FROM repos WHERE user_github_id = :githubId  COLLATE NOCASE")
     suspend fun deleteRepos(githubId: String)
+
+    @Query("DELETE FROM repos")
+    fun resetRepos()
 }
