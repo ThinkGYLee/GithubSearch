@@ -159,9 +159,8 @@ fun HomeScreen(
                 modifier = Modifier,
             )
         },
-        modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp),
+        modifier = modifier.fillMaxSize(),
+
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
@@ -187,7 +186,7 @@ fun HomeScreen(
             else -> {
                 if (users.itemCount > 0) {
                     SearchItemList(
-                        modifier = modifier.padding(paddingValues),
+                        modifier = Modifier.fillMaxSize().padding(paddingValues),
                         users = users,
                         onClick = { moveToDetail(it) },
                     )
