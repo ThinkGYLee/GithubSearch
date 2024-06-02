@@ -75,7 +75,7 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
-    //lifecycle 관련 라이브러리를 2.8.0으로 올리려면 compose version도 1.7.0 이상으로 세팅(현재 1.6.7)
+    // lifecycle 관련 라이브러리를 2.8.0으로 올리려면 compose version도 1.7.0 이상으로 세팅(현재 1.6.7)
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
