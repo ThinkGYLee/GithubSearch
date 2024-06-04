@@ -8,11 +8,11 @@ import javax.inject.Inject
 
 class RevokeInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val clientId = BuildConfig.CLIENT_ID
-        val clientSecret = BuildConfig.CLIENT_SECRET
-        val encodedBasic: String = Base64.getEncoder().encodeToString(("$clientId:$clientSecret").toByteArray())
+        val encodedBasic: String = Base64.getEncoder()
+            .encodeToString(("${BuildConfig.CLIENT_ID}:${BuildConfig.CLIENT_SECRET}").toByteArray())
         val builder = chain.request().newBuilder()
 
+        builder.addHeader("Accept", "application/vnd.github+json")
         builder.addHeader("Authorization", "Basic $encodedBasic")
         return chain.proceed(builder.build())
     }
