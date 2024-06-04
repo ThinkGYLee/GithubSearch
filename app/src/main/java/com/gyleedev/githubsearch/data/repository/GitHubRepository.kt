@@ -15,8 +15,10 @@ import com.gyleedev.githubsearch.data.database.entity.toModel
 import com.gyleedev.githubsearch.data.paging.UserPagingSource
 import com.gyleedev.githubsearch.data.remote.AccessService
 import com.gyleedev.githubsearch.data.remote.GithubApiService
-import com.gyleedev.githubsearch.data.remote.NetworkModule
 import com.gyleedev.githubsearch.data.remote.RevokeService
+import com.gyleedev.githubsearch.data.remote.TypeAccess
+import com.gyleedev.githubsearch.data.remote.TypeApi
+import com.gyleedev.githubsearch.data.remote.TypeRevoke
 import com.gyleedev.githubsearch.data.remote.response.GithubAccessResponse
 import com.gyleedev.githubsearch.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
@@ -60,9 +62,9 @@ class GitHubRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val reposDao: ReposDao,
     private val accessTimeDao: AccessTimeDao,
-    @NetworkModule.TypeApi private val githubApiService: GithubApiService,
-    @NetworkModule.TypeAccess private val accessService: AccessService,
-    @NetworkModule.TypeRevoke private val revokeService: RevokeService,
+    @TypeApi private val githubApiService: GithubApiService,
+    @TypeAccess private val accessService: AccessService,
+    @TypeRevoke private val revokeService: RevokeService,
     private val preferenceUtil: PreferenceUtil,
 ) : GitHubRepository {
 
@@ -304,13 +306,16 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun revokeApplication() {
         val accessToken = preferenceUtil.getString(defValue = "")
-        try {
-            revokeService.revoke(
-                clientId = BuildConfig.CLIENT_ID,
-                accessToken = RevokeRequestBody(accessToken),
-            )
-        } catch (e: Exception) {
-            println(e)
+        if (accessToken.isNotEmpty() || accessToken.isNotBlank()) {
+            try {
+                revokeService.revoke(
+                    clientId = BuildConfig.CLIENT_ID,
+                    accessToken = RevokeRequestBody(accessToken),
+                )
+            } catch (e: Exception) {
+                // 예외처리
+                println(e)
+            }
         }
     }
 }
