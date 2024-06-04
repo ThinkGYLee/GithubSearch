@@ -12,28 +12,17 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class TypeAccess
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class TypeApi
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class TypeRevoke
-
     private val apiUrl = "https://api.github.com"
     private val accessUrl = "https://github.com"
 
+    // TODO 이동
+    @Singleton
     @Provides
     fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
         return PreferenceUtil(context)
@@ -109,19 +98,19 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeRevoke
-    fun provideRevokeOkHttpClient(): OkHttpClient =
-        if (BuildConfig.DEBUG) {
+    fun provideRevokeOkHttpClient(): OkHttpClient {
+        val revokeInterceptor = RevokeInterceptor()
+        val interceptor = if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor()
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-            val revokeInterceptor = RevokeInterceptor()
             OkHttpClient.Builder()
                 .addNetworkInterceptor(loggingInterceptor)
-                .addInterceptor(revokeInterceptor)
-                .build()
         } else {
-            OkHttpClient.Builder().build()
+            OkHttpClient.Builder()
         }
+        return interceptor.addInterceptor(revokeInterceptor).build()
+    }
 
     @Singleton
     @Provides
