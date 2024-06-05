@@ -54,4 +54,8 @@
     <string name="dialog_log_out_content">Press Yes to Log Out From Github</string>
     <string name="dialog_answer_yes">Yes</string>
     <string name="dialog_answer_no">No</string>
+    <string name="setting_choice_language">Choose the language</string>
+    <string name="setting_korean">한국어</string>
+    <string name="setting_english">English</string>
+    <string name="setting_japanese">日本語</string>
 </resources>
