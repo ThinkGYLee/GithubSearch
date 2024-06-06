@@ -1,5 +1,6 @@
 package com.gyleedev.githubsearch.ui.setting
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gyleedev.githubsearch.BuildConfig
@@ -56,6 +58,9 @@ fun SettingScreen(
 
     val isDark = isSystemInDarkTheme()
     val version = BuildConfig.VERSION_NAME
+
+    val currentTheme = AppCompatDelegate.getDefaultNightMode()
+    val currentLocale = AppCompatDelegate.getApplicationLocales()
 
     val showLanguageDialog = remember { mutableStateOf(false) }
     val showThemeDialog = remember { mutableStateOf(false) }
@@ -236,6 +241,7 @@ fun SettingScreen(
     }
 }
 
+
 @Composable
 private fun TwoButtonDialog(
     onDismissRequest: () -> Unit,
@@ -251,10 +257,12 @@ private fun TwoButtonDialog(
             titleResource = R.string.dialog_log_out_title
             contentResource = R.string.dialog_log_out_content
         }
+
         false -> {
             titleResource = R.string.dialog_log_in_title
             contentResource = R.string.dialog_log_in_content
         }
+
         null -> {
             titleResource = R.string.dialog_reset_title
             contentResource = R.string.dialog_reset_content
@@ -316,3 +324,156 @@ private fun SettingRow(
         trailingContent()
     }
 }
+
+/*
+아이디어 생각
+컨피규레이션 체인지가 안 일어 난다면 뭔지 바뀔일은 없다.
+최상위에 현재 스테이트를 쓰고 내린다.
+ */
+@Composable
+private fun RadioButtonDialog(
+    onDismissRequest: () -> Unit,
+    onEventRequest: () -> Unit,
+    item: RadioDialogItem,
+    modifier: Modifier
+) {
+
+    val currentTheme = AppCompatDelegate.getDefaultNightMode()
+    val currentLocale = AppCompatDelegate.getApplicationLocales()
+    when (item) {
+        is RadioDialogItem.Theme -> {
+            val themeItem = item as List<ThemeItem>
+            val list = item.list as List<Int>
+            list
+        }
+
+        is RadioDialogItem.Language -> {
+
+        }
+    }
+
+
+
+    AlertDialog(
+        title = {
+            Text(
+                text = stringResource(id = R.string.text_filter_title),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.text_filter_content),
+                    modifier = Modifier.padding(bottom = 5.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                /*RadioButtons(
+                    selectedItemId = selectedItemId,
+                    RadioItems(
+                        item.list.map { stringResource(id = it) }
+                    ),
+                    selectedItem = { string ->
+                        list.indexOf(string).also {
+                            selectedItem.value = string
+                        }
+                    }
+                )*/
+            }
+        },
+        onDismissRequest = { TODO() },
+        confirmButton = { TODO() },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun RadioButtons(
+    selectedItemId: Int,
+    items: RadioDialogItem,
+    selectedItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+
+    val selectedValue = remember { mutableStateOf("") }
+    val isSelectedItem: (String) -> Boolean = {
+        selectedValue.value == it
+    }
+    val onChangeState: (String) -> Unit = {
+        selectedValue.value = it
+        selectedItem(selectedValue.value)
+    }
+
+    Column(modifier = modifier.padding(top = 10.dp)) {
+        val declaration = items.list
+        declaration.forEach { item ->
+            /*Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .selectable(
+                            selected = isSelectedItem(item),
+                            onClick = {
+                                onChangeState(item)
+                                selectedId.intValue = declaration.indexOf(item)
+                            },
+                            role = Role.RadioButton
+                        )
+                        .padding(bottom = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = declaration[selectedId.intValue] == item,
+                        onClick = null,
+                        modifier = Modifier.padding(end = 5.dp)
+                    )
+                    Text(text = item, style = MaterialTheme.typography.labelMedium)
+                }
+            }*/
+        }
+    }
+}
+
+sealed class RadioDialogItem(
+    val list: List<Any>
+) {
+    data object Theme : RadioDialogItem(themeList)
+    data object Language : RadioDialogItem(languageList)
+}
+
+data class ThemeItem(
+    val type: Int,
+    val content: Int
+)
+data class LanguageItem(
+    val type: String,
+    val content: Int
+)
+
+val themeList = listOf(
+    ThemeItem(
+        AppCompatDelegate.MODE_NIGHT_YES,
+        R.string.filter_dark_theme
+    ),
+    ThemeItem(
+        AppCompatDelegate.MODE_NIGHT_NO,
+        R.string.filter_light_theme
+    ),
+    ThemeItem(
+        AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
+        R.string.filter_default_theme
+    )
+)
+
+val languageList = listOf(
+    LanguageItem(
+        "[ko_KR]",
+        R.string.setting_korean
+    ),
+    LanguageItem(
+        "[en_US]",
+        R.string.setting_english
+    ),
+)
