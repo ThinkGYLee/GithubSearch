@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.ui.BottomNavItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -334,25 +335,28 @@ private fun SettingRow(
 private fun RadioButtonDialog(
     onDismissRequest: () -> Unit,
     onEventRequest: () -> Unit,
-    item: RadioDialogItem,
+    type: DialogType,
     modifier: Modifier
 ) {
 
-    val currentTheme = AppCompatDelegate.getDefaultNightMode()
-    val currentLocale = AppCompatDelegate.getApplicationLocales()
-    when (item) {
-        is RadioDialogItem.Theme -> {
-            val themeItem = item as List<ThemeItem>
-            val list = item.list as List<Int>
-            list
+    val selectedItem: Int
+    val item = when (type) {
+        DialogType.THEME -> {
+            SettingDialogItem.Theme(dataList = themeList).also { theme ->
+                selectedItem = theme.dataList.indexOf(theme.dataList.find { themeItem ->
+                    themeItem.type == AppCompatDelegate.getDefaultNightMode()
+                })
+            }
         }
 
-        is RadioDialogItem.Language -> {
-
+        DialogType.LANGUAGE -> {
+            SettingDialogItem.Language(dataList = languageList).also { language ->
+                selectedItem = language.dataList.indexOf(language.dataList.find { languageItem ->
+                    languageItem.type == AppCompatDelegate.getApplicationLocales().toString()
+                })
+            }
         }
     }
-
-
 
     AlertDialog(
         title = {
@@ -369,17 +373,15 @@ private fun RadioButtonDialog(
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
-                /*RadioButtons(
+                RadioButtons(
                     selectedItemId = selectedItemId,
-                    RadioItems(
-                        item.list.map { stringResource(id = it) }
-                    ),
+                    item,
                     selectedItem = { string ->
                         list.indexOf(string).also {
                             selectedItem.value = string
                         }
                     }
-                )*/
+                )
             }
         },
         onDismissRequest = { TODO() },
@@ -391,7 +393,7 @@ private fun RadioButtonDialog(
 @Composable
 fun RadioButtons(
     selectedItemId: Int,
-    items: RadioDialogItem,
+    items: SettingDialogItem,
     selectedItem: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -436,21 +438,31 @@ fun RadioButtons(
     }
 }
 
-sealed class RadioDialogItem(
-    val list: List<Any>
-) {
-    data object Theme : RadioDialogItem(themeList)
-    data object Language : RadioDialogItem(languageList)
+sealed class SettingDialogItem {
+    data class Theme(
+        val dataList: List<ThemeItem>
+    ) : SettingDialogItem()
+
+    data class Language(
+        val dataList: List<LanguageItem>
+    ) : SettingDialogItem()
+}
+
+enum class DialogType {
+    THEME,
+    LANGUAGE
 }
 
 data class ThemeItem(
     val type: Int,
     val content: Int
 )
+
 data class LanguageItem(
     val type: String,
     val content: Int
 )
+
 
 val themeList = listOf(
     ThemeItem(
