@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,9 +46,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,14 +59,11 @@ fun SettingScreen(
     requestAuthentication: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
-    // TODO 묶을 영역 확실하게 카드로 묶고 이벤트 제대로 구현할 것
-    // 다크모드, 언어, login, 버전, 개인 정책이 기본
-
     val isDark = isSystemInDarkTheme()
     val version = BuildConfig.VERSION_NAME
 
-    val currentTheme = AppCompatDelegate.getDefaultNightMode()
-    val currentLocale = AppCompatDelegate.getApplicationLocales()
+    val themeData = SettingDialogItem.Theme(themeList)
+    val languageData = SettingDialogItem.Language(languageList)
 
     val showLanguageDialog = remember { mutableStateOf(false) }
     val showThemeDialog = remember { mutableStateOf(false) }
@@ -116,7 +116,7 @@ fun SettingScreen(
                 SettingRow(
                     leadingIcon = Icons.Outlined.DarkMode,
                     text = stringResource(R.string.setting_theme),
-                    onClick = {},
+                    onClick = { showThemeDialog.value = true },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
@@ -127,7 +127,7 @@ fun SettingScreen(
                 SettingRow(
                     leadingIcon = Icons.Outlined.Language,
                     text = stringResource(R.string.setting_language),
-                    onClick = {},
+                    onClick = { showLanguageDialog.value = true },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
@@ -215,6 +215,30 @@ fun SettingScreen(
             }
         }
 
+        if (showLanguageDialog.value) {
+            RadioButtonDialog(
+                onDismissRequest = { showLanguageDialog.value = false },
+                onEventRequest = { index ->
+                    AppCompatDelegate.setApplicationLocales(languageData.content[index].type)
+                    showLanguageDialog.value = false
+                },
+                items = languageData,
+                modifier = Modifier,
+            )
+        }
+
+        if (showThemeDialog.value) {
+            RadioButtonDialog(
+                onDismissRequest = { showThemeDialog.value = false },
+                onEventRequest = { index ->
+                    AppCompatDelegate.setDefaultNightMode(themeData.content[index].type)
+                    showThemeDialog.value = false
+                },
+                items = themeData,
+                modifier = Modifier,
+            )
+        }
+
         if (showResetDialog.value) {
             TwoButtonDialog(
                 onDismissRequest = { showResetDialog.value = false },
@@ -243,7 +267,6 @@ fun SettingScreen(
         }
     }
 }
-
 
 @Composable
 private fun TwoButtonDialog(
@@ -336,20 +359,36 @@ private fun SettingRow(
 @Composable
 private fun RadioButtonDialog(
     onDismissRequest: () -> Unit,
-    onEventRequest: () -> Unit,
+    onEventRequest: (Int) -> Unit,
     items: SettingDialogItem,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
-    val selectedIndex = when (items.data) {
-        is Item.Theme -> {
-            val data = items.data as Item.Theme
-            data.content.indexOf(data.content.find { it.type == AppCompatDelegate.getDefaultNightMode() })
+    val stringResourceList: List<Int>
+
+    val defaultIndex = when (items) {
+        is SettingDialogItem.Theme -> {
+            val data = items.content
+            stringResourceList = data.map { it.content }
+            data.indexOf(
+                data.find {
+                    it.type == AppCompatDelegate.getDefaultNightMode()
+                },
+            )
         }
 
-        is Item.Language -> {
-            val data = items.data as Item.Language
-            data.content.indexOf(data.content.find { it.type == AppCompatDelegate.getApplicationLocales().toString() })
+        is SettingDialogItem.Language -> {
+            val data = items.content
+            stringResourceList = data.map { it.content }
+            data.indexOf(
+                data.find {
+                    it.type == AppCompatDelegate.getApplicationLocales()
+                },
+            )
         }
+    }
+
+    val selectedIndex = remember {
+        mutableIntStateOf(defaultIndex)
     }
 
     AlertDialog(
@@ -357,7 +396,7 @@ private fun RadioButtonDialog(
             Text(
                 text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         },
         text = {
@@ -365,129 +404,113 @@ private fun RadioButtonDialog(
                 Text(
                     text = stringResource(id = R.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 RadioButtons(
-                    selectedIndex = selectedIndex,
-                    items
+                    selectedIndex = selectedIndex.value,
+                    stringResourceList,
+                    onIndexChange = { selectedIndex.value = it },
                 )
             }
         },
-        onDismissRequest = { TODO() },
-        confirmButton = { TODO() },
-        modifier = modifier
+        onDismissRequest = { onDismissRequest() },
+        dismissButton = {
+            TextButton(onClick = {
+                onDismissRequest()
+            }) {
+                Text(text = stringResource(id = R.string.text_filter_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onEventRequest(selectedIndex.value)
+                    onDismissRequest()
+                },
+            ) {
+                Text(text = stringResource(id = R.string.text_filter_confirm))
+            }
+        },
+        modifier = modifier,
     )
 }
 
 @Composable
 fun RadioButtons(
     selectedIndex: Int,
-    items: SettingDialogItem,
+    items: List<Int>,
+    onIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
-    val selectedValue = remember { mutableIntStateOf(selectedIndex) }
-    val isSelectedItem: (Int) -> Boolean = {
-        selectedValue.value == it
-    }
-    val onChangeState: (Int) -> Unit = {
-        selectedValue.value = it
-    }
-
-    val declaration = when (items.data) {
-        is Item.Theme -> {
-            val data = items.data as Item.Theme
-            data.content.map { it.content }
-        }
-
-        is Item.Language -> {
-            val data = items.data as Item.Language
-            data.content.map { it.content }
-        }
-    }
-
     Column(modifier = modifier.padding(top = 10.dp)) {
-        declaration.forEach { item ->
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .selectable(
-                            selected = isSelectedItem(item),
-                            onClick = {
-                                onChangeState(item)
-                                //selectedId.intValue = declaration.indexOf(item)
-                            },
-                            role = Role.RadioButton
-                        )
-                        .padding(bottom = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = declaration[selectedIndex] == item,
-                        onClick = null,
-                        modifier = Modifier.padding(end = 5.dp)
+        items.forEach { item ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .selectable(
+                        selected = selectedIndex == items.indexOf(item),
+                        onClick = {
+                            onIndexChange(items.indexOf(item))
+                        },
+                        role = Role.RadioButton,
                     )
-                    Text(text = item.toString(), style = MaterialTheme.typography.labelMedium)
-                }
+                    .padding(bottom = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(
+                    selected = selectedIndex == items.indexOf(item),
+                    onClick = null,
+                    modifier = Modifier.padding(end = 5.dp),
+                )
+                Text(text = stringResource(id = item), style = MaterialTheme.typography.labelMedium)
             }
         }
     }
 }
 
 sealed interface SettingDialogItem {
-    val data: Item
-}
-
-sealed interface Item {
     data class Theme(
-        val content: List<ThemeItem>
-    ) : Item
+        val content: List<ThemeItem>,
+    ) : SettingDialogItem
 
     data class Language(
-        val content: List<LanguageItem>
-    ) : Item
-}
-
-enum class DialogType {
-    THEME,
-    LANGUAGE
+        val content: List<LanguageItem>,
+    ) : SettingDialogItem
 }
 
 data class ThemeItem(
     val type: Int,
-    val content: Int
+    val content: Int,
 )
 
 data class LanguageItem(
-    val type: String,
-    val content: Int
+    val type: LocaleListCompat,
+    val content: Int,
 )
-
 
 val themeList = listOf(
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_YES,
-        R.string.filter_dark_theme
+        R.string.filter_dark_theme,
     ),
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_NO,
-        R.string.filter_light_theme
+        R.string.filter_light_theme,
     ),
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
-        R.string.filter_default_theme
-    )
+        R.string.filter_default_theme,
+    ),
 )
 
 val languageList = listOf(
     LanguageItem(
-        "[ko_KR]",
-        R.string.setting_korean
+        LocaleListCompat.create(Locale.KOREA),
+        R.string.setting_korean,
     ),
     LanguageItem(
-        "[en_US]",
-        R.string.setting_english
+        LocaleListCompat.create(Locale.ENGLISH),
+        R.string.setting_english,
     ),
 )
