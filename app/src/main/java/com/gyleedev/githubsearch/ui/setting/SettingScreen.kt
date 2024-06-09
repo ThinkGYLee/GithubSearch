@@ -74,7 +74,7 @@ fun SettingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Setting") },
+                title = { Text(text = stringResource(id = R.string.title_setting)) },
                 modifier = Modifier,
             )
         },
@@ -407,9 +407,9 @@ private fun RadioButtonDialog(
                     style = MaterialTheme.typography.titleMedium,
                 )
                 RadioButtons(
-                    selectedIndex = selectedIndex.value,
+                    selectedIndex = selectedIndex.intValue,
                     stringResourceList,
-                    onIndexChange = { selectedIndex.value = it },
+                    onIndexChange = { selectedIndex.intValue = it },
                 )
             }
         },
@@ -424,7 +424,7 @@ private fun RadioButtonDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onEventRequest(selectedIndex.value)
+                    onEventRequest(selectedIndex.intValue)
                     onDismissRequest()
                 },
             ) {
