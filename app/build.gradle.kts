@@ -126,6 +126,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
 
+    implementation ("com.github.skydoves:landscapist-glide:2.3.3")
+
     implementation("com.github.bumptech.glide:glide:4.16.0")
     ksp("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
