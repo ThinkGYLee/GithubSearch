@@ -165,7 +165,7 @@ fun HomeScreen(
         },
         modifier = modifier.fillMaxSize(),
 
-        ) { paddingValues ->
+    ) { paddingValues ->
 
         when (users.loadState.refresh) {
             is LoadState.Loading -> {
@@ -343,7 +343,7 @@ fun EmbeddedSearchBar(
             user = user,
             onClick = moveToDetail,
             modifier = Modifier,
-            onUserUpdate = { onUserUpdate() }
+            onUserUpdate = { onUserUpdate() },
         )
 
         if (loading) {
