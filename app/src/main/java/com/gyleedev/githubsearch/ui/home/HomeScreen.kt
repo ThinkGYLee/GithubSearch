@@ -76,7 +76,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val users = viewModel.users.collectAsLazyPagingItems()
-    users.refresh()
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
     val loading by viewModel.loading.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -155,6 +154,7 @@ fun HomeScreen(
                     viewModel.getUser()
                 },
                 onSearchItemReset = { viewModel.resetUser() },
+                onUserUpdate = { users.refresh() },
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
@@ -165,7 +165,7 @@ fun HomeScreen(
         },
         modifier = modifier.fillMaxSize(),
 
-    ) { paddingValues ->
+        ) { paddingValues ->
 
         when (users.loadState.refresh) {
             is LoadState.Loading -> {
@@ -259,6 +259,7 @@ fun EmbeddedSearchBar(
     onSearch: (String) -> Unit,
     onSearchItemReset: () -> Unit,
     moveToDetail: () -> Unit,
+    onUserUpdate: () -> Unit,
     user: UserModel?,
     loading: Boolean,
     modifier: Modifier = Modifier,
@@ -342,6 +343,7 @@ fun EmbeddedSearchBar(
             user = user,
             onClick = moveToDetail,
             modifier = Modifier,
+            onUserUpdate = { onUserUpdate() }
         )
 
         if (loading) {
@@ -421,10 +423,12 @@ private fun HomeItem(
 @Composable
 private fun SearchResultItem(
     user: UserModel?,
+    onUserUpdate: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (user != null) {
+        onUserUpdate()
         Row(
             modifier = modifier
                 .fillMaxWidth()
