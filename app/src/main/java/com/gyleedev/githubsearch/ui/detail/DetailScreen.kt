@@ -124,7 +124,7 @@ fun DetailScreen(
 
 @Composable
 private fun DetailUserTitleItem(
-    user: DetailFeed.UserProfile
+    user: DetailFeed.UserProfile,
 ) {
     val data = user.userModel
 
