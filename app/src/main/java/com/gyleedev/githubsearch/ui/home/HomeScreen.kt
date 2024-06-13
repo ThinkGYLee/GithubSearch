@@ -47,23 +47,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -188,7 +191,9 @@ fun HomeScreen(
             else -> {
                 if (users.itemCount > 0) {
                     SearchItemList(
-                        modifier = Modifier.fillMaxSize().padding(paddingValues),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                         users = users,
                         onClick = { moveToDetail(it) },
                     )
@@ -377,7 +382,6 @@ private fun SearchItemList(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun HomeItem(
     user: UserModel,
@@ -394,13 +398,19 @@ private fun HomeItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
-            model = (user.avatar),
+            imageModel = { user.avatar },
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
         Text(
             text = user.login,
@@ -409,7 +419,6 @@ private fun HomeItem(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SearchResultItem(
     user: UserModel?,
@@ -427,15 +436,21 @@ private fun SearchResultItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             GlideImage(
-                model = (user.avatar),
+                imageModel = { user.avatar },
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(80.dp)
                     .clip(
                         CircleShape,
                     ),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
+                component = rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
             )
 
             Column {
