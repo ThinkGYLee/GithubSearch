@@ -69,7 +69,7 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 @Composable
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
-    requestToken: () -> Unit,
+    requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -156,12 +156,13 @@ fun HomeScreen(
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
             )
         },
-        modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp),
+        modifier = modifier.fillMaxSize(),
+
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
@@ -187,7 +188,7 @@ fun HomeScreen(
             else -> {
                 if (users.itemCount > 0) {
                     SearchItemList(
-                        modifier = modifier.padding(paddingValues),
+                        modifier = Modifier.fillMaxSize().padding(paddingValues),
                         users = users,
                         onClick = { moveToDetail(it) },
                     )
@@ -208,7 +209,7 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
-                            requestToken()
+                            requestAuthentication()
                             login(context)
                         },
                     ) {

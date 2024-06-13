@@ -16,4 +16,14 @@ class PreferenceUtil(@ApplicationContext context: Context) {
     fun setString(key: String = "Token", str: String) {
         accessPreference.edit().putString(key, str).apply()
     }
+
+    fun isKeyExist(): Boolean {
+        return accessPreference.getString("Token", "").let {
+            !it.isNullOrEmpty()
+        }
+    }
+
+    fun deleteKey() {
+        setString(str = "")
+    }
 }

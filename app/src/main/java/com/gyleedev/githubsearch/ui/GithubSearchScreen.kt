@@ -54,26 +54,26 @@ sealed class BottomNavItem(
 @Composable
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
-    onLoginClicked: () -> Unit,
+    onAuthenticationRequest: () -> Unit,
 ) {
     Scaffold(
         bottomBar = {
             BottomNavigation(navController = navController, modifier = Modifier)
         },
-        modifier = Modifier,
+        modifier = Modifier.navigationBarsPadding(),
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = Modifier
-                .padding(bottom = innerPadding.calculateBottomPadding() / 2)
+                .padding(bottom = innerPadding.calculateBottomPadding())
                 .statusBarsPadding(),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestToken = { onLoginClicked() },
+                    requestAuthentication = { onAuthenticationRequest() },
                 )
             }
 
@@ -101,9 +101,9 @@ fun GithubSearchApp(
 
             composable(route = BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
+                    requestAuthentication = { onAuthenticationRequest() },
                     modifier = Modifier
                         .fillMaxSize(),
-                    onClick = { },
                 )
             }
         }
@@ -121,7 +121,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.navigationBarsPadding(),
+        modifier = modifier,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

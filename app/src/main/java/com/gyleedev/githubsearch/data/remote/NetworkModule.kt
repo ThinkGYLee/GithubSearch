@@ -12,24 +12,17 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
 
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class TypeAccess
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class TypeApi
-
     private val apiUrl = "https://api.github.com"
     private val accessUrl = "https://github.com"
 
+    // TODO 이동
+    @Singleton
     @Provides
     fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
         return PreferenceUtil(context)
@@ -100,5 +93,40 @@ class NetworkModule {
     @TypeAccess
     fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService {
         return retrofit.create(AccessService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeOkHttpClient(): OkHttpClient {
+        val revokeInterceptor = RevokeInterceptor()
+        val interceptor = if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor()
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+
+            OkHttpClient.Builder()
+                .addNetworkInterceptor(loggingInterceptor)
+        } else {
+            OkHttpClient.Builder()
+        }
+        return interceptor.addInterceptor(revokeInterceptor).build()
+    }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeRetrofit(@TypeRevoke okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl(apiUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    @TypeRevoke
+    fun provideRevokeGithubApi(@TypeRevoke retrofit: Retrofit): RevokeService {
+        return retrofit.create(RevokeService::class.java)
     }
 }
