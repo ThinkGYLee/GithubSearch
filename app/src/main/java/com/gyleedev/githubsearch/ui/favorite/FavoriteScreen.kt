@@ -33,7 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -42,10 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,7 +177,7 @@ private fun FavoriteItemList(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FavoriteItem(
     user: UserModel,
@@ -197,14 +199,20 @@ private fun FavoriteItem(
 
     ) {
         GlideImage(
-            model = (user.avatar),
+            imageModel = { user.avatar },
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .heightIn(max = 80.dp, min = 20.dp)
                 .widthIn(max = 80.dp, min = 20.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
         Text(
             text = user.login,

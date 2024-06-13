@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Apartment
@@ -28,16 +31,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.DetailFeed
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.shimmer.Shimmer
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,9 +122,10 @@ fun DetailScreen(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
+private fun DetailUserTitleItem(
+    user: DetailFeed.UserProfile,
+) {
     val data = user.userModel
 
     Row(
@@ -129,8 +137,20 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         GlideImage(
-            model = (data.avatar),
-            contentDescription = null,
+            imageModel = { data.avatar },
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .heightIn(max = 80.dp, min = 20.dp)
+                .widthIn(max = 80.dp, min = 20.dp)
+                .clip(CircleShape),
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
