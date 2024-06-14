@@ -74,9 +74,10 @@ class GitHubRepositoryImpl @Inject constructor(
                 pageSize = 10,
                 enablePlaceholders = false,
             ),
-            pagingSourceFactory = { UserPagingSource(userDao) },
+            pagingSourceFactory = { userDao.getUsers() },
         ).flow.map { pagingData ->
-            pagingData.map { it.toModel() }
+            pagingData.map {
+                it.toModel() }
         }
     }
 
