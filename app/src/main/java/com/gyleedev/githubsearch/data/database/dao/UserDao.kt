@@ -11,8 +11,8 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 @Dao
 interface UserDao {
 
-    @Query("SELECT * FROM user LIMIT 10 OFFSET (:page-1)*10")
-    fun getUsers(page: Int): List<UserEntity>
+    @Query("SELECT * FROM user")
+    fun getUsers(): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user WHERE favorite = true ")
     fun getUsersAll(): PagingSource<Int, UserEntity>
