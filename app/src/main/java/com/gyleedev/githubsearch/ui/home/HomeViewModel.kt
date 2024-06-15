@@ -40,9 +40,9 @@ class HomeViewModel @Inject constructor(
     val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun getUser() {
+    fun getUser(id: String) {
         viewModelScope.launch(exceptionHandler) {
-            when (val userWrapper = searchUserUseCase(_searchId.value)) {
+            when (val userWrapper = searchUserUseCase(id)) {
                 is UserWrapper.FromDatabase -> {
                     _userInfo.emit(userWrapper.data)
                 }
@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
 
     fun updateSearchId(id: String) {
         viewModelScope.launch {
-            _searchId.emit(id)
+          //  _searchId.emit(id)
         }
     }
 
