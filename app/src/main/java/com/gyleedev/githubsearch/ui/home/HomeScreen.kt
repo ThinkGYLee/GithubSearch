@@ -79,6 +79,7 @@ fun HomeScreen(
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
     val loading by viewModel.loading.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
@@ -137,24 +138,17 @@ fun HomeScreen(
         }
     }
 
-    var searchText by remember { mutableStateOf("") }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             EmbeddedSearchBar(
-                onQueryChange = {
-                    searchText = it
-                    viewModel.updateSearchId(it)
-                },
+                onQueryChange = viewModel::updateSearchId,
                 isSearchActive = isSearchActive,
+                query = query,
                 onActiveChanged = { isSearchActive = it },
-                onSearch = {
-                    searchText = ""
-                    viewModel.getUser()
-                },
-                onSearchItemReset = { viewModel.resetUser() },
-                onUserUpdate = { users.refresh() },
+                onSearch = viewModel::getUser,
+                onSearchItemReset = viewModel::resetUser,
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
@@ -164,7 +158,6 @@ fun HomeScreen(
             )
         },
         modifier = modifier.fillMaxSize(),
-
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
@@ -234,7 +227,7 @@ fun HomeScreen(
     }
 }
 
-fun login(context: Context) {
+private fun login(context: Context) {
     val clientId = BuildConfig.CLIENT_ID
     val loginUrl = Uri.Builder().scheme("https").authority("github.com")
         .appendPath("login")
@@ -252,44 +245,33 @@ fun login(context: Context) {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun EmbeddedSearchBar(
+private fun EmbeddedSearchBar(
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
+    query: String,
     onActiveChanged: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
     onSearchItemReset: () -> Unit,
     moveToDetail: () -> Unit,
-    onUserUpdate: () -> Unit,
     user: UserModel?,
     loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-
-    val activeChanged: (Boolean) -> Unit = { active ->
-        searchQuery = ""
-        onQueryChange("")
-        onActiveChanged(active)
-    }
-
     SearchBar(
-        query = searchQuery,
-        onQueryChange = { query ->
-            searchQuery = query
-            onQueryChange(query)
+        query = query,
+        onQueryChange = { changedQuery ->
+            onQueryChange(changedQuery)
         },
         onSearch = onSearch,
         active = isSearchActive,
-        onActiveChange = activeChanged,
+        onActiveChange = { onActiveChanged(it) },
         modifier = modifier,
         placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
                     onClick = {
-                        searchQuery = ""
-                        onQueryChange("")
-                        activeChanged(false)
+                        onActiveChanged(false)
                     },
                 ) {
                     Icon(
@@ -306,12 +288,10 @@ fun EmbeddedSearchBar(
                 )
             }
         },
-        trailingIcon = if (isSearchActive && searchQuery.isNotEmpty()) {
+        trailingIcon = if (isSearchActive && query.isNotEmpty()) {
             {
                 IconButton(
                     onClick = {
-                        searchQuery = ""
-                        onQueryChange("")
                         onSearchItemReset()
                     },
                 ) {
@@ -339,23 +319,20 @@ fun EmbeddedSearchBar(
             WindowInsets(0.dp)
         },
     ) {
-        SearchResultItem(
-            user = user,
-            onClick = moveToDetail,
-            modifier = Modifier,
-            onUserUpdate = { onUserUpdate() },
-        )
-
-        if (loading) {
-            Surface(
-                modifier = modifier.fillMaxSize(),
-            ) {
-                Box(
-                    modifier = Modifier,
-                    Alignment.Center,
-                ) {
-                    CircularProgressIndicator(modifier = Modifier)
-                }
+        Box(modifier = modifier.fillMaxSize()) {
+            if (user != null) {
+                SearchResultItem(
+                    user = user,
+                    onClick = moveToDetail,
+                    modifier = Modifier
+                        .align(
+                            Alignment.TopStart,
+                        )
+                        .padding(top = 20.dp),
+                )
+            }
+            if (loading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }
@@ -422,62 +399,57 @@ private fun HomeItem(
 
 @Composable
 private fun SearchResultItem(
-    user: UserModel?,
-    onUserUpdate: () -> Unit,
+    user: UserModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (user != null) {
-        onUserUpdate()
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .padding(12.dp)
-                .clickable(onClick = onClick),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            GlideImage(
-                imageModel = { user.avatar },
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .size(80.dp)
-                    .clip(
-                        CircleShape,
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        GlideImage(
+            imageModel = { user.avatar },
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .size(80.dp)
+                .clip(
+                    CircleShape,
+                ),
+            component = rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
                     ),
-                component = rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
+                )
+            },
+        )
+
+        Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+            if (user.name != null) {
+                Text(
+                    text = user.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            Text(
+                text = user.login,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp),
             )
 
-            Column {
-                if (user.name != null) {
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-
+            if (user.bio != null) {
                 Text(
-                    text = user.login,
+                    text = user.bio,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp),
                 )
-
-                if (user.bio != null) {
-                    Text(
-                        text = user.bio,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
             }
         }
     }
