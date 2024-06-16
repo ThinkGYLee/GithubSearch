@@ -23,7 +23,8 @@ class HomeViewModel @Inject constructor(
     getUsersUseCase: HomeGetUsersUseCase,
     private val searchUserUseCase: HomeSearchUserUseCase,
 ) : BaseViewModel() {
-    private val _searchId = MutableStateFlow("")
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     private val _userInfo = MutableStateFlow<UserModel?>(null)
     val userInfo: StateFlow<UserModel?> = _userInfo
@@ -82,7 +83,7 @@ class HomeViewModel @Inject constructor(
 
     fun updateSearchId(id: String) {
         viewModelScope.launch {
-          //  _searchId.emit(id)
+            _searchQuery.emit(id)
         }
     }
 
