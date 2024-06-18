@@ -23,7 +23,8 @@ class HomeViewModel @Inject constructor(
     getUsersUseCase: HomeGetUsersUseCase,
     private val searchUserUseCase: HomeSearchUserUseCase,
 ) : BaseViewModel() {
-    private val _searchId = MutableStateFlow("")
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     private val _userInfo = MutableStateFlow<UserModel?>(null)
     val userInfo: StateFlow<UserModel?> = _userInfo
@@ -40,9 +41,9 @@ class HomeViewModel @Inject constructor(
     val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun getUser() {
+    fun getUser(id: String) {
         viewModelScope.launch(exceptionHandler) {
-            when (val userWrapper = searchUserUseCase(_searchId.value)) {
+            when (val userWrapper = searchUserUseCase(id)) {
                 is UserWrapper.FromDatabase -> {
                     _userInfo.emit(userWrapper.data)
                 }
@@ -82,7 +83,7 @@ class HomeViewModel @Inject constructor(
 
     fun updateSearchId(id: String) {
         viewModelScope.launch {
-            _searchId.emit(id)
+            _searchQuery.emit(id)
         }
     }
 

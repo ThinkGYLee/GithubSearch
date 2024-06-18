@@ -12,7 +12,6 @@ import com.gyleedev.githubsearch.data.database.entity.AccessTime
 import com.gyleedev.githubsearch.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.data.database.entity.toEntity
 import com.gyleedev.githubsearch.data.database.entity.toModel
-import com.gyleedev.githubsearch.data.paging.UserPagingSource
 import com.gyleedev.githubsearch.data.remote.AccessService
 import com.gyleedev.githubsearch.data.remote.GithubApiService
 import com.gyleedev.githubsearch.data.remote.RevokeService
@@ -74,9 +73,11 @@ class GitHubRepositoryImpl @Inject constructor(
                 pageSize = 10,
                 enablePlaceholders = false,
             ),
-            pagingSourceFactory = { UserPagingSource(userDao) },
+            pagingSourceFactory = { userDao.getUsers() },
         ).flow.map { pagingData ->
-            pagingData.map { it.toModel() }
+            pagingData.map {
+                it.toModel()
+            }
         }
     }
 

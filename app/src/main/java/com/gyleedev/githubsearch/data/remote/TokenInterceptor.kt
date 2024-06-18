@@ -12,7 +12,9 @@ class TokenInterceptor @Inject constructor(
         val accessToken = preferenceUtil.getString(defValue = "")
         val builder = chain.request().newBuilder()
 
-        builder.addHeader("Authorization", "token $accessToken")
+        if (accessToken != "") {
+            builder.addHeader("Authorization", "token $accessToken")
+        }
         return chain.proceed(builder.build())
     }
 }
