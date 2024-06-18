@@ -82,7 +82,7 @@ fun FavoriteScreen(
                 modifier = Modifier,
             )
         },
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
         if (users.itemCount > 0) {
             FavoriteItemList(
@@ -98,7 +98,7 @@ fun FavoriteScreen(
             )
         } else {
             NoItem(
-                modifier = modifier.padding(paddingValues),
+                modifier = Modifier.padding(paddingValues),
             )
         }
     }
@@ -223,7 +223,7 @@ private fun FavoriteItem(
 
 @Composable
 private fun NoItem(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
