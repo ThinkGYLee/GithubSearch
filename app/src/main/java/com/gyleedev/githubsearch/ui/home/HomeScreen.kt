@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -152,9 +153,7 @@ fun HomeScreen(
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                modifier = Modifier.fillMaxWidth(),
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -163,7 +162,7 @@ fun HomeScreen(
         when (users.loadState.refresh) {
             is LoadState.Loading -> {
                 Surface(
-                    modifier = modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                     Box(
                         modifier = Modifier,
@@ -176,7 +175,7 @@ fun HomeScreen(
 
             is LoadState.Error -> {
                 NoItem(
-                    modifier = modifier,
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -191,7 +190,7 @@ fun HomeScreen(
                     )
                 } else {
                     NoItem(
-                        modifier = modifier,
+                        modifier = Modifier.padding(paddingValues),
                     )
                 }
             }
@@ -257,6 +256,11 @@ private fun EmbeddedSearchBar(
     loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val animatePadding by animateDpAsState(
+        targetValue = if (isSearchActive) 0.dp else 20.dp,
+        label = "animatePadding",
+    )
+
     SearchBar(
         query = query,
         onQueryChange = { changedQuery ->
@@ -265,7 +269,7 @@ private fun EmbeddedSearchBar(
         onSearch = onSearch,
         active = isSearchActive,
         onActiveChange = { onActiveChanged(it) },
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = animatePadding),
         placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
@@ -292,6 +296,7 @@ private fun EmbeddedSearchBar(
             {
                 IconButton(
                     onClick = {
+                        onQueryChange("")
                         onSearchItemReset()
                     },
                 ) {
@@ -319,7 +324,11 @@ private fun EmbeddedSearchBar(
             WindowInsets(0.dp)
         },
     ) {
-        Box(modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
+        ) {
             if (user != null) {
                 SearchResultItem(
                     user = user,
@@ -457,7 +466,7 @@ private fun SearchResultItem(
 
 @Composable
 private fun NoItem(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
