@@ -6,5 +6,5 @@ data class RepositoryModel(
     val description: String?,
     val language: String?,
     val stargazer: Int,
-    val favorite: Boolean,
+    val favorite: Boolean
 )

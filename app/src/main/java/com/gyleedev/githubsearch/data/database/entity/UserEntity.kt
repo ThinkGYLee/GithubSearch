@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 @Entity(
-    tableName = "user",
+    tableName = "user"
 )
 data class UserEntity(
     @PrimaryKey(autoGenerate = true)
@@ -39,7 +39,7 @@ data class UserEntity(
     @ColumnInfo(name = "blogUrl")
     val blogUrl: String?,
     @ColumnInfo(name = "favorite")
-    val favorite: Boolean,
+    val favorite: Boolean
 )
 
 fun UserModel.toEntity(): UserEntity {
@@ -58,7 +58,7 @@ fun UserModel.toEntity(): UserEntity {
         updatedDate = updatedDate,
         reposAddress = reposAddress,
         blogUrl = blogUrl,
-        favorite = favorite,
+        favorite = favorite
     )
 }
 
@@ -77,6 +77,6 @@ fun UserEntity.toModel(): UserModel {
         updatedDate = updatedDate,
         reposAddress = reposAddress,
         blogUrl = blogUrl,
-        favorite = favorite,
+        favorite = favorite
     )
 }

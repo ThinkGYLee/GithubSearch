@@ -7,7 +7,7 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 object ModelToFeed {
     fun modelToFeed(
         userInfo: UserModel?,
-        repoInfo: List<RepositoryModel>?,
+        repoInfo: List<RepositoryModel>?
     ): List<DetailFeed> {
         val list = mutableListOf<DetailFeed>()
 

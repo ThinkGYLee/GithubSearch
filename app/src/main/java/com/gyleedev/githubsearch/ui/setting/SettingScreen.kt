@@ -57,7 +57,7 @@ import java.util.Locale
 fun SettingScreen(
     modifier: Modifier = Modifier,
     requestAuthentication: () -> Unit,
-    viewModel: SettingViewModel = hiltViewModel(),
+    viewModel: SettingViewModel = hiltViewModel()
 ) {
     val isDark = isSystemInDarkTheme()
     val version = BuildConfig.VERSION_NAME
@@ -75,63 +75,63 @@ fun SettingScreen(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.title_setting)) },
-                modifier = Modifier,
+                modifier = Modifier
             )
         },
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .padding(paddingValues),
+                .padding(paddingValues)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(48.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.setting_title),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
             Card(
                 colors = if (isDark) {
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 } else {
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.elevatedCardElevation(),
+                elevation = CardDefaults.elevatedCardElevation()
             ) {
                 SettingRow(
                     leadingIcon = Icons.Outlined.DarkMode,
                     text = stringResource(R.string.setting_theme),
-                    onClick = { showThemeDialog.value = true },
+                    onClick = { showThemeDialog.value = true }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
+                        contentDescription = null
                     )
                 }
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Language,
                     text = stringResource(R.string.setting_language),
-                    onClick = { showLanguageDialog.value = true },
+                    onClick = { showLanguageDialog.value = true }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
+                        contentDescription = null
                     )
                 }
 
@@ -144,22 +144,22 @@ fun SettingScreen(
                         } else {
                             showLoginDialog.value = true
                         }
-                    },
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
+                        contentDescription = null
                     )
                 }
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Storage,
                     text = stringResource(R.string.setting_reset),
-                    onClick = { showResetDialog.value = true },
+                    onClick = { showResetDialog.value = true }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
+                        contentDescription = null
                     )
                 }
             }
@@ -169,47 +169,47 @@ fun SettingScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(48.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.setting_information),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
             Card(
                 colors = if (isDark) {
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 } else {
                     CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.elevatedCardElevation(),
+                elevation = CardDefaults.elevatedCardElevation()
             ) {
                 SettingRow(
                     leadingIcon = Icons.AutoMirrored.Outlined.Help,
                     text = stringResource(R.string.setting_version),
-                    onClick = {},
+                    onClick = {}
                 ) {
                     Text(
                         text = version,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Description,
                     text = stringResource(R.string.setting_term),
-                    onClick = {},
+                    onClick = {}
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                        contentDescription = null,
+                        contentDescription = null
                     )
                 }
             }
@@ -223,7 +223,7 @@ fun SettingScreen(
                     showLanguageDialog.value = false
                 },
                 items = languageData,
-                modifier = Modifier,
+                modifier = Modifier
             )
         }
 
@@ -235,7 +235,7 @@ fun SettingScreen(
                     showThemeDialog.value = false
                 },
                 items = themeData,
-                modifier = Modifier,
+                modifier = Modifier
             )
         }
 
@@ -244,7 +244,7 @@ fun SettingScreen(
                 onDismissRequest = { showResetDialog.value = false },
                 onEventRequest = { viewModel.resetData() },
                 modifier = Modifier,
-                type = null,
+                type = null
             )
         }
 
@@ -253,7 +253,7 @@ fun SettingScreen(
                 onDismissRequest = { showLoginDialog.value = false },
                 onEventRequest = { requestAuthentication() },
                 modifier = Modifier,
-                type = false,
+                type = false
             )
         }
 
@@ -262,7 +262,7 @@ fun SettingScreen(
                 onDismissRequest = { showLogoutDialog.value = false },
                 onEventRequest = { viewModel.deleteKey() },
                 modifier = Modifier,
-                type = true,
+                type = true
             )
         }
     }
@@ -273,7 +273,7 @@ private fun TwoButtonDialog(
     onDismissRequest: () -> Unit,
     onEventRequest: () -> Unit,
     modifier: Modifier,
-    type: Boolean?,
+    type: Boolean?
 ) {
     val titleResource: Int
     val contentResource: Int
@@ -304,7 +304,7 @@ private fun TwoButtonDialog(
                 onClick = {
                     onDismissRequest()
                     onEventRequest()
-                },
+                }
             ) {
                 Text(stringResource(id = R.string.dialog_answer_yes))
             }
@@ -313,12 +313,12 @@ private fun TwoButtonDialog(
             Button(
                 onClick = {
                     onDismissRequest()
-                },
+                }
             ) {
                 Text(stringResource(id = R.string.dialog_answer_no))
             }
         },
-        modifier = modifier,
+        modifier = modifier
     )
 }
 
@@ -328,7 +328,7 @@ private fun SettingRow(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    trailingContent: @Composable () -> Unit,
+    trailingContent: @Composable () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -337,12 +337,12 @@ private fun SettingRow(
             .clickable(onClick = onClick, role = Role.Button)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = null,
+                contentDescription = null
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = text)
@@ -361,7 +361,7 @@ private fun RadioButtonDialog(
     onDismissRequest: () -> Unit,
     onEventRequest: (Int) -> Unit,
     items: SettingDialogItem,
-    modifier: Modifier,
+    modifier: Modifier
 ) {
     val stringResourceList: List<Int>
 
@@ -372,7 +372,7 @@ private fun RadioButtonDialog(
             data.indexOf(
                 data.find {
                     it.type == AppCompatDelegate.getDefaultNightMode()
-                },
+                }
             )
         }
 
@@ -382,7 +382,7 @@ private fun RadioButtonDialog(
             data.indexOf(
                 data.find {
                     it.type == AppCompatDelegate.getApplicationLocales()
-                },
+                }
             )
         }
     }
@@ -396,7 +396,7 @@ private fun RadioButtonDialog(
             Text(
                 text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
         },
         text = {
@@ -404,12 +404,12 @@ private fun RadioButtonDialog(
                 Text(
                     text = stringResource(id = R.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 RadioButtons(
                     selectedIndex = selectedIndex.intValue,
                     stringResourceList,
-                    onIndexChange = { selectedIndex.intValue = it },
+                    onIndexChange = { selectedIndex.intValue = it }
                 )
             }
         },
@@ -426,12 +426,12 @@ private fun RadioButtonDialog(
                 onClick = {
                     onEventRequest(selectedIndex.intValue)
                     onDismissRequest()
-                },
+                }
             ) {
                 Text(text = stringResource(id = R.string.text_filter_confirm))
             }
         },
-        modifier = modifier,
+        modifier = modifier
     )
 }
 
@@ -440,7 +440,7 @@ fun RadioButtons(
     selectedIndex: Int,
     items: List<Int>,
     onIndexChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.padding(top = 10.dp)) {
         items.forEach { item ->
@@ -453,15 +453,15 @@ fun RadioButtons(
                         onClick = {
                             onIndexChange(items.indexOf(item))
                         },
-                        role = Role.RadioButton,
+                        role = Role.RadioButton
                     )
                     .padding(bottom = 3.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = selectedIndex == items.indexOf(item),
                     onClick = null,
-                    modifier = Modifier.padding(end = 5.dp),
+                    modifier = Modifier.padding(end = 5.dp)
                 )
                 Text(text = stringResource(id = item), style = MaterialTheme.typography.labelMedium)
             }
@@ -471,46 +471,46 @@ fun RadioButtons(
 
 sealed interface SettingDialogItem {
     data class Theme(
-        val content: List<ThemeItem>,
+        val content: List<ThemeItem>
     ) : SettingDialogItem
 
     data class Language(
-        val content: List<LanguageItem>,
+        val content: List<LanguageItem>
     ) : SettingDialogItem
 }
 
 data class ThemeItem(
     val type: Int,
-    val content: Int,
+    val content: Int
 )
 
 data class LanguageItem(
     val type: LocaleListCompat,
-    val content: Int,
+    val content: Int
 )
 
 val themeList = listOf(
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_YES,
-        R.string.filter_dark_theme,
+        R.string.filter_dark_theme
     ),
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_NO,
-        R.string.filter_light_theme,
+        R.string.filter_light_theme
     ),
     ThemeItem(
         AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
-        R.string.filter_default_theme,
-    ),
+        R.string.filter_default_theme
+    )
 )
 
 val languageList = listOf(
     LanguageItem(
         LocaleListCompat.create(Locale.KOREA),
-        R.string.setting_korean,
+        R.string.setting_korean
     ),
     LanguageItem(
         LocaleListCompat.create(Locale.ENGLISH),
-        R.string.setting_english,
-    ),
+        R.string.setting_english
+    )
 )

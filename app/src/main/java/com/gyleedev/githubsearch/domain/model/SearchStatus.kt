@@ -5,5 +5,5 @@ enum class SearchStatus {
     NO_SUCH_USER,
     BAD_NETWORK,
     NEED_AUTHENTICATION,
-    UNKNOWN_FAIL,
+    UNKNOWN_FAIL
 }

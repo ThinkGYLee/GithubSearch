@@ -13,5 +13,5 @@ data class AccessTime(
     @ColumnInfo(name = "github_id")
     val githubId: String,
     @ColumnInfo(name = "access_time")
-    val accessTime: Instant,
+    val accessTime: Instant
 )

@@ -13,7 +13,7 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val resetDataUseCase: ResetDataUseCase,
     private val revokeApplicationUseCase: RevokeApplicationUseCase,
-    private val preferenceUtil: PreferenceUtil,
+    private val preferenceUtil: PreferenceUtil
 ) : BaseViewModel() {
 
     fun resetData() {

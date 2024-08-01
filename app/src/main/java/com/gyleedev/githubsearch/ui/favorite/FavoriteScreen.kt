@@ -54,7 +54,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun FavoriteScreen(
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FavoriteViewModel = hiltViewModel(),
+    viewModel: FavoriteViewModel = hiltViewModel()
 ) {
     val users = viewModel.items.collectAsLazyPagingItems()
     users.refresh()
@@ -75,14 +75,14 @@ fun FavoriteScreen(
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = stringResource(id = R.string.icon_content_description_filter),
+                            contentDescription = stringResource(id = R.string.icon_content_description_filter)
                         )
                     }
                 },
-                modifier = Modifier,
+                modifier = Modifier
             )
         },
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         if (users.itemCount > 0) {
             FavoriteItemList(
@@ -94,11 +94,11 @@ fun FavoriteScreen(
                 onLongClick = {
                     user.value = it
                     showDeleteDialog.value = true
-                },
+                }
             )
         } else {
             NoItem(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier.padding(paddingValues)
             )
         }
     }
@@ -112,7 +112,7 @@ fun FavoriteScreen(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
-                    },
+                    }
                 ) {
                     Text(stringResource(id = R.string.text_dialog_confirm))
                 }
@@ -122,11 +122,11 @@ fun FavoriteScreen(
                     onClick = {
                         showDeleteDialog.value = false
                         user.value = null
-                    },
+                    }
                 ) {
                     Text(stringResource(id = R.string.text_dialog_cancel))
                 }
-            },
+            }
         )
     }
 
@@ -149,7 +149,7 @@ fun FavoriteScreen(
                 }
             },
             selectedItemId = selectedItem.intValue,
-            onSelectedItemChange = { selectedItem.intValue = it },
+            onSelectedItemChange = { selectedItem.intValue = it }
         )
     }
 }
@@ -159,19 +159,19 @@ private fun FavoriteItemList(
     users: LazyPagingItems<UserModel>,
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit,
-    onLongClick: (UserModel) -> Unit,
+    onLongClick: (UserModel) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp)
     ) {
         items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
             val user = users[index] as UserModel
             FavoriteItem(
                 user,
                 onClick = { onClick(user.login) },
-                onLongClick = { onLongClick(it) },
+                onLongClick = { onLongClick(it) }
             )
         }
     }
@@ -183,7 +183,7 @@ private fun FavoriteItem(
     user: UserModel,
     onClick: () -> Unit,
     onLongClick: (UserModel) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -192,10 +192,10 @@ private fun FavoriteItem(
             .padding(12.dp)
             .combinedClickable(
                 onLongClick = { onLongClick(user) },
-                onClick = onClick,
+                onClick = onClick
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
 
     ) {
         GlideImage(
@@ -209,31 +209,31 @@ private fun FavoriteItem(
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
+                        highlightColor = Color.LightGray
+                    )
                 )
-            },
+            }
         )
         Text(
             text = user.login,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
 private fun NoItem(
-    modifier: Modifier,
+    modifier: Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(id = R.string.favorite_no_item),
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -243,12 +243,12 @@ fun FilterDialog(
     selectedItemId: Int,
     onChangeState: (Boolean) -> Unit,
     onFilterChange: () -> Unit,
-    onSelectedItemChange: (Int) -> Unit,
+    onSelectedItemChange: (Int) -> Unit
 ) {
     val declarations = listOf(
         stringResource(id = R.string.filter_list_has_repos),
         stringResource(id = R.string.filter_list_no_repos),
-        stringResource(id = R.string.filter_list_all),
+        stringResource(id = R.string.filter_list_all)
     )
 
     AlertDialog(
@@ -257,7 +257,7 @@ fun FilterDialog(
             Text(
                 text = stringResource(id = R.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
         },
         text = {
@@ -265,14 +265,14 @@ fun FilterDialog(
                 Text(
                     text = stringResource(id = R.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 RadioButtons(
                     selectedItemId = selectedItemId,
                     RadioItems(declarations),
                     selectedItem = { string ->
                         declarations.indexOf(string).also { onSelectedItemChange(it) }
-                    },
+                    }
                 )
             }
         },
@@ -286,11 +286,11 @@ fun FilterDialog(
                 onClick = {
                     onFilterChange()
                     onChangeState(false)
-                },
+                }
             ) {
                 Text(text = stringResource(id = R.string.text_filter_confirm))
             }
-        },
+        }
     )
 }
 
@@ -299,7 +299,7 @@ fun RadioButtons(
     selectedItemId: Int,
     items: RadioItems,
     selectedItem: (String) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val selectedValue = remember { mutableStateOf("") }
     val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
@@ -319,15 +319,15 @@ fun RadioButtons(
                         .selectable(
                             selected = isSelectedItem(item),
                             onClick = { onChangeState(item) },
-                            role = Role.RadioButton,
+                            role = Role.RadioButton
                         )
                         .padding(bottom = 3.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
                         selected = declaration[selectedItemId] == item,
                         onClick = null,
-                        modifier = Modifier.padding(end = 5.dp),
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                     Text(text = item, style = MaterialTheme.typography.labelMedium)
                 }
@@ -337,5 +337,5 @@ fun RadioButtons(
 }
 
 data class RadioItems(
-    val list: List<String>,
+    val list: List<String>
 )

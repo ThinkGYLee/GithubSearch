@@ -16,7 +16,7 @@ data class UserResponse(
     @SerializedName("created_at") val createdDate: String,
     @SerializedName("updated_at") val updatedDate: String,
     @SerializedName("repos_url") val reposAddress: String,
-    @SerializedName("blog") val blogUrl: String,
+    @SerializedName("blog") val blogUrl: String
 )
 
 fun UserResponse.toModel(): UserModel {
@@ -34,6 +34,6 @@ fun UserResponse.toModel(): UserModel {
         updatedDate = updatedDate,
         reposAddress = reposAddress,
         blogUrl = blogUrl,
-        favorite = false,
+        favorite = false
     )
 }

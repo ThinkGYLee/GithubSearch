@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: GitHubRepository,
-    private val preferenceUtil: PreferenceUtil,
+    private val preferenceUtil: PreferenceUtil
 ) : BaseViewModel() {
 
     private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
@@ -25,7 +25,7 @@ class MainViewModel @Inject constructor(
             val response = repository.getAccessToken(
                 id = BuildConfig.CLIENT_ID,
                 secret = BuildConfig.CLIENT_SECRET,
-                code = code,
+                code = code
             )
 
             if (response.isSuccessful && response.code() == 200) {
