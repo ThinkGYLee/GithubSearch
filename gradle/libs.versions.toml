@@ -6,12 +6,11 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.4"
-activityCompose = "1.9.1"
-composeBom = "2024.04.01"
-
+activityCompose = "1.9.0"
+composeBom = "2024.05.00"
 hilt = "2.51.1"
 hiltNavCompose = "1.2.0"
-
+hiltCompiler = "2.51.1"
 ksp = "1.9.24-1.0.20"
 room = "2.6.1"
 paging = "3.3.0"
@@ -20,6 +19,16 @@ landscapist = "2.3.3"
 appcompatVersion = "1.7.0"
 navVersion = "2.7.7"
 spotless = "6.11.0"
+library = "8.1.4"
+lifecycle = "2.7.0"
+browser = "1.8.0"
+retrofit2-retrofit = "2.11.0"
+retrofit2-converter-gson = "2.9.0"
+okhttp3-logging-interceptor = "4.12.0"
+google-gson = "2.10.1"
+google-material = "1.12.0"
+fragment = "1.7.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +37,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -36,8 +46,55 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-material = { group = "androidx.compose.material", name = "material" }
+androidx-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
+
+lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+
+navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navVersion"}
+navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navVersion"}
+
+appcompat = { group = "androidx.appcompat", name="appcompat", version.ref = "appcompatVersion" }
+
+room-runtime = { group = "androidx.room", name="room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name="room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name="room-ktx", version.ref = "room" }
+room-paging = { group = "androidx.room", name="room-paging", version.ref = "room" }
+
+paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "paging" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navVersion" }
+
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltCompiler" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavCompose" }
+
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutine" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+
+landscapist-glide = { module = "com.github.skydoves:landscapist-glide", version.ref = "landscapist" }
+landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
+
+retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit2-retrofit" }
+retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit2-converter-gson" }
+okhttp3-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp3-logging-interceptor" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "google-gson" }
+google-material = { module = "com.google.android.material:material", version.ref = "google-material"}
+fragment = {module = "androidx.fragment:fragment-ktx", version.ref = "fragment"}
+
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+safeargs = { id = "androidx.navigation.safeargs", version.ref = "navVersion" }
+library = { id = "com.android.library", version.ref = "library" }
