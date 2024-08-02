@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.konan.properties.hasProperty
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.safeargs)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -44,8 +46,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
+    composeCompiler {
+        enableStrongSkippingMode = true
+        includeSourceInformation = true
+        // composeCompiler 블록내의 설정들은 하단 Reference를 참고해보세요
+        // Compose compiler -> Compose compiler options dsl
     }
 
     buildFeatures {
@@ -54,9 +66,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
