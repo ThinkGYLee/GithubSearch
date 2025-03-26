@@ -5,7 +5,7 @@ import com.gyleedev.githubsearch.domain.model.UserWrapper
 import javax.inject.Inject
 
 class HomeSearchUserUseCase @Inject constructor(
-    private val repository: GitHubRepository,
+    private val repository: GitHubRepository
 ) {
     suspend operator fun invoke(user: String): UserWrapper {
         return repository.getUserAtHome(user)

@@ -5,7 +5,7 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 import javax.inject.Inject
 
 class FavoriteGetFavoritesUseCase @Inject constructor(
-    private val repository: GitHubRepository,
+    private val repository: GitHubRepository
 ) {
     operator fun invoke(status: FilterStatus) = repository.getFavorites(status)
 }

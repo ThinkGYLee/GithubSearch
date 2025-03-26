@@ -11,7 +11,7 @@ import java.io.IOException
 
 class FavoritePagingSource(
     private val dao: UserDao,
-    private val status: FilterStatus,
+    private val status: FilterStatus
 ) : PagingSource<Int, UserEntity>() {
     override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -32,7 +32,7 @@ class FavoritePagingSource(
             LoadResult.Page(
                 data = data,
                 prevKey = if (page == 1) null else page - 1,
-                nextKey = if (data.isEmpty()) null else page + 1,
+                nextKey = if (data.isEmpty()) null else page + 1
             )
         } catch (exception: IOException) {
             LoadResult.Error(exception)

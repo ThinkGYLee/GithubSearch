@@ -10,6 +10,6 @@ interface RevokeService {
     @HTTP(method = "DELETE", path = "applications/{client_id}/grant", hasBody = true)
     suspend fun revoke(
         @Path("client_id") clientId: String,
-        @Body accessToken: RevokeRequestBody,
+        @Body accessToken: RevokeRequestBody
     ): RevokeResponse
 }

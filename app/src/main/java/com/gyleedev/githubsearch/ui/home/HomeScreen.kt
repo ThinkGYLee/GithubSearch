@@ -74,7 +74,7 @@ fun HomeScreen(
     moveToDetail: (String) -> Unit,
     requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val users = viewModel.users.collectAsLazyPagingItems()
     val user by viewModel.userInfo.collectAsStateWithLifecycle()
@@ -113,7 +113,7 @@ fun HomeScreen(
                     Toast.makeText(
                         context,
                         context.getString(R.string.search_result_no_user),
-                        Toast.LENGTH_SHORT,
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
 
@@ -121,7 +121,7 @@ fun HomeScreen(
                     Toast.makeText(
                         context,
                         context.getString(R.string.http_exception),
-                        Toast.LENGTH_SHORT,
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
 
@@ -153,20 +153,20 @@ fun HomeScreen(
                 moveToDetail = { user?.let { moveToDetail(it.login) } },
                 user = user,
                 loading = loading,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
             )
         },
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
 
         when (users.loadState.refresh) {
             is LoadState.Loading -> {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Box(
                         modifier = Modifier,
-                        Alignment.Center,
+                        Alignment.Center
                     ) {
                         CircularProgressIndicator(modifier = Modifier)
                     }
@@ -175,7 +175,7 @@ fun HomeScreen(
 
             is LoadState.Error -> {
                 NoItem(
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier.padding(paddingValues)
                 )
             }
 
@@ -186,11 +186,11 @@ fun HomeScreen(
                             .fillMaxSize()
                             .padding(paddingValues),
                         users = users,
-                        onClick = { moveToDetail(it) },
+                        onClick = { moveToDetail(it) }
                     )
                 } else {
                     NoItem(
-                        modifier = Modifier.padding(paddingValues),
+                        modifier = Modifier.padding(paddingValues)
                     )
                 }
             }
@@ -207,7 +207,7 @@ fun HomeScreen(
                             showRequestAuthenticationDialog = false
                             requestAuthentication()
                             login(context)
-                        },
+                        }
                     ) {
                         Text(stringResource(id = R.string.text_dialog_confirm))
                     }
@@ -216,11 +216,11 @@ fun HomeScreen(
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
-                        },
+                        }
                     ) {
                         Text(stringResource(id = R.string.text_dialog_cancel))
                     }
-                },
+                }
             )
         }
     }
@@ -254,11 +254,11 @@ private fun EmbeddedSearchBar(
     moveToDetail: () -> Unit,
     user: UserModel?,
     loading: Boolean,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val animatePadding by animateDpAsState(
         targetValue = if (isSearchActive) 0.dp else 20.dp,
-        label = "animatePadding",
+        label = "animatePadding"
     )
 
     SearchBar(
@@ -276,19 +276,19 @@ private fun EmbeddedSearchBar(
                 IconButton(
                     onClick = {
                         onActiveChanged(false)
-                    },
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             } else {
                 Icon(
                     imageVector = Icons.Rounded.Search,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         },
@@ -298,12 +298,12 @@ private fun EmbeddedSearchBar(
                     onClick = {
                         onQueryChange("")
                         onSearchItemReset()
-                    },
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -315,19 +315,19 @@ private fun EmbeddedSearchBar(
                 MaterialTheme.colorScheme.background
             } else {
                 MaterialTheme.colorScheme.surfaceContainerLow
-            },
+            }
         ),
         tonalElevation = 0.dp,
         windowInsets = if (isSearchActive) {
             SearchBarDefaults.windowInsets
         } else {
             WindowInsets(0.dp)
-        },
+        }
     ) {
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 12.dp)
         ) {
             if (user != null) {
                 SearchResultItem(
@@ -335,9 +335,9 @@ private fun EmbeddedSearchBar(
                     onClick = moveToDetail,
                     modifier = Modifier
                         .align(
-                            Alignment.TopStart,
+                            Alignment.TopStart
                         )
-                        .padding(top = 20.dp),
+                        .padding(top = 20.dp)
                 )
             }
             if (loading) {
@@ -351,17 +351,17 @@ private fun EmbeddedSearchBar(
 private fun SearchItemList(
     users: LazyPagingItems<UserModel>,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit,
+    onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp)
     ) {
         items(
             users.itemCount,
             key = { users[it]?.login!! },
-            contentType = { 0 },
+            contentType = { 0 }
         ) { index ->
             val user = users[index] as UserModel
             HomeItem(user, onClick = { onClick(user.login) })
@@ -373,7 +373,7 @@ private fun SearchItemList(
 private fun HomeItem(
     user: UserModel,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -382,7 +382,7 @@ private fun HomeItem(
             .clickable(onClick = onClick)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         GlideImage(
             imageModel = { user.avatar },
@@ -394,14 +394,14 @@ private fun HomeItem(
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
+                        highlightColor = Color.LightGray
+                    )
                 )
-            },
+            }
         )
         Text(
             text = user.login,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -410,7 +410,7 @@ private fun HomeItem(
 private fun SearchResultItem(
     user: UserModel,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -418,7 +418,7 @@ private fun SearchResultItem(
             .heightIn(min = 80.dp)
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         GlideImage(
             imageModel = { user.avatar },
@@ -426,16 +426,16 @@ private fun SearchResultItem(
                 .padding(horizontal = 8.dp)
                 .size(80.dp)
                 .clip(
-                    CircleShape,
+                    CircleShape
                 ),
             component = rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
+                        highlightColor = Color.LightGray
+                    )
                 )
-            },
+            }
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
@@ -443,21 +443,21 @@ private fun SearchResultItem(
                 Text(
                     text = user.name,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
             Text(
                 text = user.login,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 4.dp)
             )
 
             if (user.bio != null) {
                 Text(
                     text = user.bio,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -466,17 +466,17 @@ private fun SearchResultItem(
 
 @Composable
 private fun NoItem(
-    modifier: Modifier,
+    modifier: Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(id = R.string.home_no_item),
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Bold
         )
     }
 }

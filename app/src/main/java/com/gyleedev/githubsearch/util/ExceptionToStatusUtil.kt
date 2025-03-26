@@ -5,7 +5,7 @@ import retrofit2.HttpException
 import java.net.UnknownHostException
 
 fun exceptionToStatusUtil(
-    exception: Exception,
+    exception: Exception
 ): SearchStatus {
     return when (exception) {
         is HttpException -> {

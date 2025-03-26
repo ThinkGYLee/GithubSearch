@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getUsersUseCase: HomeGetUsersUseCase,
-    private val searchUserUseCase: HomeSearchUserUseCase,
+    private val searchUserUseCase: HomeSearchUserUseCase
 ) : BaseViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery

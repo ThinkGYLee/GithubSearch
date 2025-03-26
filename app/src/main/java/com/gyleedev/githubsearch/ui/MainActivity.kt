@@ -33,15 +33,15 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
                 darkScrim = android.graphics.Color.TRANSPARENT,
-                lightScrim = android.graphics.Color.TRANSPARENT,
-            ),
+                lightScrim = android.graphics.Color.TRANSPARENT
+            )
         )
         setContent {
             GithubSearchTheme {
                 GithubSearchApp(
                     onAuthenticationRequest = {
                         login(this)
-                    },
+                    }
                 )
             }
         }
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(
             this@MainActivity,
             resultMessage,
-            Toast.LENGTH_SHORT,
+            Toast.LENGTH_SHORT
         ).show()
     }
 }

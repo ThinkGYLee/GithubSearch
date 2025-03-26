@@ -42,7 +42,7 @@ import com.gyleedev.githubsearch.ui.setting.SettingScreen
 sealed class BottomNavItem(
     val title: Int,
     val icons: ImageVector,
-    val screenRoute: String,
+    val screenRoute: String
 ) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
@@ -54,26 +54,26 @@ sealed class BottomNavItem(
 @Composable
 fun GithubSearchApp(
     navController: NavHostController = rememberNavController(),
-    onAuthenticationRequest: () -> Unit,
+    onAuthenticationRequest: () -> Unit
 ) {
     Scaffold(
         bottomBar = {
             BottomNavigation(navController = navController, modifier = Modifier)
         },
-        modifier = Modifier.navigationBarsPadding(),
+        modifier = Modifier.navigationBarsPadding()
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = Modifier
                 .padding(bottom = innerPadding.calculateBottomPadding())
-                .statusBarsPadding(),
+                .statusBarsPadding()
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestAuthentication = { onAuthenticationRequest() },
+                    requestAuthentication = { onAuthenticationRequest() }
                 )
             }
 
@@ -83,19 +83,19 @@ fun GithubSearchApp(
                     navArgument("id") {
                         type = NavType.StringType
                         nullable = false
-                    },
-                ),
+                    }
+                )
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { navController.navigateUp() },
+                    onClick = { navController.navigateUp() }
                 )
             }
 
             composable(route = BottomNavItem.Favorite.screenRoute) {
                 FavoriteScreen(
                     modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") }
                 )
             }
 
@@ -103,7 +103,7 @@ fun GithubSearchApp(
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
                 )
             }
         }
@@ -115,13 +115,13 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Favorite,
-        BottomNavItem.Setting,
+        BottomNavItem.Setting
     )
 
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier,
+        modifier = modifier
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -134,7 +134,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                         contentDescription = stringResource(id = item.title),
                         modifier = Modifier
                             .width(26.dp)
-                            .height(26.dp),
+                            .height(26.dp)
                     )
                 },
                 label = { Text(stringResource(id = item.title), fontSize = 9.sp) },
@@ -150,7 +150,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                },
+                }
             )
         }
     }
