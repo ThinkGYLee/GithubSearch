@@ -1,7 +1,7 @@
 package com.gyleedev.githubsearch.ui
 
 import android.content.Context
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         val customTabsIntent = CustomTabsIntent.Builder().build()
 
         // 아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
-        customTabsIntent.intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
+        customTabsIntent.intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP)
         customTabsIntent.launchUrl(context, loginUrl)
     }
 
