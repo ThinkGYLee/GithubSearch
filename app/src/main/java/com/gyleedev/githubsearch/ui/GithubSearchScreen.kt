@@ -20,6 +20,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,19 +56,26 @@ sealed class BottomNavItem(
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchApp(
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     onAuthenticationRequest: () -> Unit
 ) {
+    var bottomBarStatus by rememberSaveable {
+        mutableStateOf(true)
+    }
+
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController = navController, modifier = Modifier)
+            if (bottomBarStatus) {
+                BottomNavigation(navController = navController, modifier = Modifier)
+            }
         },
         modifier = Modifier.navigationBarsPadding()
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
-            modifier = Modifier
+            modifier = modifier
                 .padding(bottom = innerPadding.calculateBottomPadding())
                 .statusBarsPadding()
         ) {
@@ -73,7 +83,8 @@ fun GithubSearchApp(
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestAuthentication = { onAuthenticationRequest() }
+                    requestAuthentication = { onAuthenticationRequest() },
+                    requestBottomBarStatus = { bottomBarStatus = !it }
                 )
             }
 
