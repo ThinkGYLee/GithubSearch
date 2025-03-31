@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -73,6 +72,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
     requestAuthentication: () -> Unit,
+    requestBottomBarStatus: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -140,6 +140,10 @@ fun HomeScreen(
     }
 
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(isSearchActive) {
+        requestBottomBarStatus(isSearchActive)
+    }
 
     Scaffold(
         topBar = {
@@ -317,12 +321,7 @@ private fun EmbeddedSearchBar(
                 MaterialTheme.colorScheme.surfaceContainerLow
             }
         ),
-        tonalElevation = 0.dp,
-        windowInsets = if (isSearchActive) {
-            SearchBarDefaults.windowInsets
-        } else {
-            WindowInsets(0.dp)
-        }
+        tonalElevation = 0.dp
     ) {
         Box(
             modifier = modifier
@@ -466,7 +465,7 @@ private fun SearchResultItem(
 
 @Composable
 private fun NoItem(
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
