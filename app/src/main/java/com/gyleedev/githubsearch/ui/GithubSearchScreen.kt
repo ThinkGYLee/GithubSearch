@@ -55,7 +55,7 @@ sealed class BottomNavItem(
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun GithubSearchApp(
+fun GithubSearchScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     onAuthenticationRequest: () -> Unit
