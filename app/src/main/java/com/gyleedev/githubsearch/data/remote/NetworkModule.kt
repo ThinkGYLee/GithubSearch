@@ -31,19 +31,18 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiOkHttpClient(preferenceUtil: PreferenceUtil): OkHttpClient =
-        if (BuildConfig.DEBUG) {
-            val loggingInterceptor = HttpLoggingInterceptor()
-            val tokenInterceptor = TokenInterceptor(preferenceUtil)
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideApiOkHttpClient(preferenceUtil: PreferenceUtil): OkHttpClient = if (BuildConfig.DEBUG) {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        val tokenInterceptor = TokenInterceptor(preferenceUtil)
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-            OkHttpClient.Builder()
-                .addInterceptor(tokenInterceptor)
-                .addNetworkInterceptor(loggingInterceptor)
-                .build()
-        } else {
-            OkHttpClient.Builder().build()
-        }
+        OkHttpClient.Builder()
+            .addInterceptor(tokenInterceptor)
+            .addNetworkInterceptor(loggingInterceptor)
+            .build()
+    } else {
+        OkHttpClient.Builder().build()
+    }
 
     @Singleton
     @Provides

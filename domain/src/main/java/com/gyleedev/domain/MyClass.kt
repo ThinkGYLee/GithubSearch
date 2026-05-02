@@ -1,4 +1,3 @@
 package com.gyleedev.domain
 
-class MyClass {
-}
+class MyClass

@@ -4,9 +4,7 @@ import com.gyleedev.githubsearch.domain.model.SearchStatus
 import retrofit2.HttpException
 import java.net.UnknownHostException
 
-fun exceptionToStatusUtil(
-    exception: Exception
-): SearchStatus {
+fun exceptionToStatusUtil(exception: Exception): SearchStatus {
     return when (exception) {
         is HttpException -> {
             codeToStatusUtil(exception.code())
