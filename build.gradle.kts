@@ -8,10 +8,10 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.safeargs) apply false
     alias(libs.plugins.library) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
+
 
 
 subprojects {
@@ -24,13 +24,13 @@ subprojects {
                 "ktlint_standard_package-name" to "disabled",
                 "ktlint_standard_function-naming" to "disabled"
             ))
-            indentWithSpaces()
+            leadingTabsToSpaces()
             endWithNewline()
         }
         kotlinGradle {
             target("**/*.gradle.kts")
             ktlint()
-            indentWithSpaces()
+            leadingTabsToSpaces()
             endWithNewline()
         }
     }
