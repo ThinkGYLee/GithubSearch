@@ -1,32 +1,46 @@
 plugins {
-    alias(libs.plugins.library)
+    `kotlin-dsl`
 }
 
-android {
-    namespace = "com.gyleedev.build_logic"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 33
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
-}
+group = "com.gyleedev.build_logic"
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.hilt.gradle.plugin)
+    compileOnly(libs.ksp.gradle.plugin)
+    compileOnly(libs.compose.compiler.gradle.plugin)
+}
+
+gradlePlugin {
+    plugins {
+        register("androidApplication") {
+            id = "gyleedev.android.application"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+        register("androidLibrary") {
+            id = "gyleedev.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidFeature") {
+            id = "gyleedev.android.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
+        register("androidHilt") {
+            id = "gyleedev.android.hilt"
+            implementationClass = "AndroidHiltConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "gyleedev.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("androidRetrofit") {
+            id = "gyleedev.android.retrofit"
+            implementationClass = "AndroidRetrofitConventionPlugin"
+        }
+        register("jvmLibrary") {
+            id = "gyleedev.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+    }
 }
