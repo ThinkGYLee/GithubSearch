@@ -17,7 +17,6 @@ rootProject.name = "GithubSearch"
 include(":app")
 include(":feature:detail")
 include(":feature:home")
-include(":mylibrary")
 include(":feature:setting")
 include(":feature:favorite")
 include(":core")
