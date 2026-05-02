@@ -20,7 +20,10 @@ subprojects {
     configure<SpotlessExtension> {
         kotlin {
             target("**/*.kt")
-            ktlint()
+            ktlint().editorConfigOverride(mapOf(
+                "ktlint_standard_package-name" to "disabled",
+                "ktlint_standard_function-naming" to "disabled"
+            ))
             indentWithSpaces()
             endWithNewline()
         }
