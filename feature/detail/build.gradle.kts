@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.gyleedev.detail"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 33
