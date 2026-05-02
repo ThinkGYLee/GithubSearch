@@ -22,9 +22,7 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun isKeyExists(): Boolean {
-        return preferenceUtil.isKeyExist()
-    }
+    fun isKeyExists(): Boolean = preferenceUtil.isKeyExist()
 
     fun deleteKey() {
         viewModelScope.launch {

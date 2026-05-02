@@ -334,6 +334,4 @@ fun RadioButtons(
     }
 }
 
-data class RadioItems(
-    val list: List<String>,
-)
+data class RadioItems(val list: List<String>)

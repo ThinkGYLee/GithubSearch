@@ -24,9 +24,7 @@ class NetworkModule {
     // TODO 이동
     @Singleton
     @Provides
-    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
-        return PreferenceUtil(context)
-    }
+    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil = PreferenceUtil(context)
 
     @Singleton
     @Provides
@@ -47,20 +45,17 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiRetrofit(@TypeApi okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(apiUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    fun provideApiRetrofit(@TypeApi okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .baseUrl(apiUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiGithubApi(@TypeApi retrofit: Retrofit): GithubApiService {
-        return retrofit.create(GithubApiService::class.java)
-    }
+    fun provideApiGithubApi(@TypeApi retrofit: Retrofit): GithubApiService =
+        retrofit.create(GithubApiService::class.java)
 
     @Singleton
     @Provides
@@ -79,20 +74,17 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeAccess
-    fun provideAccessRetrofit(@TypeAccess okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(accessUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    fun provideAccessRetrofit(@TypeAccess okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .baseUrl(accessUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Singleton
     @Provides
     @TypeAccess
-    fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService {
-        return retrofit.create(AccessService::class.java)
-    }
+    fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService =
+        retrofit.create(AccessService::class.java)
 
     @Singleton
     @Provides
@@ -114,18 +106,15 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeRevoke
-    fun provideRevokeRetrofit(@TypeRevoke okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .baseUrl(apiUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    fun provideRevokeRetrofit(@TypeRevoke okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .baseUrl(apiUrl)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Singleton
     @Provides
     @TypeRevoke
-    fun provideRevokeGithubApi(@TypeRevoke retrofit: Retrofit): RevokeService {
-        return retrofit.create(RevokeService::class.java)
-    }
+    fun provideRevokeGithubApi(@TypeRevoke retrofit: Retrofit): RevokeService =
+        retrofit.create(RevokeService::class.java)
 }

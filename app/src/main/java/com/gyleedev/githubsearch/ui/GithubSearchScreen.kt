@@ -42,11 +42,7 @@ import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.ui.home.HomeScreen
 import com.gyleedev.githubsearch.ui.setting.SettingScreen
 
-sealed class BottomNavItem(
-    val title: Int,
-    val icons: ImageVector,
-    val screenRoute: String,
-) {
+sealed class BottomNavItem(val title: Int, val icons: ImageVector, val screenRoute: String) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
     data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)

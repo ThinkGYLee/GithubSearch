@@ -97,6 +97,7 @@ fun GithubSearchTheme(
         }
 
         darkTheme -> DarkColorScheme
+
         else -> LightColorScheme
     }
 

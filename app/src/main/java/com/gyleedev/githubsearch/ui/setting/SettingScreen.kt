@@ -465,24 +465,14 @@ fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> U
 }
 
 sealed interface SettingDialogItem {
-    data class Theme(
-        val content: List<ThemeItem>,
-    ) : SettingDialogItem
+    data class Theme(val content: List<ThemeItem>) : SettingDialogItem
 
-    data class Language(
-        val content: List<LanguageItem>,
-    ) : SettingDialogItem
+    data class Language(val content: List<LanguageItem>) : SettingDialogItem
 }
 
-data class ThemeItem(
-    val type: Int,
-    val content: Int,
-)
+data class ThemeItem(val type: Int, val content: Int)
 
-data class LanguageItem(
-    val type: LocaleListCompat,
-    val content: Int,
-)
+data class LanguageItem(val type: LocaleListCompat, val content: Int)
 
 val themeList = listOf(
     ThemeItem(

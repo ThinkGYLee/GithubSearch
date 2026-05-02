@@ -9,15 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-class FavoritePagingSource(
-    private val dao: UserDao,
-    private val status: FilterStatus,
-) : PagingSource<Int, UserEntity>() {
-    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
+class FavoritePagingSource(private val dao: UserDao, private val status: FilterStatus) :
+    PagingSource<Int, UserEntity>() {
+    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? =
+        state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey
         }
-    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserEntity> {
         val page = params.key ?: 1
@@ -28,9 +25,11 @@ class FavoritePagingSource(
                 FilterStatus.ALL -> {
                     data
                 }
+
                 FilterStatus.REPO -> {
                     data.filter { it.repos > 0 }
                 }
+
                 FilterStatus.NOREPO -> {
                     data.filter { it.repos == 0 }
                 }

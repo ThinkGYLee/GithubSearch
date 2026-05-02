@@ -7,19 +7,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class DetailUpdateFavoriteStatusUseCase @Inject constructor(
-    private val repository: GitHubRepository,
-) {
-    suspend operator fun invoke(id: String): List<DetailFeed> {
-        return withContext(Dispatchers.IO) {
-            val user = repository.updateUserFavorite(id)
-            val repo = repository.getReposFromDatabase(id)
-            val userModel = if (user is UserWrapper.FromDatabase) {
-                user.data
-            } else {
-                null
-            }
-            ModelToFeed.modelToFeed(userModel, repo)
+class DetailUpdateFavoriteStatusUseCase @Inject constructor(private val repository: GitHubRepository) {
+    suspend operator fun invoke(id: String): List<DetailFeed> = withContext(Dispatchers.IO) {
+        val user = repository.updateUserFavorite(id)
+        val repo = repository.getReposFromDatabase(id)
+        val userModel = if (user is UserWrapper.FromDatabase) {
+            user.data
+        } else {
+            null
         }
+        ModelToFeed.modelToFeed(userModel, repo)
     }
 }

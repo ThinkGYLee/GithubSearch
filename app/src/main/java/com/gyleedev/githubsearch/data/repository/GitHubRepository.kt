@@ -63,98 +63,84 @@ class GitHubRepositoryImpl @Inject constructor(
     private val preferenceUtil: PreferenceUtil,
 ) : GitHubRepository {
 
-    override fun getUsers(): Flow<PagingData<UserModel>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false,
-            ),
-            pagingSourceFactory = { userDao.getUsers() },
-        ).flow.map { pagingData ->
-            pagingData.map {
-                it.toModel()
-            }
+    override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
+        pagingSourceFactory = { userDao.getUsers() },
+    ).flow.map { pagingData ->
+        pagingData.map {
+            it.toModel()
         }
     }
 
-    override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false,
-            ),
-            pagingSourceFactory = {
-                userDao.getUsers(status)
-            },
-        ).flow.map { pagingData ->
-            pagingData.map { it.toModel() }
-        }
+    override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
+        pagingSourceFactory = {
+            userDao.getUsers(status)
+        },
+    ).flow.map { pagingData ->
+        pagingData.map { it.toModel() }
     }
 
     // Home에서 user정보를 요청하는 함수
-    override suspend fun getUserAtHome(id: String): UserWrapper {
-        return withContext(Dispatchers.IO) {
-            try {
-                val user = userDao.getUserByGithubId(id)
-                UserWrapper.FromDatabase(data = user.toModel())
-            } catch (e: NullPointerException) {
-                getUserFromGithub(id)
-            }
+    override suspend fun getUserAtHome(id: String): UserWrapper = withContext(Dispatchers.IO) {
+        try {
+            val user = userDao.getUserByGithubId(id)
+            UserWrapper.FromDatabase(data = user.toModel())
+        } catch (e: NullPointerException) {
+            getUserFromGithub(id)
         }
     }
 
-    private suspend fun getUserFromGithub(id: String): UserWrapper {
-        return try {
-            val userResponse = githubApiService.getUser(id)
-            UserWrapper.Success(
-                status = SearchStatus.SUCCESS,
-                data = userResponse.toModel(),
-            )
-        } catch (e: Exception) {
-            val status = exceptionToStatusUtil(e)
-            UserWrapper.Failure(
-                status = status,
-            )
-        } catch (e: UnknownError) {
-            UserWrapper.Failure(
-                status = SearchStatus.BAD_NETWORK,
-            )
-        }
+    private suspend fun getUserFromGithub(id: String): UserWrapper = try {
+        val userResponse = githubApiService.getUser(id)
+        UserWrapper.Success(
+            status = SearchStatus.SUCCESS,
+            data = userResponse.toModel(),
+        )
+    } catch (e: Exception) {
+        val status = exceptionToStatusUtil(e)
+        UserWrapper.Failure(
+            status = status,
+        )
+    } catch (e: UnknownError) {
+        UserWrapper.Failure(
+            status = SearchStatus.BAD_NETWORK,
+        )
     }
 
     // 마지막 액세스 시간 가져오기
-    override suspend fun getLastAccessById(id: String): AccessTime? {
-        return accessTimeDao.getTimeByGithubId(id)
-    }
+    override suspend fun getLastAccessById(id: String): AccessTime? = accessTimeDao.getTimeByGithubId(id)
 
     // 유저정보 가져오기
-    override suspend fun getUser(id: String): UserModel {
-        return withContext(Dispatchers.IO) {
-            userDao.getUser(id).toModel()
-        }
+    override suspend fun getUser(id: String): UserModel = withContext(Dispatchers.IO) {
+        userDao.getUser(id).toModel()
     }
 
     // 유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
-    private suspend fun insertUserFromGithub(id: String): UserWrapper {
-        return try {
-            val userRemote = githubApiService.getUser(id)
-            val entityId = userDao.insertUser(userRemote.toModel().toEntity())
-            insertRepos(id, entityId)
-            updateAccessTime(id)
-            UserWrapper.Success(
-                status = SearchStatus.SUCCESS,
-                data = userRemote.toModel(),
-            )
-        } catch (e: Exception) {
-            val status = exceptionToStatusUtil(e)
-            UserWrapper.Failure(
-                status = status,
-            )
-        } catch (e: UnknownError) {
-            UserWrapper.Failure(
-                status = SearchStatus.BAD_NETWORK,
-            )
-        }
+    private suspend fun insertUserFromGithub(id: String): UserWrapper = try {
+        val userRemote = githubApiService.getUser(id)
+        val entityId = userDao.insertUser(userRemote.toModel().toEntity())
+        insertRepos(id, entityId)
+        updateAccessTime(id)
+        UserWrapper.Success(
+            status = SearchStatus.SUCCESS,
+            data = userRemote.toModel(),
+        )
+    } catch (e: Exception) {
+        val status = exceptionToStatusUtil(e)
+        UserWrapper.Failure(
+            status = status,
+        )
+    } catch (e: UnknownError) {
+        UserWrapper.Failure(
+            status = SearchStatus.BAD_NETWORK,
+        )
     }
 
     private suspend fun updateUserFromGithub(id: String): UserWrapper {
@@ -213,12 +199,10 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     // db에서 레포정보 가져오기
-    override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel> {
-        return try {
-            reposDao.getReposByGithubId(githubId).map { it.toModel() }
-        } catch (e: Throwable) {
-            getReposFromDatabase(githubId)
-        }
+    override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel> = try {
+        reposDao.getReposByGithubId(githubId).map { it.toModel() }
+    } catch (e: Throwable) {
+        getReposFromDatabase(githubId)
     }
 
     private fun updateAccessTime(id: String) {
@@ -242,51 +226,47 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDetailUser(githubId: String): UserWrapper {
-        return withContext(Dispatchers.IO) {
-            val lastAccess = getLastAccessById(githubId)
-            if (lastAccess != null) {
-                if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
-                    UserWrapper.FromDatabase(
-                        data = getUser(githubId),
-                    )
-                } else {
-                    updateUserFromGithub(githubId)
-                }
+    override suspend fun getDetailUser(githubId: String): UserWrapper = withContext(Dispatchers.IO) {
+        val lastAccess = getLastAccessById(githubId)
+        if (lastAccess != null) {
+            if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
+                UserWrapper.FromDatabase(
+                    data = getUser(githubId),
+                )
             } else {
-                insertUserFromGithub(githubId)
+                updateUserFromGithub(githubId)
             }
+        } else {
+            insertUserFromGithub(githubId)
         }
     }
 
-    override suspend fun updateUserFavorite(id: String): UserWrapper {
-        return try {
-            val user = userDao.getUser(id)
-            userDao.updateUser(
-                UserEntity(
-                    id = user.id,
-                    userId = user.userId,
-                    name = user.name,
-                    followers = user.followers,
-                    following = user.following,
-                    company = user.company,
-                    avatar = user.avatar,
-                    email = user.email,
-                    bio = user.bio,
-                    repos = user.repos,
-                    createdDate = user.createdDate,
-                    updatedDate = user.updatedDate,
-                    reposAddress = user.reposAddress,
-                    blogUrl = user.blogUrl,
-                    favorite = !user.favorite,
-                ),
-            )
-            UserWrapper.FromDatabase(
-                data = userDao.getUser(id).toModel(),
-            )
-        } catch (e: Throwable) {
-            updateUserFavorite(id)
-        }
+    override suspend fun updateUserFavorite(id: String): UserWrapper = try {
+        val user = userDao.getUser(id)
+        userDao.updateUser(
+            UserEntity(
+                id = user.id,
+                userId = user.userId,
+                name = user.name,
+                followers = user.followers,
+                following = user.following,
+                company = user.company,
+                avatar = user.avatar,
+                email = user.email,
+                bio = user.bio,
+                repos = user.repos,
+                createdDate = user.createdDate,
+                updatedDate = user.updatedDate,
+                reposAddress = user.reposAddress,
+                blogUrl = user.blogUrl,
+                favorite = !user.favorite,
+            ),
+        )
+        UserWrapper.FromDatabase(
+            data = userDao.getUser(id).toModel(),
+        )
+    } catch (e: Throwable) {
+        updateUserFavorite(id)
     }
 
     override suspend fun getAccessToken(id: String, secret: String, code: String) =

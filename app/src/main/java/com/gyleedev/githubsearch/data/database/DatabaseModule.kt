@@ -18,13 +18,11 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun providesUserDatabase(@ApplicationContext context: Context): UserDatabase {
-        return Room.databaseBuilder(
-            context,
-            UserDatabase::class.java,
-            "database",
-        ).build()
-    }
+    fun providesUserDatabase(@ApplicationContext context: Context): UserDatabase = Room.databaseBuilder(
+        context,
+        UserDatabase::class.java,
+        "database",
+    ).build()
 
     @Singleton
     @Provides

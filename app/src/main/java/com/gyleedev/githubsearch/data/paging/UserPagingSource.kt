@@ -6,15 +6,12 @@ import com.gyleedev.githubsearch.data.database.dao.UserDao
 import com.gyleedev.githubsearch.data.database.entity.UserEntity
 import java.io.IOException
 
-class UserPagingSource(
-    private val dao: UserDao,
-) : PagingSource<Int, UserEntity>() {
-    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
+class UserPagingSource(private val dao: UserDao) : PagingSource<Int, UserEntity>() {
+    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? =
+        state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
-    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserEntity> {
         val page = params.key ?: 1
