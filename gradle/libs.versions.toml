@@ -28,6 +28,7 @@ okhttp3-logging-interceptor = "4.12.0"
 google-gson = "2.10.1"
 google-material = "1.12.0"
 fragment = "1.8.2"
+jetbrainsKotlinJvm = "2.0.0"
 
 
 [libraries]
@@ -99,3 +100,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 safeargs = { id = "androidx.navigation.safeargs", version.ref = "navVersion" }
 library = { id = "com.android.library", version.ref = "library" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
