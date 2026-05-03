@@ -16,24 +16,22 @@ data class UserResponse(
     @SerializedName("created_at") val createdDate: String,
     @SerializedName("updated_at") val updatedDate: String,
     @SerializedName("repos_url") val reposAddress: String,
-    @SerializedName("blog") val blogUrl: String
+    @SerializedName("blog") val blogUrl: String,
 )
 
-fun UserResponse.toModel(): UserModel {
-    return UserModel(
-        name = name,
-        login = login,
-        followers = followers,
-        following = following,
-        avatar = avatar,
-        company = company,
-        email = email,
-        bio = bio,
-        repos = repos,
-        createdDate = createdDate,
-        updatedDate = updatedDate,
-        reposAddress = reposAddress,
-        blogUrl = blogUrl,
-        favorite = false
-    )
-}
+fun UserResponse.toModel(): UserModel = UserModel(
+    name = name,
+    login = login,
+    followers = followers,
+    following = following,
+    avatar = avatar,
+    company = company,
+    email = email,
+    bio = bio,
+    repos = repos,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    reposAddress = reposAddress,
+    blogUrl = blogUrl,
+    favorite = false,
+)

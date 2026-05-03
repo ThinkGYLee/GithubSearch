@@ -9,18 +9,14 @@ class PreferenceUtil(@ApplicationContext context: Context) {
     private val accessPreference: SharedPreferences =
         context.getSharedPreferences("AccessToken", Context.MODE_PRIVATE)
 
-    fun getString(key: String = "Token", defValue: String): String {
-        return accessPreference.getString(key, defValue) as String
-    }
+    fun getString(key: String = "Token", defValue: String): String = accessPreference.getString(key, defValue) as String
 
     fun setString(key: String = "Token", str: String) {
         accessPreference.edit().putString(key, str).apply()
     }
 
-    fun isKeyExist(): Boolean {
-        return accessPreference.getString("Token", "").let {
-            !it.isNullOrEmpty()
-        }
+    fun isKeyExist(): Boolean = accessPreference.getString("Token", "").let {
+        !it.isNullOrEmpty()
     }
 
     fun deleteKey() {

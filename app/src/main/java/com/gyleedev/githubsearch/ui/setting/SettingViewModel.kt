@@ -13,7 +13,7 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val resetDataUseCase: ResetDataUseCase,
     private val revokeApplicationUseCase: RevokeApplicationUseCase,
-    private val preferenceUtil: PreferenceUtil
+    private val preferenceUtil: PreferenceUtil,
 ) : BaseViewModel() {
 
     fun resetData() {
@@ -22,9 +22,7 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun isKeyExists(): Boolean {
-        return preferenceUtil.isKeyExist()
-    }
+    fun isKeyExists(): Boolean = preferenceUtil.isKeyExist()
 
     fun deleteKey() {
         viewModelScope.launch {

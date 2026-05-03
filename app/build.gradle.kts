@@ -9,18 +9,17 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.safeargs)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.gyleedev.githubsearch"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.gyleedev.githubsearch"
         minSdk = 33
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -38,7 +37,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -54,7 +53,6 @@ android {
     }
 
     composeCompiler {
-        enableStrongSkippingMode = true
         includeSourceInformation = true
         // composeCompiler 블록내의 설정들은 하단 Reference를 참고해보세요
         // Compose compiler -> Compose compiler options dsl
@@ -141,9 +139,7 @@ dependencies {
     implementation(libs.navigation.fragment)
 }
 
-fun getApiKey(propertyKey: String): String {
-    return getProps(propertyKey)
-}
+fun getApiKey(propertyKey: String): String = getProps(propertyKey)
 
 @Suppress("UNCHECKED_CAST")
 fun <T> getProps(key: String): T {

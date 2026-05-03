@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.gyleedev.githubsearch.domain.model.UserModel
 
 @Entity(
-    tableName = "user"
+    tableName = "user",
 )
 data class UserEntity(
     @PrimaryKey(autoGenerate = true)
@@ -39,44 +39,40 @@ data class UserEntity(
     @ColumnInfo(name = "blogUrl")
     val blogUrl: String?,
     @ColumnInfo(name = "favorite")
-    val favorite: Boolean
+    val favorite: Boolean,
 )
 
-fun UserModel.toEntity(): UserEntity {
-    return UserEntity(
-        id = 0,
-        userId = login,
-        name = name,
-        followers = followers,
-        following = following,
-        company = company,
-        avatar = avatar,
-        email = email,
-        bio = bio,
-        repos = repos,
-        createdDate = createdDate,
-        updatedDate = updatedDate,
-        reposAddress = reposAddress,
-        blogUrl = blogUrl,
-        favorite = favorite
-    )
-}
+fun UserModel.toEntity(): UserEntity = UserEntity(
+    id = 0,
+    userId = login,
+    name = name,
+    followers = followers,
+    following = following,
+    company = company,
+    avatar = avatar,
+    email = email,
+    bio = bio,
+    repos = repos,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    reposAddress = reposAddress,
+    blogUrl = blogUrl,
+    favorite = favorite,
+)
 
-fun UserEntity.toModel(): UserModel {
-    return UserModel(
-        login = userId,
-        name = name,
-        followers = followers,
-        following = following,
-        company = company,
-        avatar = avatar,
-        email = email,
-        bio = bio,
-        repos = repos,
-        createdDate = createdDate,
-        updatedDate = updatedDate,
-        reposAddress = reposAddress,
-        blogUrl = blogUrl,
-        favorite = favorite
-    )
-}
+fun UserEntity.toModel(): UserModel = UserModel(
+    login = userId,
+    name = name,
+    followers = followers,
+    following = following,
+    company = company,
+    avatar = avatar,
+    email = email,
+    bio = bio,
+    repos = repos,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    reposAddress = reposAddress,
+    blogUrl = blogUrl,
+    favorite = favorite,
+)
