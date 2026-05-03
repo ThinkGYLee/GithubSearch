@@ -1,7 +1,7 @@
 package com.gyleedev.githubsearch.domain.usecase
 
-import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import javax.inject.Inject
 
 class HomeSearchUserUseCase @Inject constructor(private val repository: GitHubRepository) {
