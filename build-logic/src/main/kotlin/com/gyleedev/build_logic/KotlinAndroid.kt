@@ -12,9 +12,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
  * Android 프로젝트(Application, Library)의 Kotlin 관련 기본 설정을 적용합니다.
  * SDK 버전, Java 호환성, JVM 타겟 등을 중앙에서 관리합니다.
  */
-internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-) {
+internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {
         compileSdk = 36
 
