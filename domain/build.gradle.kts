@@ -1,13 +1,10 @@
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    }
-}
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    id("gyleedev.jvm.library")
+}
+
+dependencies {
+    api(libs.javax.inject)
+    api(libs.paging.common)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.google.gson)
 }
