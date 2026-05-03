@@ -1,0 +1,41 @@
+{
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "write_file|replace|patch",
+        "hooks": [
+          {
+            "name": "pre-mod-check",
+            "type": "command",
+            "command": "python3 $GEMINI_PROJECT_DIR/.gemini/hooks/pre_mod.py",
+            "description": "수정 전 상태 확인 및 보고: read_file로 현재 코드를 확인하고 사용자에게 수정 계획을 보고한 뒤 승인을 받습니다."
+          }
+        ]
+      },
+      {
+        "matcher": "run_shell_command",
+        "hooks": [
+          {
+            "name": "git-korean-check",
+            "type": "command",
+            "command": "python3 $GEMINI_PROJECT_DIR/.gemini/hooks/git_check.py",
+            "description": "Git 작업 시 메시지에 한국어가 포함되어 있는지 확인합니다."
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "write_file|replace|patch",
+        "hooks": [
+          {
+            "name": "post-mod-validation",
+            "type": "command",
+            "command": "python3 $GEMINI_PROJECT_DIR/.gemini/hooks/post_mod.py",
+            "description": "수정 후 3단계 검증: 1. 스타일 교정(Spotless) -> 2. 컴파일 확인 -> 3. 단위 테스트 실행"
+          }
+        ]
+      }
+    ]
+  }
+}
