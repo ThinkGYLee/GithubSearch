@@ -27,10 +27,10 @@ interface UserDao {
     fun getFavorite(page: Int, favorite: Boolean = true): List<UserEntity>
 
     @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
-    fun getUser(id: String): UserEntity
+    fun getUser(id: String): UserEntity?
 
     @Query("SELECT * FROM user WHERE user_id = :userId COLLATE NOCASE")
-    fun getUserByGithubId(userId: String): UserEntity
+    fun getUserByGithubId(userId: String): UserEntity?
 
     @Insert
     fun insertUser(user: UserEntity): Long
