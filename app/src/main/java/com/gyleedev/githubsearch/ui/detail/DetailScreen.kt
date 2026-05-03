@@ -209,7 +209,8 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             )
         }
 
-        if (data.company != null) {
+        val company = data.company
+        if (company != null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -224,11 +225,12 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                         .width(24.dp)
                         .height(24.dp),
                 )
-                Text(text = data.company)
+                Text(text = company)
             }
         }
 
-        if (data.email != null) {
+        val email = data.email
+        if (email != null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -243,7 +245,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                         .width(24.dp)
                         .height(24.dp),
                 )
-                Text(text = data.email)
+                Text(text = email)
             }
         }
 

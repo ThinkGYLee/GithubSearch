@@ -430,9 +430,10 @@ private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Mod
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
-            if (user.name != null) {
+            val name = user.name
+            if (name != null) {
                 Text(
-                    text = user.name,
+                    text = name,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                 )
@@ -444,9 +445,10 @@ private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Mod
                 modifier = Modifier.padding(vertical = 4.dp),
             )
 
-            if (user.bio != null) {
+            val bio = user.bio
+            if (bio != null) {
                 Text(
-                    text = user.bio,
+                    text = bio,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                 )
