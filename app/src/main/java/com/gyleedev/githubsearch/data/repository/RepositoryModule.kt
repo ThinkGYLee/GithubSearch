@@ -1,5 +1,6 @@
 package com.gyleedev.githubsearch.data.repository
 
+import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
