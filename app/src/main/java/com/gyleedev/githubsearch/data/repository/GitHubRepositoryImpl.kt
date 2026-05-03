@@ -19,7 +19,6 @@ import com.gyleedev.githubsearch.data.remote.TypeAccess
 import com.gyleedev.githubsearch.data.remote.TypeApi
 import com.gyleedev.githubsearch.data.remote.TypeRevoke
 import com.gyleedev.githubsearch.data.remote.response.toModel
-import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
@@ -36,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
+import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 
 class GitHubRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
@@ -73,10 +73,10 @@ class GitHubRepositoryImpl @Inject constructor(
 
     // Home에서 user정보를 요청하는 함수
     override suspend fun getUserAtHome(id: String): UserWrapper = withContext(Dispatchers.IO) {
-        try {
-            val user = userDao.getUserByGithubId(id)
+        val user = userDao.getUserByGithubId(id)
+        if (user != null) {
             UserWrapper.FromDatabase(data = user.toModel())
-        } catch (e: NullPointerException) {
+        } else {
             getUserFromGithub(id)
         }
     }
@@ -105,7 +105,12 @@ class GitHubRepositoryImpl @Inject constructor(
 
     // 유저정보 가져오기
     override suspend fun getUser(id: String): UserModel? = withContext(Dispatchers.IO) {
-        userDao.getUser(id).toModel()
+        val user = userDao.getUser(id)
+        if (user != null) {
+            user.toModel()
+        } else {
+            null
+        }
     }
 
     // 유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
@@ -138,29 +143,33 @@ class GitHubRepositoryImpl @Inject constructor(
             )
             val userLocal = userDao.getUser(id)
 
-            val updateUser = UserEntity(
-                id = userLocal.id,
-                userId = userRemote.data.login,
-                name = userRemote.data.name,
-                followers = userRemote.data.followers,
-                following = userRemote.data.following,
-                avatar = userRemote.data.avatar,
-                company = userRemote.data.company,
-                email = userRemote.data.email,
-                bio = userRemote.data.bio,
-                blogUrl = userRemote.data.blogUrl,
-                createdDate = userRemote.data.createdDate,
-                updatedDate = userRemote.data.updatedDate,
-                repos = userRemote.data.repos,
-                reposAddress = userRemote.data.reposAddress,
-                favorite = userLocal.favorite,
-            )
-            userDao.updateUser(updateUser)
-            if (userResponse.repos > 0) {
-                insertRepos(id, userLocal.id)
+            if (userLocal != null) {
+                val updateUser = UserEntity(
+                    id = userLocal.id,
+                    userId = userRemote.data.login,
+                    name = userRemote.data.name,
+                    followers = userRemote.data.followers,
+                    following = userRemote.data.following,
+                    avatar = userRemote.data.avatar,
+                    company = userRemote.data.company,
+                    email = userRemote.data.email,
+                    bio = userRemote.data.bio,
+                    blogUrl = userRemote.data.blogUrl,
+                    createdDate = userRemote.data.createdDate,
+                    updatedDate = userRemote.data.updatedDate,
+                    repos = userRemote.data.repos,
+                    reposAddress = userRemote.data.reposAddress,
+                    favorite = userLocal.favorite,
+                )
+                userDao.updateUser(updateUser)
+                if (userResponse.repos > 0) {
+                    insertRepos(id, userLocal.id)
+                }
+                updateAccessTime(id)
+                return userRemote
+            } else {
+                return insertUserFromGithub(id)
             }
-            updateAccessTime(id)
-            return userRemote
         } catch (e: Exception) {
             val status = exceptionToStatusUtil(e)
             return UserWrapper.Failure(
@@ -216,9 +225,14 @@ class GitHubRepositoryImpl @Inject constructor(
         val lastAccess = getLastAccessById(githubId)
         if (lastAccess != null) {
             if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
-                UserWrapper.FromDatabase(
-                    data = getUser(githubId)!!,
-                )
+                val user = getUser(githubId)
+                if (user != null) {
+                    UserWrapper.FromDatabase(
+                        data = user,
+                    )
+                } else {
+                    insertUserFromGithub(githubId)
+                }
             } else {
                 updateUserFromGithub(githubId)
             }
@@ -229,30 +243,39 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserFavorite(id: String): UserWrapper = try {
         val user = userDao.getUser(id)
-        userDao.updateUser(
-            UserEntity(
-                id = user.id,
-                userId = user.userId,
-                name = user.name,
-                followers = user.followers,
-                following = user.following,
-                company = user.company,
-                avatar = user.avatar,
-                email = user.email,
-                bio = user.bio,
-                repos = user.repos,
-                createdDate = user.createdDate,
-                updatedDate = user.updatedDate,
-                reposAddress = user.reposAddress,
-                blogUrl = user.blogUrl,
-                favorite = !user.favorite,
-            ),
-        )
-        UserWrapper.FromDatabase(
-            data = userDao.getUser(id).toModel(),
-        )
-    } catch (e: Throwable) {
-        updateUserFavorite(id)
+        if (user != null) {
+            userDao.updateUser(
+                UserEntity(
+                    id = user.id,
+                    userId = user.userId,
+                    name = user.name,
+                    followers = user.followers,
+                    following = user.following,
+                    company = user.company,
+                    avatar = user.avatar,
+                    email = user.email,
+                    bio = user.bio,
+                    repos = user.repos,
+                    createdDate = user.createdDate,
+                    updatedDate = user.updatedDate,
+                    reposAddress = user.reposAddress,
+                    blogUrl = user.blogUrl,
+                    favorite = !user.favorite,
+                ),
+            )
+            val updatedUser = userDao.getUser(id)
+            if (updatedUser != null) {
+                UserWrapper.FromDatabase(
+                    data = updatedUser.toModel(),
+                )
+            } else {
+                UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
+            }
+        } else {
+            UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
+        }
+    } catch (e: Exception) {
+        UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
     }
 
     override suspend fun getAccessToken(id: String, secret: String, code: String): GithubAccessModel? {
