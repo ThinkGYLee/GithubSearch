@@ -1,4 +1,4 @@
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.gyleedev.build_logic.configureComposeAndroid
 import com.gyleedev.build_logic.libs
 import org.gradle.api.Plugin

@@ -42,5 +42,9 @@ gradlePlugin {
             id = "gyleedev.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("androidLibraryCompose") {
+            id = "gyleedev.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
     }
 }

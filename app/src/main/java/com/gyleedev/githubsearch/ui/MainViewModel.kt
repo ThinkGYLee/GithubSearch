@@ -3,7 +3,7 @@ package com.gyleedev.githubsearch.ui
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.core.BaseViewModel
-import com.gyleedev.githubsearch.data.repository.GitHubRepository
+import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import com.gyleedev.githubsearch.util.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,13 +28,9 @@ class MainViewModel @Inject constructor(
                 code = code,
             )
 
-            if (response.isSuccessful && response.code() == 200) {
-                response.body().let {
-                    if (it != null) {
-                        preferenceUtil.setString(str = it.accessToken)
-                        _alertLoginSuccess.emit(true)
-                    }
-                }
+            if (response != null) {
+                preferenceUtil.setString(str = response.accessToken)
+                _alertLoginSuccess.emit(true)
             } else {
                 _alertLoginSuccess.emit(false)
             }

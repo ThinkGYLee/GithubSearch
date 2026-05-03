@@ -1,8 +1,8 @@
 package com.gyleedev.githubsearch.domain.usecase
 
-import com.gyleedev.githubsearch.data.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

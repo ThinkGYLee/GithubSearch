@@ -1,8 +1,5 @@
 package com.gyleedev.githubsearch.domain.model
 
-import androidx.compose.runtime.Stable
-
-@Stable
 data class UserModel(
     val name: String?,
     val login: String,
