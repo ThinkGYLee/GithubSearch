@@ -17,14 +17,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-
     private val apiUrl = "https://api.github.com"
     private val accessUrl = "https://github.com"
 
     // TODO 이동
     @Singleton
     @Provides
-    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil = PreferenceUtil(context)
+    fun providePreferenceUtil(
+        @ApplicationContext context: Context,
+    ): PreferenceUtil = PreferenceUtil(context)
 
     @Singleton
     @Provides
@@ -34,7 +35,8 @@ class NetworkModule {
         val tokenInterceptor = TokenInterceptor(preferenceUtil)
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        OkHttpClient.Builder()
+        OkHttpClient
+            .Builder()
             .addInterceptor(tokenInterceptor)
             .addNetworkInterceptor(loggingInterceptor)
             .build()
@@ -45,7 +47,10 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiRetrofit(@TypeApi okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideApiRetrofit(
+        @TypeApi okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit
+        .Builder()
         .client(okHttpClient)
         .baseUrl(apiUrl)
         .addConverterFactory(GsonConverterFactory.create())
@@ -54,8 +59,9 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiGithubApi(@TypeApi retrofit: Retrofit): GithubApiService =
-        retrofit.create(GithubApiService::class.java)
+    fun provideApiGithubApi(
+        @TypeApi retrofit: Retrofit,
+    ): GithubApiService = retrofit.create(GithubApiService::class.java)
 
     @Singleton
     @Provides
@@ -64,7 +70,8 @@ class NetworkModule {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        OkHttpClient.Builder()
+        OkHttpClient
+            .Builder()
             .addInterceptor(loggingInterceptor)
             .build()
     } else {
@@ -74,7 +81,10 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeAccess
-    fun provideAccessRetrofit(@TypeAccess okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideAccessRetrofit(
+        @TypeAccess okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit
+        .Builder()
         .client(okHttpClient)
         .baseUrl(accessUrl)
         .addConverterFactory(GsonConverterFactory.create())
@@ -83,30 +93,36 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeAccess
-    fun provideAccessGithubApi(@TypeAccess retrofit: Retrofit): AccessService =
-        retrofit.create(AccessService::class.java)
+    fun provideAccessGithubApi(
+        @TypeAccess retrofit: Retrofit,
+    ): AccessService = retrofit.create(AccessService::class.java)
 
     @Singleton
     @Provides
     @TypeRevoke
     fun provideRevokeOkHttpClient(): OkHttpClient {
         val revokeInterceptor = RevokeInterceptor()
-        val interceptor = if (BuildConfig.DEBUG) {
-            val loggingInterceptor = HttpLoggingInterceptor()
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val interceptor =
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor()
+                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-            OkHttpClient.Builder()
-                .addNetworkInterceptor(loggingInterceptor)
-        } else {
-            OkHttpClient.Builder()
-        }
+                OkHttpClient
+                    .Builder()
+                    .addNetworkInterceptor(loggingInterceptor)
+            } else {
+                OkHttpClient.Builder()
+            }
         return interceptor.addInterceptor(revokeInterceptor).build()
     }
 
     @Singleton
     @Provides
     @TypeRevoke
-    fun provideRevokeRetrofit(@TypeRevoke okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideRevokeRetrofit(
+        @TypeRevoke okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit
+        .Builder()
         .client(okHttpClient)
         .baseUrl(apiUrl)
         .addConverterFactory(GsonConverterFactory.create())
@@ -115,6 +131,7 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeRevoke
-    fun provideRevokeGithubApi(@TypeRevoke retrofit: Retrofit): RevokeService =
-        retrofit.create(RevokeService::class.java)
+    fun provideRevokeGithubApi(
+        @TypeRevoke retrofit: Retrofit,
+    ): RevokeService = retrofit.create(RevokeService::class.java)
 }

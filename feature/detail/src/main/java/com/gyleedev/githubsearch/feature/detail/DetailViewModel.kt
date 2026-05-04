@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.detail
+package com.gyleedev.githubsearch.feature.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -13,12 +13,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(
+class DetailViewModel
+@Inject
+constructor(
     private val getUserFeedUseCase: GetUserFeedUseCase,
     private val updateFavoriteStatusAndRefreshFeedUseCase: UpdateFavoriteStatusAndRefreshFeedUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-
     private val _itemList = MutableStateFlow<List<DetailFeed>>(emptyList())
     val itemList: StateFlow<List<DetailFeed>> = _itemList
 
@@ -42,11 +43,12 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun setInitialFavoriteStatus(list: List<DetailFeed>) {
-        val user = if (list[0] is DetailFeed.UserProfile) {
-            list[0] as DetailFeed.UserProfile
-        } else {
-            null
-        }
+        val user =
+            if (list[0] is DetailFeed.UserProfile) {
+                list[0] as DetailFeed.UserProfile
+            } else {
+                null
+            }
         viewModelScope.launch {
             if (user != null) {
                 _favoriteStatus.emit(user.userModel.favorite)

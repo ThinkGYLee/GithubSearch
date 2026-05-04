@@ -22,6 +22,8 @@ import com.gyleedev.data.database.entity.UserEntity
 @TypeConverters(DbTypeConverters::class)
 abstract class UserDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
+
     abstract fun reposDao(): ReposDao
+
     abstract fun accessTimeDao(): AccessTimeDao
 }

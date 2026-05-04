@@ -20,17 +20,16 @@ subprojects {
     configure<SpotlessExtension> {
         kotlin {
             target("**/*.kt")
-            ktlint().editorConfigOverride(mapOf(
-                "ktlint_standard_package-name" to "disabled",
-                "ktlint_standard_function-naming" to "disabled"
-            ))
-            leadingTabsToSpaces()
+            ktlint("1.8.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
+            leadingTabsToSpaces(4)
             endWithNewline()
         }
         kotlinGradle {
             target("**/*.gradle.kts")
-            ktlint()
-            leadingTabsToSpaces()
+            ktlint("1.8.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
+            leadingTabsToSpaces(4)
             endWithNewline()
         }
     }

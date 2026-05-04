@@ -1,12 +1,8 @@
-package com.gyleedev.githubsearch.ui.home
+package com.gyleedev.githubsearch.feature.home
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,13 +48,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.gyleedev.githubsearch.BuildConfig
-import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -66,6 +60,8 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.home.R as HomeR
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -82,26 +78,22 @@ fun HomeScreen(
     val context = LocalContext.current
     val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
+    val unknownHostException = stringResource(id = DesignSystemR.string.unknown_host_exception)
+    val socketException = stringResource(id = DesignSystemR.string.socket_exception)
+    val httpException = stringResource(id = DesignSystemR.string.http_exception)
+    val etcException = stringResource(id = DesignSystemR.string.etc_exception)
+    val noSuchUserMessage = stringResource(id = HomeR.string.search_result_no_user)
+
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
             viewModel.stopLoading()
-            val message = when (fetchState) {
-                FetchState.WRONG_CONNECTION -> {
-                    context.getString(R.string.unknown_host_exception)
+            val message =
+                when (fetchState) {
+                    FetchState.WRONG_CONNECTION -> unknownHostException
+                    FetchState.BAD_INTERNET -> socketException
+                    FetchState.PARSE_ERROR -> httpException
+                    FetchState.FAIL -> etcException
                 }
-
-                FetchState.BAD_INTERNET -> {
-                    context.getString(R.string.socket_exception)
-                }
-
-                FetchState.PARSE_ERROR -> {
-                    context.getString(R.string.http_exception)
-                }
-
-                FetchState.FAIL -> {
-                    context.getString(R.string.etc_exception)
-                }
-            }
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -110,19 +102,21 @@ fun HomeScreen(
         viewModel.errorAlert.collect { status ->
             when (status) {
                 SearchStatus.NO_SUCH_USER -> {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.search_result_no_user),
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            noSuchUserMessage,
+                            Toast.LENGTH_SHORT,
+                        ).show()
                 }
 
                 SearchStatus.BAD_NETWORK -> {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.http_exception),
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            httpException,
+                            Toast.LENGTH_SHORT,
+                        ).show()
                 }
 
                 else -> {
@@ -186,7 +180,8 @@ fun HomeScreen(
             else -> {
                 if (users.itemCount > 0) {
                     SearchItemList(
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .fillMaxSize()
                             .padding(paddingValues),
                         users = users,
@@ -203,17 +198,16 @@ fun HomeScreen(
         if (showRequestAuthenticationDialog) {
             AlertDialog(
                 onDismissRequest = { showRequestAuthenticationDialog = false },
-                title = { Text(text = stringResource(id = R.string.title_request_authentication)) },
-                text = { Text(text = stringResource(id = R.string.content_request_authentication)) },
+                title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
+                text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
                 confirmButton = {
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
                             requestAuthentication()
-                            login(context)
                         },
                     ) {
-                        Text(stringResource(id = R.string.text_dialog_confirm))
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
                     }
                 },
                 dismissButton = {
@@ -222,28 +216,12 @@ fun HomeScreen(
                             showRequestAuthenticationDialog = false
                         },
                     ) {
-                        Text(stringResource(id = R.string.text_dialog_cancel))
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
                     }
                 },
             )
         }
     }
-}
-
-private fun login(context: Context) {
-    val clientId = BuildConfig.CLIENT_ID
-    val loginUrl = Uri.Builder().scheme("https").authority("github.com")
-        .appendPath("login")
-        .appendPath("oauth")
-        .appendPath("authorize")
-        .appendQueryParameter("client_id", clientId)
-        .build()
-
-    val customTabsIntent = CustomTabsIntent.Builder().build()
-
-    // 아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
-    customTabsIntent.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    customTabsIntent.launchUrl(context, loginUrl)
 }
 
 @Composable
@@ -274,7 +252,7 @@ private fun EmbeddedSearchBar(
         active = isSearchActive,
         onActiveChange = { onActiveChanged(it) },
         modifier = modifier.padding(horizontal = animatePadding),
-        placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
+        placeholder = { Text(stringResource(id = HomeR.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
@@ -296,7 +274,8 @@ private fun EmbeddedSearchBar(
                 )
             }
         },
-        trailingIcon = if (isSearchActive && query.isNotEmpty()) {
+        trailingIcon =
+        if (isSearchActive && query.isNotEmpty()) {
             {
                 IconButton(
                     onClick = {
@@ -314,8 +293,10 @@ private fun EmbeddedSearchBar(
         } else {
             null
         },
-        colors = SearchBarDefaults.colors(
-            containerColor = if (isSearchActive) {
+        colors =
+        SearchBarDefaults.colors(
+            containerColor =
+            if (isSearchActive) {
                 MaterialTheme.colorScheme.background
             } else {
                 MaterialTheme.colorScheme.surfaceContainerLow
@@ -324,7 +305,8 @@ private fun EmbeddedSearchBar(
         tonalElevation = 0.dp,
     ) {
         Box(
-            modifier = modifier
+            modifier =
+            modifier
                 .fillMaxSize()
                 .padding(horizontal = 12.dp),
         ) {
@@ -332,11 +314,11 @@ private fun EmbeddedSearchBar(
                 SearchResultItem(
                     user = user,
                     onClick = moveToDetail,
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .align(
                             Alignment.TopStart,
-                        )
-                        .padding(top = 20.dp),
+                        ).padding(top = 20.dp),
                 )
             }
             if (loading) {
@@ -353,7 +335,8 @@ private fun SearchItemList(
     onClick: (String) -> Unit,
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxSize()
             .padding(vertical = 12.dp),
     ) {
@@ -369,9 +352,14 @@ private fun SearchItemList(
 }
 
 @Composable
-private fun HomeItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun HomeItem(
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .heightIn(min = 80.dp, max = 100.dp)
             .clickable(onClick = onClick)
@@ -381,11 +369,13 @@ private fun HomeItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = 
     ) {
         GlideImage(
             imageModel = { user.avatar },
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(horizontal = 8.dp)
                 .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
                 .clip(CircleShape),
-            component = rememberImageComponent {
+            component =
+            rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
@@ -402,9 +392,14 @@ private fun HomeItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = 
 }
 
 @Composable
-private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SearchResultItem(
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .heightIn(min = 80.dp)
             .clickable(onClick = onClick),
@@ -413,13 +408,15 @@ private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Mod
     ) {
         GlideImage(
             imageModel = { user.avatar },
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(horizontal = 8.dp)
                 .size(80.dp)
                 .clip(
                     CircleShape,
                 ),
-            component = rememberImageComponent {
+            component =
+            rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
@@ -465,7 +462,7 @@ private fun NoItem(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(id = R.string.home_no_item),
+            text = stringResource(id = HomeR.string.home_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )

@@ -5,7 +5,11 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-class TokenInterceptor @Inject constructor(private val preferenceUtil: PreferenceUtil) : Interceptor {
+class TokenInterceptor
+@Inject
+constructor(
+    private val preferenceUtil: PreferenceUtil,
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = preferenceUtil.getString(defValue = "")
         val builder = chain.request().newBuilder()

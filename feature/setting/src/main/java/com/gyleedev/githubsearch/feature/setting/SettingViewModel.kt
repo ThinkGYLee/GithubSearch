@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.setting
+package com.gyleedev.githubsearch.feature.setting
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.common.BaseViewModel
@@ -13,7 +13,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingViewModel @Inject constructor(
+class SettingViewModel
+@Inject
+constructor(
     private val resetDataUseCase: ResetDataUseCase,
     private val revokeApplicationUseCase: RevokeApplicationUseCase,
     private val checkLoginStatusUseCase: CheckLoginStatusUseCase,

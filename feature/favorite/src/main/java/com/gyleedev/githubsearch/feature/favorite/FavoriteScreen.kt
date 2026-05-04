@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.favorite
+package com.gyleedev.githubsearch.feature.favorite
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -39,15 +39,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,22 +61,24 @@ fun FavoriteScreen(
     users.refresh()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
-    val user = remember {
-        mutableStateOf<UserModel?>(null)
-    }
-    val selectedItem = remember {
-        mutableIntStateOf(2)
-    }
+    val user =
+        remember {
+            mutableStateOf<UserModel?>(null)
+        }
+    val selectedItem =
+        remember {
+            mutableIntStateOf(2)
+        }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.title_favorite)) },
+                title = { Text(text = stringResource(id = FavoriteR.string.title_favorite)) },
                 actions = {
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = stringResource(id = R.string.icon_content_description_filter),
+                            contentDescription = stringResource(id = FavoriteR.string.icon_content_description_filter),
                         )
                     }
                 },
@@ -86,7 +89,8 @@ fun FavoriteScreen(
     ) { paddingValues ->
         if (users.itemCount > 0) {
             FavoriteItemList(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
                 users = users,
@@ -106,7 +110,7 @@ fun FavoriteScreen(
     if (showDeleteDialog.value) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog.value = false },
-            title = { Text(text = stringResource(id = R.string.text_delete_favorite_title)) },
+            title = { Text(text = stringResource(id = FavoriteR.string.text_delete_favorite_title)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -114,7 +118,7 @@ fun FavoriteScreen(
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
                     },
                 ) {
-                    Text(stringResource(id = R.string.text_dialog_confirm))
+                    Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
                 }
             },
             dismissButton = {
@@ -124,7 +128,7 @@ fun FavoriteScreen(
                         user.value = null
                     },
                 ) {
-                    Text(stringResource(id = R.string.text_dialog_cancel))
+                    Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
                 }
             },
         )
@@ -162,7 +166,8 @@ private fun FavoriteItemList(
     onLongClick: (UserModel) -> Unit,
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxSize()
             .padding(vertical = 12.dp),
     ) {
@@ -186,7 +191,8 @@ private fun FavoriteItem(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .heightIn(min = 80.dp, max = 100.dp)
             .padding(12.dp)
@@ -196,16 +202,17 @@ private fun FavoriteItem(
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-
     ) {
         GlideImage(
             imageModel = { user.avatar },
-            modifier = Modifier
+            modifier =
+            Modifier
                 .padding(horizontal = 8.dp)
                 .heightIn(max = 80.dp, min = 20.dp)
                 .widthIn(max = 80.dp, min = 20.dp)
                 .clip(CircleShape),
-            component = rememberImageComponent {
+            component =
+            rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,
@@ -229,7 +236,7 @@ private fun NoItem(modifier: Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(id = R.string.favorite_no_item),
+            text = stringResource(id = FavoriteR.string.favorite_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -243,17 +250,18 @@ fun FilterDialog(
     onFilterChange: () -> Unit,
     onSelectedItemChange: (Int) -> Unit,
 ) {
-    val declarations = listOf(
-        stringResource(id = R.string.filter_list_has_repos),
-        stringResource(id = R.string.filter_list_no_repos),
-        stringResource(id = R.string.filter_list_all),
-    )
+    val declarations =
+        listOf(
+            stringResource(id = FavoriteR.string.filter_list_has_repos),
+            stringResource(id = FavoriteR.string.filter_list_no_repos),
+            stringResource(id = FavoriteR.string.filter_list_all),
+        )
 
     AlertDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
-                text = stringResource(id = R.string.text_filter_title),
+                text = stringResource(id = DesignSystemR.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
@@ -261,7 +269,7 @@ fun FilterDialog(
         text = {
             Column {
                 Text(
-                    text = stringResource(id = R.string.text_filter_content),
+                    text = stringResource(id = DesignSystemR.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -276,7 +284,7 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = stringResource(id = R.string.text_filter_cancel))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_cancel))
             }
         },
         confirmButton = {
@@ -286,7 +294,7 @@ fun FilterDialog(
                     onChangeState(false)
                 },
             ) {
-                Text(text = stringResource(id = R.string.text_filter_confirm))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_confirm))
             }
         },
     )
@@ -311,15 +319,15 @@ fun RadioButtons(
         declaration.forEach { item ->
             Column {
                 Row(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
                         .heightIn(min = 48.dp)
                         .selectable(
                             selected = isSelectedItem(item),
                             onClick = { onChangeState(item) },
                             role = Role.RadioButton,
-                        )
-                        .padding(bottom = 3.dp),
+                        ).padding(bottom = 3.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -334,4 +342,6 @@ fun RadioButtons(
     }
 }
 
-data class RadioItems(val list: List<String>)
+data class RadioItems(
+    val list: List<String>,
+)

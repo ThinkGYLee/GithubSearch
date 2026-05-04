@@ -18,15 +18,16 @@ abstract class BaseViewModel : ViewModel() {
     val fetchState: SharedFlow<FetchState> = _fetchState
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    protected val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        throwable.printStackTrace()
-        when (throwable) {
-            is SocketException -> emitException(FetchState.BAD_INTERNET)
-            is HttpException -> emitException(FetchState.PARSE_ERROR)
-            is UnknownHostException -> emitException(FetchState.WRONG_CONNECTION)
-            else -> emitException(FetchState.FAIL)
+    protected val exceptionHandler =
+        CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+            when (throwable) {
+                is SocketException -> emitException(FetchState.BAD_INTERNET)
+                is HttpException -> emitException(FetchState.PARSE_ERROR)
+                is UnknownHostException -> emitException(FetchState.WRONG_CONNECTION)
+                else -> emitException(FetchState.FAIL)
+            }
         }
-    }
 
     private fun emitException(fetchState: FetchState) {
         viewModelScope.launch {

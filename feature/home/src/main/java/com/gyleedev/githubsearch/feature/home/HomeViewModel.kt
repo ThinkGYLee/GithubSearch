@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.home
+package com.gyleedev.githubsearch.feature.home
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
@@ -19,7 +19,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel
+@Inject
+constructor(
     getUsersUseCase: GetUsersUseCase,
     private val searchUserUseCase: SearchUserUseCase,
 ) : BaseViewModel() {

@@ -10,8 +10,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val getAccessTokenUseCase: GetAccessTokenUseCase) : BaseViewModel() {
-
+class MainViewModel
+@Inject
+constructor(
+    private val getAccessTokenUseCase: GetAccessTokenUseCase,
+) : BaseViewModel() {
     private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
     val alertLoginSuccess: SharedFlow<Boolean> = _alertLoginSuccess
 

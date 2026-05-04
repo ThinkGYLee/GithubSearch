@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.setting
+package com.gyleedev.githubsearch.feature.setting
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
@@ -49,20 +49,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.gyleedev.githubsearch.BuildConfig
-import com.gyleedev.githubsearch.R
 import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.setting.R as SettingR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
+    versionName: String,
     requestAuthentication: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val isDark = isSystemInDarkTheme()
-    val version = BuildConfig.VERSION_NAME
 
     val themeData = SettingDialogItem.Theme(themeList)
     val languageData = SettingDialogItem.Language(languageList)
@@ -86,7 +86,7 @@ fun SettingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.title_setting)) },
+                title = { Text(text = stringResource(id = SettingR.string.title_setting)) },
                 modifier = Modifier,
             )
         },
@@ -94,26 +94,29 @@ fun SettingScreen(
     ) { paddingValues ->
 
         Column(
-            modifier = Modifier
+            modifier =
+            Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .padding(paddingValues),
         ) {
             Row(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.setting_title),
+                    text = stringResource(SettingR.string.setting_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
 
             Card(
-                colors = if (isDark) {
+                colors =
+                if (isDark) {
                     CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     )
@@ -127,7 +130,7 @@ fun SettingScreen(
             ) {
                 SettingRow(
                     leadingIcon = Icons.Outlined.DarkMode,
-                    text = stringResource(R.string.setting_theme),
+                    text = stringResource(SettingR.string.setting_theme),
                     onClick = { showThemeDialog.value = true },
                 ) {
                     Icon(
@@ -138,7 +141,7 @@ fun SettingScreen(
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Language,
-                    text = stringResource(R.string.setting_language),
+                    text = stringResource(SettingR.string.setting_language),
                     onClick = { showLanguageDialog.value = true },
                 ) {
                     Icon(
@@ -149,7 +152,7 @@ fun SettingScreen(
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.AccountCircle,
-                    text = stringResource(R.string.setting_login),
+                    text = stringResource(SettingR.string.setting_login),
                     onClick = viewModel::isKeyExists,
                 ) {
                     Icon(
@@ -160,7 +163,7 @@ fun SettingScreen(
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Storage,
-                    text = stringResource(R.string.setting_reset),
+                    text = stringResource(SettingR.string.setting_reset),
                     onClick = { showResetDialog.value = true },
                 ) {
                     Icon(
@@ -171,20 +174,22 @@ fun SettingScreen(
             }
 
             Row(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.setting_information),
+                    text = stringResource(SettingR.string.setting_information),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
 
             Card(
-                colors = if (isDark) {
+                colors =
+                if (isDark) {
                     CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     )
@@ -198,11 +203,11 @@ fun SettingScreen(
             ) {
                 SettingRow(
                     leadingIcon = Icons.AutoMirrored.Outlined.Help,
-                    text = stringResource(R.string.setting_version),
+                    text = stringResource(SettingR.string.setting_version),
                     onClick = {},
                 ) {
                     Text(
-                        text = version,
+                        text = versionName,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -210,7 +215,7 @@ fun SettingScreen(
 
                 SettingRow(
                     leadingIcon = Icons.Outlined.Description,
-                    text = stringResource(R.string.setting_term),
+                    text = stringResource(SettingR.string.setting_term),
                     onClick = {},
                 ) {
                     Icon(
@@ -286,18 +291,18 @@ private fun TwoButtonDialog(
 
     when (type) {
         true -> {
-            titleResource = R.string.dialog_log_out_title
-            contentResource = R.string.dialog_log_out_content
+            titleResource = SettingR.string.dialog_log_out_title
+            contentResource = SettingR.string.dialog_log_out_content
         }
 
         false -> {
-            titleResource = R.string.dialog_log_in_title
-            contentResource = R.string.dialog_log_in_content
+            titleResource = SettingR.string.dialog_log_in_title
+            contentResource = SettingR.string.dialog_log_in_content
         }
 
         null -> {
-            titleResource = R.string.dialog_reset_title
-            contentResource = R.string.dialog_reset_content
+            titleResource = SettingR.string.dialog_reset_title
+            contentResource = SettingR.string.dialog_reset_content
         }
     }
 
@@ -312,7 +317,7 @@ private fun TwoButtonDialog(
                     onEventRequest()
                 },
             ) {
-                Text(stringResource(id = R.string.dialog_answer_yes))
+                Text(stringResource(id = SettingR.string.dialog_answer_yes))
             }
         },
         dismissButton = {
@@ -321,7 +326,7 @@ private fun TwoButtonDialog(
                     onDismissRequest()
                 },
             ) {
-                Text(stringResource(id = R.string.dialog_answer_no))
+                Text(stringResource(id = SettingR.string.dialog_answer_no))
             }
         },
         modifier = modifier,
@@ -337,7 +342,8 @@ private fun SettingRow(
     trailingContent: @Composable () -> Unit,
 ) {
     Row(
-        modifier = modifier
+        modifier =
+        modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
             .clickable(onClick = onClick, role = Role.Button)
@@ -357,11 +363,6 @@ private fun SettingRow(
     }
 }
 
-/*
-아이디어 생각
-컨피규레이션 체인지가 안 일어 난다면 뭔지 바뀔일은 없다.
-최상위에 현재 스테이트를 쓰고 내린다.
- */
 @Composable
 private fun RadioButtonDialog(
     onDismissRequest: () -> Unit,
@@ -371,36 +372,38 @@ private fun RadioButtonDialog(
 ) {
     val stringResourceList: List<Int>
 
-    val defaultIndex = when (items) {
-        is SettingDialogItem.Theme -> {
-            val data = items.content
-            stringResourceList = data.map { it.content }
-            data.indexOf(
-                data.find {
-                    it.type == AppCompatDelegate.getDefaultNightMode()
-                },
-            )
+    val defaultIndex =
+        when (items) {
+            is SettingDialogItem.Theme -> {
+                val data = items.content
+                stringResourceList = data.map { it.content }
+                data.indexOf(
+                    data.find {
+                        it.type == AppCompatDelegate.getDefaultNightMode()
+                    },
+                )
+            }
+
+            is SettingDialogItem.Language -> {
+                val data = items.content
+                stringResourceList = data.map { it.content }
+                data.indexOf(
+                    data.find {
+                        it.type == AppCompatDelegate.getApplicationLocales()
+                    },
+                )
+            }
         }
 
-        is SettingDialogItem.Language -> {
-            val data = items.content
-            stringResourceList = data.map { it.content }
-            data.indexOf(
-                data.find {
-                    it.type == AppCompatDelegate.getApplicationLocales()
-                },
-            )
+    val selectedIndex =
+        remember {
+            mutableIntStateOf(defaultIndex)
         }
-    }
-
-    val selectedIndex = remember {
-        mutableIntStateOf(defaultIndex)
-    }
 
     AlertDialog(
         title = {
             Text(
-                text = stringResource(id = R.string.text_filter_title),
+                text = stringResource(id = DesignSystemR.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
@@ -408,7 +411,7 @@ private fun RadioButtonDialog(
         text = {
             Column {
                 Text(
-                    text = stringResource(id = R.string.text_filter_content),
+                    text = stringResource(id = DesignSystemR.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -424,7 +427,7 @@ private fun RadioButtonDialog(
             TextButton(onClick = {
                 onDismissRequest()
             }) {
-                Text(text = stringResource(id = R.string.text_filter_cancel))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_cancel))
             }
         },
         confirmButton = {
@@ -434,7 +437,7 @@ private fun RadioButtonDialog(
                     onDismissRequest()
                 },
             ) {
-                Text(text = stringResource(id = R.string.text_filter_confirm))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_confirm))
             }
         },
         modifier = modifier,
@@ -442,11 +445,17 @@ private fun RadioButtonDialog(
 }
 
 @Composable
-fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun RadioButtons(
+    selectedIndex: Int,
+    items: List<Int>,
+    onIndexChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.padding(top = 10.dp)) {
         items.forEach { item ->
             Row(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
                     .selectable(
@@ -455,8 +464,7 @@ fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> U
                             onIndexChange(items.indexOf(item))
                         },
                         role = Role.RadioButton,
-                    )
-                    .padding(bottom = 3.dp),
+                    ).padding(bottom = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
@@ -471,37 +479,49 @@ fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> U
 }
 
 sealed interface SettingDialogItem {
-    data class Theme(val content: List<ThemeItem>) : SettingDialogItem
+    data class Theme(
+        val content: List<ThemeItem>,
+    ) : SettingDialogItem
 
-    data class Language(val content: List<LanguageItem>) : SettingDialogItem
+    data class Language(
+        val content: List<LanguageItem>,
+    ) : SettingDialogItem
 }
 
-data class ThemeItem(val type: Int, val content: Int)
-
-data class LanguageItem(val type: LocaleListCompat, val content: Int)
-
-val themeList = listOf(
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_YES,
-        R.string.filter_dark_theme,
-    ),
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_NO,
-        R.string.filter_light_theme,
-    ),
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
-        R.string.filter_default_theme,
-    ),
+data class ThemeItem(
+    val type: Int,
+    val content: Int,
 )
 
-val languageList = listOf(
-    LanguageItem(
-        LocaleListCompat.create(Locale.KOREA),
-        R.string.setting_korean,
-    ),
-    LanguageItem(
-        LocaleListCompat.create(Locale.ENGLISH),
-        R.string.setting_english,
-    ),
+data class LanguageItem(
+    val type: LocaleListCompat,
+    val content: Int,
 )
+
+val themeList =
+    listOf(
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_YES,
+            SettingR.string.filter_dark_theme,
+        ),
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_NO,
+            SettingR.string.filter_light_theme,
+        ),
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
+            SettingR.string.filter_default_theme,
+        ),
+    )
+
+val languageList =
+    listOf(
+        LanguageItem(
+            LocaleListCompat.create(Locale.KOREA),
+            SettingR.string.setting_korean,
+        ),
+        LanguageItem(
+            LocaleListCompat.create(Locale.ENGLISH),
+            SettingR.string.setting_english,
+        ),
+    )

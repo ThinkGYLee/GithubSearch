@@ -41,12 +41,27 @@
     - `MainActivity`, `GithubSearchScreen` 등 기존 참조 코드의 import 경로 수정
     - 각 모듈에 적합한 Compose/Library 컨벤션 플러그인 적용 (`gyleedev.android.library.compose`, `gyleedev.android.library`)
 
-### Phase 4: `:feature:*` 모듈 마이그레이션 (Compose UI)
-- [ ] **`:feature:home`**: `app/.../ui/home` 패키지 (Screen, ViewModel) 이동
-- [ ] **`:feature:detail`**: `app/.../ui/detail` 패키지 이동
-- [ ] **`:feature:favorite`**: `app/.../ui/favorite` 패키지 이동
-- [ ] **`:feature:setting`**: `app/.../ui/setting` 패키지 이동
-- [ ] 각 feature 모듈에 `gyleedev.android.feature` 컨벤션 적용 및 `:domain`, `:core:designsystem` 의존성 주입
+### Phase 4: :feature:* 모듈 마이그레이션 (Compose UI)
+- [x] **:feature:home**: 홈 화면 마이그레이션
+    - 이동 대상: `app/.../ui/home/` (HomeScreen.kt, HomeViewModel.kt)
+    - 목적지: `feature/home/.../feature/home/`
+    - 패키지명 변경: `com.gyleedev.githubsearch.ui.home` -> `com.gyleedev.githubsearch.feature.home`
+- [x] **:feature:detail**: 상세 화면 마이그레이션
+    - 이동 대상: `app/.../ui/detail/` (DetailScreen.kt, DetailViewModel.kt)
+    - 목적지: `feature/detail/.../feature/detail/`
+    - 패키지명 변경: `com.gyleedev.githubsearch.ui.detail` -> `com.gyleedev.githubsearch.feature.detail`
+- [x] **:feature:favorite**: 즐겨찾기 화면 마이그레이션
+    - 이동 대상: `app/.../ui/favorite/` (FavoriteScreen.kt, FavoriteViewModel.kt)
+    - 목적지: `feature/favorite/.../feature/favorite/`
+    - 패키지명 변경: `com.gyleedev.githubsearch.ui.favorite` -> `com.gyleedev.githubsearch.feature.favorite`
+- [x] **:feature:setting**: 설정 화면 마이그레이션
+    - 이동 대상: `app/.../ui/setting/` (SettingScreen.kt, SettingViewModel.kt)
+    - 목적지: `feature/setting/.../feature/setting/`
+    - 패키지명 변경: `com.gyleedev.githubsearch.ui.setting` -> `com.gyleedev.githubsearch.feature.setting`
+- [ ] **공통 적용 사항**:
+    - 각 feature 모듈에 `gyleedev.android.feature` 컨벤션 적용
+    - 의존성 추가: `:domain`, `:core:common`, `:core:designsystem`
+    - `app` 모듈에서 `:feature:*` 의존성 추가 및 `GithubSearchScreen.kt` 임포트 수정
 
 ### Phase 5: `:app` 모듈 최종 통합 (Wiring)
 - [ ] `MainActivity`, `MainViewModel`, `GithubSearchScreen` (Global Navigation) 확인

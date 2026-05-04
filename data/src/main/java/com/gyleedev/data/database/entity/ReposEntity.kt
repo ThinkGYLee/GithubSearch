@@ -17,7 +17,6 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
             onDelete = ForeignKey.CASCADE,
         ),
     ],
-
 )
 data class ReposEntity(
     @PrimaryKey(autoGenerate = true)

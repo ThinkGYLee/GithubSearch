@@ -39,7 +39,9 @@ import java.time.Instant
 import javax.inject.Inject
 import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 
-class GitHubRepositoryImpl @Inject constructor(
+class GitHubRepositoryImpl
+@Inject
+constructor(
     private val userDao: UserDao,
     private val reposDao: ReposDao,
     private val accessTimeDao: AccessTimeDao,
@@ -48,9 +50,9 @@ class GitHubRepositoryImpl @Inject constructor(
     @TypeRevoke private val revokeService: RevokeService,
     private val preferenceUtil: PreferenceUtil,
 ) : GitHubRepository {
-
     override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
-        config = PagingConfig(
+        config =
+        PagingConfig(
             pageSize = 10,
             enablePlaceholders = false,
         ),
@@ -62,7 +64,8 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> = Pager(
-        config = PagingConfig(
+        config =
+        PagingConfig(
             pageSize = 10,
             enablePlaceholders = false,
         ),
@@ -139,30 +142,32 @@ class GitHubRepositoryImpl @Inject constructor(
     private suspend fun updateUserFromGithub(id: String): UserWrapper {
         try {
             val userResponse = githubApiService.getUser(id)
-            val userRemote = UserWrapper.Success(
-                status = SearchStatus.SUCCESS,
-                data = userResponse.toModel(),
-            )
+            val userRemote =
+                UserWrapper.Success(
+                    status = SearchStatus.SUCCESS,
+                    data = userResponse.toModel(),
+                )
             val userLocal = userDao.getUser(id)
 
             if (userLocal != null) {
-                val updateUser = UserEntity(
-                    id = userLocal.id,
-                    userId = userRemote.data.login,
-                    name = userRemote.data.name,
-                    followers = userRemote.data.followers,
-                    following = userRemote.data.following,
-                    avatar = userRemote.data.avatar,
-                    company = userRemote.data.company,
-                    email = userRemote.data.email,
-                    bio = userRemote.data.bio,
-                    blogUrl = userRemote.data.blogUrl,
-                    createdDate = userRemote.data.createdDate,
-                    updatedDate = userRemote.data.updatedDate,
-                    repos = userRemote.data.repos,
-                    reposAddress = userRemote.data.reposAddress,
-                    favorite = userLocal.favorite,
-                )
+                val updateUser =
+                    UserEntity(
+                        id = userLocal.id,
+                        userId = userRemote.data.login,
+                        name = userRemote.data.name,
+                        followers = userRemote.data.followers,
+                        following = userRemote.data.following,
+                        avatar = userRemote.data.avatar,
+                        company = userRemote.data.company,
+                        email = userRemote.data.email,
+                        bio = userRemote.data.bio,
+                        blogUrl = userRemote.data.blogUrl,
+                        createdDate = userRemote.data.createdDate,
+                        updatedDate = userRemote.data.updatedDate,
+                        repos = userRemote.data.repos,
+                        reposAddress = userRemote.data.reposAddress,
+                        favorite = userLocal.favorite,
+                    )
                 userDao.updateUser(updateUser)
                 if (userResponse.repos > 0) {
                     insertRepos(id, userLocal.id)
@@ -185,7 +190,10 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     // 레포정보 삽입
-    private suspend fun insertRepos(githubId: String, userEntityId: Long) {
+    private suspend fun insertRepos(
+        githubId: String,
+        userEntityId: Long,
+    ) {
         try {
             val response = githubApiService.getRepos(githubId)
             reposDao.deleteRepos(githubId)
@@ -281,11 +289,12 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAccessToken(code: String): GithubAccessModel? {
-        val response = accessService.getAccessToken(
-            clientId = BuildConfig.CLIENT_ID,
-            clientSecret = BuildConfig.CLIENT_SECRET,
-            code = code,
-        )
+        val response =
+            accessService.getAccessToken(
+                clientId = BuildConfig.CLIENT_ID,
+                clientSecret = BuildConfig.CLIENT_SECRET,
+                code = code,
+            )
         return if (response.isSuccessful && response.code() == 200) {
             response.body()?.let { GithubAccessModel(it.accessToken) }
         } else {

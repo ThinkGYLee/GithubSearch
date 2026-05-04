@@ -1,0 +1,15 @@
+<resources>
+    <string name="unknown_host_exception">check your network</string>
+    <string name="socket_exception">network is weak</string>
+    <string name="http_exception">bad network status</string>
+    <string name="etc_exception">search failed</string>
+    <string name="title_request_authentication">Authentication Request</string>
+    <string name="content_request_authentication">Authentication is required to search more</string>
+    <string name="text_dialog_confirm">Yes</string>
+    <string name="text_dialog_cancel">No</string>
+
+    <string name="text_filter_title">Filter</string>
+    <string name="text_filter_content">Set Filter Conditions</string>
+    <string name="text_filter_cancel">Cancel</string>
+    <string name="text_filter_confirm">Confirm</string>
+</resources>
