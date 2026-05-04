@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.favorite
+package com.gyleedev.githubsearch.feature.favorite
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -42,12 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,12 +71,12 @@ fun FavoriteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.title_favorite)) },
+                title = { Text(text = stringResource(id = FavoriteR.string.title_favorite)) },
                 actions = {
                     IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = stringResource(id = R.string.icon_content_description_filter),
+                            contentDescription = stringResource(id = FavoriteR.string.icon_content_description_filter),
                         )
                     }
                 },
@@ -106,7 +107,7 @@ fun FavoriteScreen(
     if (showDeleteDialog.value) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog.value = false },
-            title = { Text(text = stringResource(id = R.string.text_delete_favorite_title)) },
+            title = { Text(text = stringResource(id = FavoriteR.string.text_delete_favorite_title)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -114,7 +115,7 @@ fun FavoriteScreen(
                         user.value?.let { viewModel.updateFavoriteStatus(it) }
                     },
                 ) {
-                    Text(stringResource(id = R.string.text_dialog_confirm))
+                    Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
                 }
             },
             dismissButton = {
@@ -124,7 +125,7 @@ fun FavoriteScreen(
                         user.value = null
                     },
                 ) {
-                    Text(stringResource(id = R.string.text_dialog_cancel))
+                    Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
                 }
             },
         )
@@ -229,7 +230,7 @@ private fun NoItem(modifier: Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(id = R.string.favorite_no_item),
+            text = stringResource(id = FavoriteR.string.favorite_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -244,16 +245,16 @@ fun FilterDialog(
     onSelectedItemChange: (Int) -> Unit,
 ) {
     val declarations = listOf(
-        stringResource(id = R.string.filter_list_has_repos),
-        stringResource(id = R.string.filter_list_no_repos),
-        stringResource(id = R.string.filter_list_all),
+        stringResource(id = FavoriteR.string.filter_list_has_repos),
+        stringResource(id = FavoriteR.string.filter_list_no_repos),
+        stringResource(id = FavoriteR.string.filter_list_all),
     )
 
     AlertDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
-                text = stringResource(id = R.string.text_filter_title),
+                text = stringResource(id = FavoriteR.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
@@ -261,7 +262,7 @@ fun FilterDialog(
         text = {
             Column {
                 Text(
-                    text = stringResource(id = R.string.text_filter_content),
+                    text = stringResource(id = FavoriteR.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -276,7 +277,7 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = stringResource(id = R.string.text_filter_cancel))
+                Text(text = stringResource(id = FavoriteR.string.text_filter_cancel))
             }
         },
         confirmButton = {
@@ -286,7 +287,7 @@ fun FilterDialog(
                     onChangeState(false)
                 },
             ) {
-                Text(text = stringResource(id = R.string.text_filter_confirm))
+                Text(text = stringResource(id = FavoriteR.string.text_filter_confirm))
             }
         },
     )

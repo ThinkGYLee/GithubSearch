@@ -50,7 +50,7 @@
     - 이동 대상: `app/.../ui/detail/` (DetailScreen.kt, DetailViewModel.kt)
     - 목적지: `feature/detail/.../feature/detail/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.detail` -> `com.gyleedev.githubsearch.feature.detail`
-- [ ] **:feature:favorite**: 즐겨찾기 화면 마이그레이션
+- [x] **:feature:favorite**: 즐겨찾기 화면 마이그레이션
     - 이동 대상: `app/.../ui/favorite/` (FavoriteScreen.kt, FavoriteViewModel.kt)
     - 목적지: `feature/favorite/.../feature/favorite/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.favorite` -> `com.gyleedev.githubsearch.feature.favorite`

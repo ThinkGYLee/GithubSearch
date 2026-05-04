@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":feature:home"))
     implementation(project(":feature:detail"))
+    implementation(project(":feature:favorite"))
 
     implementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.favorite
+package com.gyleedev.githubsearch.feature.favorite
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
