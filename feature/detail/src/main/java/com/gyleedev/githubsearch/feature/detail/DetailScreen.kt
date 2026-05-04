@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.detail
+package com.gyleedev.githubsearch.feature.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,13 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -310,7 +309,7 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
                     .padding(vertical = 8.dp)
                     .width(24.dp)
                     .height(24.dp),
-                colorResource(id = R.color.yellow),
+                tint = Yellow,
             )
             Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
             data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }

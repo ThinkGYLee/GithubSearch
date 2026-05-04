@@ -46,7 +46,7 @@
     - 이동 대상: `app/.../ui/home/` (HomeScreen.kt, HomeViewModel.kt)
     - 목적지: `feature/home/.../feature/home/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.home` -> `com.gyleedev.githubsearch.feature.home`
-- [ ] **:feature:detail**: 상세 화면 마이그레이션
+- [x] **:feature:detail**: 상세 화면 마이그레이션
     - 이동 대상: `app/.../ui/detail/` (DetailScreen.kt, DetailViewModel.kt)
     - 목적지: `feature/detail/.../feature/detail/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.detail` -> `com.gyleedev.githubsearch.feature.detail`

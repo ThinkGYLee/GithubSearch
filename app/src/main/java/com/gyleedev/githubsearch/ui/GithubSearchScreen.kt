@@ -37,8 +37,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
-import com.gyleedev.githubsearch.ui.detail.DetailScreen
 import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.ui.setting.SettingScreen
 
