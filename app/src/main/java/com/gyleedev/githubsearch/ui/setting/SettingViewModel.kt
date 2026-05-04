@@ -2,10 +2,13 @@ package com.gyleedev.githubsearch.ui.setting
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.BaseViewModel
+import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.ResetDataUseCase
 import com.gyleedev.githubsearch.domain.usecase.RevokeApplicationUseCase
-import com.gyleedev.githubsearch.util.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -13,8 +16,10 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val resetDataUseCase: ResetDataUseCase,
     private val revokeApplicationUseCase: RevokeApplicationUseCase,
-    private val preferenceUtil: PreferenceUtil,
+    private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
 ) : BaseViewModel() {
+    private val _loginStatus = MutableSharedFlow<Boolean>()
+    val loginStatus: SharedFlow<Boolean> = _loginStatus
 
     fun resetData() {
         viewModelScope.launch {
@@ -22,12 +27,16 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun isKeyExists(): Boolean = preferenceUtil.isKeyExist()
+    fun isKeyExists() {
+        viewModelScope.launch {
+            val result = checkLoginStatusUseCase().first()
+            _loginStatus.emit(result)
+        }
+    }
 
     fun deleteKey() {
         viewModelScope.launch {
             revokeApplicationUseCase()
-            preferenceUtil.deleteKey()
         }
     }
 }
