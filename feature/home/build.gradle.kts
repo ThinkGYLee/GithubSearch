@@ -1,32 +1,18 @@
 plugins {
-    alias(libs.plugins.library)
+    id("gyleedev.android.feature")
 }
 
 android {
-    namespace = "com.gyleedev.home"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 33
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
+    namespace = "com.gyleedev.githubsearch.feature.home"
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
+    implementation(project(":domain"))
+    implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
+
+    implementation(libs.landscapist.glide)
+    implementation(libs.landscapist.placeholder)
+    implementation(libs.paging.compose)
+    implementation(libs.androidx.material.icons)
 }

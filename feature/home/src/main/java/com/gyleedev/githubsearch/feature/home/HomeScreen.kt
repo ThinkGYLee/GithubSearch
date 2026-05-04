@@ -1,12 +1,8 @@
-package com.gyleedev.githubsearch.ui.home
+package com.gyleedev.githubsearch.feature.home
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresExtension
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,8 +53,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.gyleedev.githubsearch.BuildConfig
-import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -66,6 +60,8 @@ import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.home.R as HomeR
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -87,19 +83,19 @@ fun HomeScreen(
             viewModel.stopLoading()
             val message = when (fetchState) {
                 FetchState.WRONG_CONNECTION -> {
-                    context.getString(R.string.unknown_host_exception)
+                    context.getString(DesignSystemR.string.unknown_host_exception)
                 }
 
                 FetchState.BAD_INTERNET -> {
-                    context.getString(R.string.socket_exception)
+                    context.getString(DesignSystemR.string.socket_exception)
                 }
 
                 FetchState.PARSE_ERROR -> {
-                    context.getString(R.string.http_exception)
+                    context.getString(DesignSystemR.string.http_exception)
                 }
 
                 FetchState.FAIL -> {
-                    context.getString(R.string.etc_exception)
+                    context.getString(DesignSystemR.string.etc_exception)
                 }
             }
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -112,7 +108,7 @@ fun HomeScreen(
                 SearchStatus.NO_SUCH_USER -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.search_result_no_user),
+                        context.getString(HomeR.string.search_result_no_user),
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
@@ -120,7 +116,7 @@ fun HomeScreen(
                 SearchStatus.BAD_NETWORK -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.http_exception),
+                        context.getString(DesignSystemR.string.http_exception),
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
@@ -203,17 +199,16 @@ fun HomeScreen(
         if (showRequestAuthenticationDialog) {
             AlertDialog(
                 onDismissRequest = { showRequestAuthenticationDialog = false },
-                title = { Text(text = stringResource(id = R.string.title_request_authentication)) },
-                text = { Text(text = stringResource(id = R.string.content_request_authentication)) },
+                title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
+                text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
                 confirmButton = {
                     Button(
                         onClick = {
                             showRequestAuthenticationDialog = false
                             requestAuthentication()
-                            login(context)
                         },
                     ) {
-                        Text(stringResource(id = R.string.text_dialog_confirm))
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
                     }
                 },
                 dismissButton = {
@@ -222,28 +217,12 @@ fun HomeScreen(
                             showRequestAuthenticationDialog = false
                         },
                     ) {
-                        Text(stringResource(id = R.string.text_dialog_cancel))
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
                     }
                 },
             )
         }
     }
-}
-
-private fun login(context: Context) {
-    val clientId = BuildConfig.CLIENT_ID
-    val loginUrl = Uri.Builder().scheme("https").authority("github.com")
-        .appendPath("login")
-        .appendPath("oauth")
-        .appendPath("authorize")
-        .appendQueryParameter("client_id", clientId)
-        .build()
-
-    val customTabsIntent = CustomTabsIntent.Builder().build()
-
-    // 아래 플래그를 적용하지 않으면 로그인이 이미 된 상태에서 열 때 앱이 죽음
-    customTabsIntent.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    customTabsIntent.launchUrl(context, loginUrl)
 }
 
 @Composable
@@ -274,7 +253,7 @@ private fun EmbeddedSearchBar(
         active = isSearchActive,
         onActiveChange = { onActiveChanged(it) },
         modifier = modifier.padding(horizontal = animatePadding),
-        placeholder = { Text(stringResource(id = R.string.placeholder_searchbar)) },
+        placeholder = { Text(stringResource(id = HomeR.string.placeholder_searchbar)) },
         leadingIcon = {
             if (isSearchActive) {
                 IconButton(
@@ -465,7 +444,7 @@ private fun NoItem(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(id = R.string.home_no_item),
+            text = stringResource(id = HomeR.string.home_no_item),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )

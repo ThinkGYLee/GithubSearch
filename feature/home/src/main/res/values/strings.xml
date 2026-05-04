@@ -1,0 +1,5 @@
+<resources>
+    <string name="placeholder_searchbar">Search</string>
+    <string name="home_no_item">No Saved Items</string>
+    <string name="search_result_no_user">no such user change the keyword</string>
+</resources>
