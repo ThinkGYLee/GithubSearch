@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
+import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +72,16 @@ fun SettingScreen(
     val showResetDialog = remember { mutableStateOf(false) }
     val showLoginDialog = remember { mutableStateOf(false) }
     val showLogoutDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.loginStatus.collectLatest { isKeyExists ->
+            if (isKeyExists) {
+                showLogoutDialog.value = true
+            } else {
+                showLoginDialog.value = true
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -138,13 +150,7 @@ fun SettingScreen(
                 SettingRow(
                     leadingIcon = Icons.Outlined.AccountCircle,
                     text = stringResource(R.string.setting_login),
-                    onClick = {
-                        if (viewModel.isKeyExists()) {
-                            showLogoutDialog.value = true
-                        } else {
-                            showLoginDialog.value = true
-                        }
-                    },
+                    onClick = viewModel::isKeyExists,
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
