@@ -17,6 +17,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 36
+                defaultConfig.versionCode = 1
+                defaultConfig.versionName = "1.0.0"
 
                 buildTypes {
                     getByName("release") {
