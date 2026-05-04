@@ -25,10 +25,21 @@
 - [ ] `app/.../data/paging` (PagingSource) 이동
 - [ ] Dagger Hilt 모듈(`NetworkModule`, `DatabaseModule`, `RepositoryModule`) 이동 및 수정
 
-### Phase 3: `:core:common` 및 `:core:designsystem` 분리
-- [ ] **`:core:designsystem`**: `app/.../ui/theme` (Color, Type, Theme) 이동
-- [ ] **`:core:common`**: `app/.../core/BaseViewModel`, `util` (LifecycleUtil, ExceptionToStatusUtil 등) 이동
-- [ ] 각 모듈에 적합한 Compose/Library 컨벤션 플러그인 적용
+### Phase 3: :core:common 및 :core:designsystem 분리
+- [x] **:core:designsystem**: UI 공통 요소 마이그레이션
+    - 이동 대상: `app/.../ui/theme/` (Color.kt, Theme.kt, Type.kt)
+    - 목적지: `core/designsystem/.../core/designsystem/theme/`
+    - 패키지명 변경: `com.gyleedev.githubsearch.ui.theme` -> `com.gyleedev.githubsearch.core.designsystem.theme`
+- [x] **:core:common**: 안드로이드/비즈니스 공통 로직 분리
+    - 모듈 생성: `core/common` 추가 (Android Library)
+    - 이동 대상:
+        - `app/.../core/BaseViewModel.kt` -> `core/common/.../core/common/BaseViewModel.kt`
+        - `app/.../util/LifecycleUtil.kt` -> `core/common/.../core/common/util/LifecycleUtil.kt`
+    - 의존성 추가: `:domain` (FetchState 사용을 위함)
+- [ ] **의존성 정비**:
+    - `app` 모듈에서 `:core:designsystem`, `:core:common` 의존성 추가
+    - `MainActivity`, `GithubSearchScreen` 등 기존 참조 코드의 import 경로 수정
+    - 각 모듈에 적합한 Compose/Library 컨벤션 플러그인 적용 (`gyleedev.android.library.compose`, `gyleedev.android.library`)
 
 ### Phase 4: `:feature:*` 모듈 마이그레이션 (Compose UI)
 - [ ] **`:feature:home`**: `app/.../ui/home` 패키지 (Screen, ViewModel) 이동
@@ -47,4 +58,4 @@
 - 런타임 크래시가 발생하지 않도록 의존성 그래프와 Dagger Hilt 컴포넌트 유효성 검사
 
 ---
-**Status**: 🚧 Phase 1 완료
+**Status**: 🚧 Phase 2 완료

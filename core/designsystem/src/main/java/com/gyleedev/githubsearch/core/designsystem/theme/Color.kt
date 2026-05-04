@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.theme
+package com.gyleedev.githubsearch.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

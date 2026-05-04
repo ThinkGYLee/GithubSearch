@@ -1,7 +1,7 @@
 package com.gyleedev.githubsearch.ui.setting
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.githubsearch.core.BaseViewModel
+import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.ResetDataUseCase
 import com.gyleedev.githubsearch.domain.usecase.RevokeApplicationUseCase
