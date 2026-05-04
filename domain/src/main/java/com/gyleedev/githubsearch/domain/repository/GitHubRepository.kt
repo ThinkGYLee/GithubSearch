@@ -19,9 +19,13 @@ interface GitHubRepository {
     suspend fun updateUserFavorite(id: String): UserWrapper
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 
-    suspend fun getAccessToken(id: String, secret: String, code: String): GithubAccessModel?
+    suspend fun getAccessToken(code: String): GithubAccessModel?
 
     suspend fun resetData()
 
     suspend fun revokeApplication()
+
+    suspend fun saveAccessToken(token: String)
+    suspend fun hasAccessToken(): Flow<Boolean>
+    suspend fun deleteAccessToken()
 }
