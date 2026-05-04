@@ -20,6 +20,7 @@ import com.gyleedev.data.remote.RevokeService
 import com.gyleedev.data.remote.TypeAccess
 import com.gyleedev.data.remote.TypeApi
 import com.gyleedev.data.remote.TypeRevoke
+import com.gyleedev.data.remote.request.toRequest
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
@@ -304,7 +305,7 @@ class GitHubRepositoryImpl @Inject constructor(
             try {
                 revokeService.revoke(
                     clientId = BuildConfig.CLIENT_ID,
-                    accessToken = RevokeRequestBody(accessToken),
+                    accessToken = RevokeRequestBody(accessToken).toRequest(),
                 )
             } catch (e: Exception) {
                 // 예외처리
