@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.feature.favorite
+package com.gyleedev.favorite
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable

@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.feature.home
+package com.gyleedev.home
 
 import android.os.Build
 import android.widget.Toast

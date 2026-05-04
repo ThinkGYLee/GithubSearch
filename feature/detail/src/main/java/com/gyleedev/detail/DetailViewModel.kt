@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.feature.detail
+package com.gyleedev.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope

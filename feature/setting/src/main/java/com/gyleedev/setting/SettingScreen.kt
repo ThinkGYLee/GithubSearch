@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.feature.setting
+package com.gyleedev.setting
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable

@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.feature.detail
+package com.gyleedev.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
 import com.gyleedev.githubsearch.domain.model.DetailFeed
+import com.gyleedev.githubsearch.feature.detail.R
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
