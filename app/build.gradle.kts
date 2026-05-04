@@ -44,18 +44,12 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.lifecycle.viewmodel.savedstate)
-
-    implementation(libs.fragment)
 
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.foundation)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.material3.window.size)
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.material)
     implementation(libs.google.material)
@@ -68,17 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.paging.compose)
-
     implementation(libs.kotlin.coroutines)
 
-    implementation(libs.landscapist.glide)
-    implementation(libs.landscapist.placeholder)
-
-    implementation(libs.hilt.navigation.compose)
-
     implementation(libs.androidx.browser)
-
-    implementation(libs.navigation.ui.ktx)
-    implementation(libs.navigation.fragment)
 }

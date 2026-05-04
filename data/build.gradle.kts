@@ -1,7 +1,6 @@
 import com.gyleedev.build_logic.getApiKey
 
 plugins {
-    alias(libs.plugins.library)
     id("gyleedev.android.library")
     id("gyleedev.android.room")
     id("gyleedev.android.retrofit")
