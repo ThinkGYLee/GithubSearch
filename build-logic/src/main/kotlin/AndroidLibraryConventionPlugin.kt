@@ -16,6 +16,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             configure<LibraryExtension> {
                 configureKotlinAndroid(this)
+                defaultConfig {
+                    consumerProguardFiles("consumer-rules.pro")
+                }
+                buildTypes {
+                    getByName("release") {
+                        isMinifyEnabled = false
+                    }
+                }
             }
         }
     }
