@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
-import com.gyleedev.githubsearch.ui.theme.GithubSearchTheme
+import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
