@@ -21,12 +21,14 @@ subprojects {
         kotlin {
             target("**/*.kt")
             ktlint("1.8.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
             leadingTabsToSpaces(4)
             endWithNewline()
         }
         kotlinGradle {
             target("**/*.gradle.kts")
             ktlint("1.8.0")
+                .setEditorConfigPath("$rootDir/.editorconfig")
             leadingTabsToSpaces(4)
             endWithNewline()
         }
