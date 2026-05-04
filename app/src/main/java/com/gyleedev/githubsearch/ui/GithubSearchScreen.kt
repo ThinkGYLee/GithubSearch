@@ -36,20 +36,24 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
-import com.gyleedev.githubsearch.ui.detail.DetailScreen
-import com.gyleedev.githubsearch.ui.favorite.FavoriteScreen
-import com.gyleedev.githubsearch.ui.home.HomeScreen
-import com.gyleedev.githubsearch.ui.setting.SettingScreen
+import com.gyleedev.githubsearch.feature.detail.DetailScreen
+import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
+import com.gyleedev.githubsearch.feature.home.HomeScreen
+import com.gyleedev.githubsearch.feature.setting.SettingScreen
 
 sealed class BottomNavItem(
     val title: Int,
     val icons: ImageVector,
-    val screenRoute: String
+    val screenRoute: String,
 ) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
+
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
+
     data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
+
     data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
 }
 
@@ -58,7 +62,7 @@ sealed class BottomNavItem(
 fun GithubSearchScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    onAuthenticationRequest: () -> Unit
+    onAuthenticationRequest: () -> Unit,
 ) {
     var bottomBarStatus by rememberSaveable {
         mutableStateOf(true)
@@ -70,51 +74,55 @@ fun GithubSearchScreen(
                 BottomNavigation(navController = navController, modifier = Modifier)
             }
         },
-        modifier = Modifier.navigationBarsPadding()
+        modifier = Modifier.navigationBarsPadding(),
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
-            modifier = modifier
+            modifier =
+            modifier
                 .padding(bottom = innerPadding.calculateBottomPadding())
-                .statusBarsPadding()
+                .statusBarsPadding(),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                     requestAuthentication = { onAuthenticationRequest() },
-                    requestBottomBarStatus = { bottomBarStatus = !it }
+                    requestBottomBarStatus = { bottomBarStatus = !it },
                 )
             }
 
             composable(
                 route = "${BottomNavItem.Detail.screenRoute}/{id}",
-                arguments = listOf(
+                arguments =
+                listOf(
                     navArgument("id") {
                         type = NavType.StringType
                         nullable = false
-                    }
-                )
+                    },
+                ),
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { navController.navigateUp() }
+                    onClick = { navController.navigateUp() },
                 )
             }
 
             composable(route = BottomNavItem.Favorite.screenRoute) {
                 FavoriteScreen(
                     modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") }
+                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                 )
             }
 
-            composable(route = BottomNavItem.Setting.screenRoute) {
+            composable(BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
-                    modifier = Modifier
-                        .fillMaxSize()
+                    versionName = BuildConfig.VERSION_NAME,
+                    modifier =
+                    Modifier
+                        .fillMaxSize(),
                 )
             }
         }
@@ -122,17 +130,21 @@ fun GithubSearchScreen(
 }
 
 @Composable
-fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Favorite,
-        BottomNavItem.Setting
-    )
+fun BottomNavigation(
+    navController: NavHostController,
+    modifier: Modifier,
+) {
+    val items =
+        listOf(
+            BottomNavItem.Home,
+            BottomNavItem.Favorite,
+            BottomNavItem.Setting,
+        )
 
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier
+        modifier = modifier,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -143,9 +155,10 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                     Icon(
                         imageVector = item.icons,
                         contentDescription = stringResource(id = item.title),
-                        modifier = Modifier
+                        modifier =
+                        Modifier
                             .width(26.dp)
-                            .height(26.dp)
+                            .height(26.dp),
                     )
                 },
                 label = { Text(stringResource(id = item.title), fontSize = 9.sp) },
@@ -161,7 +174,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
             )
         }
     }

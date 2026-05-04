@@ -18,30 +18,30 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
-import com.gyleedev.githubsearch.ui.theme.GithubSearchTheme
+import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     private val viewModel by viewModels<MainViewModel>()
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
+            statusBarStyle =
+            SystemBarStyle.auto(
                 darkScrim = android.graphics.Color.TRANSPARENT,
-                lightScrim = android.graphics.Color.TRANSPARENT
-            )
+                lightScrim = android.graphics.Color.TRANSPARENT,
+            ),
         )
         setContent {
             GithubSearchTheme {
                 GithubSearchScreen(
                     onAuthenticationRequest = {
                         login(this)
-                    }
+                    },
                 )
             }
         }
@@ -57,12 +57,16 @@ class MainActivity : AppCompatActivity() {
 
     fun login(context: Context) {
         val clientId = BuildConfig.CLIENT_ID
-        val loginUrl = Uri.Builder().scheme("https").authority("github.com")
-            .appendPath("login")
-            .appendPath("oauth")
-            .appendPath("authorize")
-            .appendQueryParameter("client_id", clientId)
-            .build()
+        val loginUrl =
+            Uri
+                .Builder()
+                .scheme("https")
+                .authority("github.com")
+                .appendPath("login")
+                .appendPath("oauth")
+                .appendPath("authorize")
+                .appendQueryParameter("client_id", clientId)
+                .build()
 
         val customTabsIntent = CustomTabsIntent.Builder().build()
 
@@ -84,16 +88,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoginResult(result: Boolean) {
-        val resultMessage = if (result) {
-            getString(R.string.log_in_success_message)
-        } else {
-            getString(R.string.log_in_fail_message)
-        }
+        val resultMessage =
+            if (result) {
+                getString(R.string.log_in_success_message)
+            } else {
+                getString(R.string.log_in_fail_message)
+            }
 
-        Toast.makeText(
-            this@MainActivity,
-            resultMessage,
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast
+            .makeText(
+                this@MainActivity,
+                resultMessage,
+                Toast.LENGTH_SHORT,
+            ).show()
     }
 }
