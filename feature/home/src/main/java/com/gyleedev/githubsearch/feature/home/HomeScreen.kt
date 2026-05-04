@@ -343,7 +343,11 @@ private fun SearchItemList(
 }
 
 @Composable
-private fun HomeItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun HomeItem(
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -376,7 +380,11 @@ private fun HomeItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = 
 }
 
 @Composable
-private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SearchResultItem(
+    user: UserModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -432,7 +440,9 @@ private fun SearchResultItem(user: UserModel, onClick: () -> Unit, modifier: Mod
 }
 
 @Composable
-private fun NoItem(modifier: Modifier = Modifier) {
+private fun NoItem(
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

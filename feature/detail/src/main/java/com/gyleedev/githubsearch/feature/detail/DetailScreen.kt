@@ -36,11 +36,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.feature.detail.R
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
@@ -48,7 +47,11 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(modifier: Modifier = Modifier, viewModel: DetailViewModel = hiltViewModel(), onClick: () -> Unit) {
+fun DetailScreen(
+    modifier: Modifier = Modifier,
+    viewModel: DetailViewModel = hiltViewModel(),
+    onClick: () -> Unit
+) {
     val list by viewModel.itemList.collectAsStateWithLifecycle()
     val status by viewModel.favoriteStatus.collectAsStateWithLifecycle()
 
@@ -123,7 +126,9 @@ fun DetailScreen(modifier: Modifier = Modifier, viewModel: DetailViewModel = hil
 }
 
 @Composable
-private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
+private fun DetailUserTitleItem(
+    user: DetailFeed.UserProfile
+) {
     val data = user.userModel
 
     Row(
@@ -184,7 +189,9 @@ private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
 }
 
 @Composable
-private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
+private fun DetailUserInfoItem(
+    user: DetailFeed.UserDetail
+) {
     val data = user.userModel
 
     Column(modifier = Modifier.padding(12.dp)) {
@@ -281,7 +288,9 @@ private fun DetailRepoTitle() {
 }
 
 @Composable
-private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
+private fun DetailRepoItem(
+    repos: DetailFeed.RepoDetail
+) {
     val data = repos.repositoryModel
 
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
