@@ -90,9 +90,9 @@ fun FavoriteScreen(
         if (users.itemCount > 0) {
             FavoriteItemList(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(paddingValues),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
                 users = users,
                 onClick = { moveToDetail(it) },
                 onLongClick = {
@@ -167,9 +167,9 @@ private fun FavoriteItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
             val user = users[index] as UserModel
@@ -192,34 +192,34 @@ private fun FavoriteItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .padding(12.dp)
-                .combinedClickable(
-                    onLongClick = { onLongClick(user) },
-                    onClick = onClick,
-                ),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .padding(12.dp)
+            .combinedClickable(
+                onLongClick = { onLongClick(user) },
+                onClick = onClick,
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
             modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
+            Modifier
+                .padding(horizontal = 8.dp)
+                .heightIn(max = 80.dp, min = 20.dp)
+                .widthIn(max = 80.dp, min = 20.dp)
+                .clip(CircleShape),
             component =
-                rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
+            rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
         Text(
             text = user.login,
@@ -320,14 +320,14 @@ fun RadioButtons(
             Column {
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp)
-                            .selectable(
-                                selected = isSelectedItem(item),
-                                onClick = { onChangeState(item) },
-                                role = Role.RadioButton,
-                            ).padding(bottom = 3.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .selectable(
+                            selected = isSelectedItem(item),
+                            onClick = { onChangeState(item) },
+                            role = Role.RadioButton,
+                        ).padding(bottom = 3.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(

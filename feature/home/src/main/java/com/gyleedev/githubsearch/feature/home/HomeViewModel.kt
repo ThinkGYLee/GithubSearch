@@ -20,78 +20,78 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel
-    @Inject
-    constructor(
-        getUsersUseCase: GetUsersUseCase,
-        private val searchUserUseCase: SearchUserUseCase,
-    ) : BaseViewModel() {
-        private val _searchQuery = MutableStateFlow("")
-        val searchQuery: StateFlow<String> = _searchQuery
+@Inject
+constructor(
+    getUsersUseCase: GetUsersUseCase,
+    private val searchUserUseCase: SearchUserUseCase,
+) : BaseViewModel() {
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
-        private val _userInfo = MutableStateFlow<UserModel?>(null)
-        val userInfo: StateFlow<UserModel?> = _userInfo
+    private val _userInfo = MutableStateFlow<UserModel?>(null)
+    val userInfo: StateFlow<UserModel?> = _userInfo
 
-        private val _loading = MutableStateFlow(false)
-        val loading: StateFlow<Boolean> = _loading
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
 
-        val users = getUsersUseCase().cachedIn(viewModelScope)
+    val users = getUsersUseCase().cachedIn(viewModelScope)
 
-        private val _errorAlert = MutableSharedFlow<SearchStatus>()
-        val errorAlert: SharedFlow<SearchStatus> = _errorAlert
+    private val _errorAlert = MutableSharedFlow<SearchStatus>()
+    val errorAlert: SharedFlow<SearchStatus> = _errorAlert
 
-        private val _requestAuthentication = MutableSharedFlow<Unit>()
-        val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
+    private val _requestAuthentication = MutableSharedFlow<Unit>()
+    val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
 
-        @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-        fun getUser(id: String) {
-            viewModelScope.launch(exceptionHandler) {
-                when (val userWrapper = searchUserUseCase(id)) {
-                    is UserWrapper.FromDatabase -> {
-                        _userInfo.emit(userWrapper.data)
-                    }
-
-                    is UserWrapper.Success -> {
-                        _userInfo.emit(userWrapper.data)
-                    }
-
-                    is UserWrapper.Failure -> {
-                        alertResponseFail(userWrapper)
-                    }
-                }
-                _loading.emit(false)
-            }
-        }
-
-        private suspend fun alertResponseFail(userWrapper: UserWrapper) {
-            val wrapper = userWrapper as UserWrapper.Failure
-            when (wrapper.status) {
-                SearchStatus.NEED_AUTHENTICATION -> {
-                    _requestAuthentication.emit(Unit)
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun getUser(id: String) {
+        viewModelScope.launch(exceptionHandler) {
+            when (val userWrapper = searchUserUseCase(id)) {
+                is UserWrapper.FromDatabase -> {
+                    _userInfo.emit(userWrapper.data)
                 }
 
-                else -> {
-                    _errorAlert.emit(wrapper.status)
+                is UserWrapper.Success -> {
+                    _userInfo.emit(userWrapper.data)
+                }
+
+                is UserWrapper.Failure -> {
+                    alertResponseFail(userWrapper)
                 }
             }
-        }
-
-        suspend fun changeLoadingState() {
-            _loading.emit(!_loading.value)
-        }
-
-        suspend fun stopLoading() {
             _loading.emit(false)
         }
+    }
 
-        fun updateSearchId(id: String) {
-            viewModelScope.launch {
-                _searchQuery.emit(id)
+    private suspend fun alertResponseFail(userWrapper: UserWrapper) {
+        val wrapper = userWrapper as UserWrapper.Failure
+        when (wrapper.status) {
+            SearchStatus.NEED_AUTHENTICATION -> {
+                _requestAuthentication.emit(Unit)
             }
-        }
 
-        fun resetUser() {
-            viewModelScope.launch {
-                _userInfo.emit(null)
+            else -> {
+                _errorAlert.emit(wrapper.status)
             }
         }
     }
+
+    suspend fun changeLoadingState() {
+        _loading.emit(!_loading.value)
+    }
+
+    suspend fun stopLoading() {
+        _loading.emit(false)
+    }
+
+    fun updateSearchId(id: String) {
+        viewModelScope.launch {
+            _searchQuery.emit(id)
+        }
+    }
+
+    fun resetUser() {
+        viewModelScope.launch {
+            _userInfo.emit(null)
+        }
+    }
+}

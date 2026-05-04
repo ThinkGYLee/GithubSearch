@@ -14,31 +14,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel
-    @Inject
-    constructor(
-        private val resetDataUseCase: ResetDataUseCase,
-        private val revokeApplicationUseCase: RevokeApplicationUseCase,
-        private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
-    ) : BaseViewModel() {
-        private val _loginStatus = MutableSharedFlow<Boolean>()
-        val loginStatus: SharedFlow<Boolean> = _loginStatus
+@Inject
+constructor(
+    private val resetDataUseCase: ResetDataUseCase,
+    private val revokeApplicationUseCase: RevokeApplicationUseCase,
+    private val checkLoginStatusUseCase: CheckLoginStatusUseCase,
+) : BaseViewModel() {
+    private val _loginStatus = MutableSharedFlow<Boolean>()
+    val loginStatus: SharedFlow<Boolean> = _loginStatus
 
-        fun resetData() {
-            viewModelScope.launch {
-                resetDataUseCase()
-            }
-        }
-
-        fun isKeyExists() {
-            viewModelScope.launch {
-                val result = checkLoginStatusUseCase().first()
-                _loginStatus.emit(result)
-            }
-        }
-
-        fun deleteKey() {
-            viewModelScope.launch {
-                revokeApplicationUseCase()
-            }
+    fun resetData() {
+        viewModelScope.launch {
+            resetDataUseCase()
         }
     }
+
+    fun isKeyExists() {
+        viewModelScope.launch {
+            val result = checkLoginStatusUseCase().first()
+            _loginStatus.emit(result)
+        }
+    }
+
+    fun deleteKey() {
+        viewModelScope.launch {
+            revokeApplicationUseCase()
+        }
+    }
+}

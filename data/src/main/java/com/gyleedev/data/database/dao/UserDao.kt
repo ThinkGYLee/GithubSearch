@@ -40,12 +40,11 @@ interface UserDao {
     @Update
     fun updateUser(user: UserEntity)
 
-    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> =
-        when (status) {
-            FilterStatus.ALL -> getUsersAll()
-            FilterStatus.REPO -> getUsersRepo()
-            FilterStatus.NOREPO -> getUsersNonRepo()
-        }
+    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
+        FilterStatus.ALL -> getUsersAll()
+        FilterStatus.REPO -> getUsersRepo()
+        FilterStatus.NOREPO -> getUsersNonRepo()
+    }
 
     @Query("DELETE FROM user")
     fun resetUser()

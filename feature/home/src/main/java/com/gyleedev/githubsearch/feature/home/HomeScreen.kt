@@ -181,9 +181,9 @@ fun HomeScreen(
                 if (users.itemCount > 0) {
                     SearchItemList(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                         users = users,
                         onClick = { moveToDetail(it) },
                     )
@@ -275,50 +275,50 @@ private fun EmbeddedSearchBar(
             }
         },
         trailingIcon =
-            if (isSearchActive && query.isNotEmpty()) {
-                {
-                    IconButton(
-                        onClick = {
-                            onQueryChange("")
-                            onSearchItemReset()
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                }
-            } else {
-                null
-            },
-        colors =
-            SearchBarDefaults.colors(
-                containerColor =
-                    if (isSearchActive) {
-                        MaterialTheme.colorScheme.background
-                    } else {
-                        MaterialTheme.colorScheme.surfaceContainerLow
+        if (isSearchActive && query.isNotEmpty()) {
+            {
+                IconButton(
+                    onClick = {
+                        onQueryChange("")
+                        onSearchItemReset()
                     },
-            ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+        } else {
+            null
+        },
+        colors =
+        SearchBarDefaults.colors(
+            containerColor =
+            if (isSearchActive) {
+                MaterialTheme.colorScheme.background
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
+        ),
         tonalElevation = 0.dp,
     ) {
         Box(
             modifier =
-                modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp),
         ) {
             if (user != null) {
                 SearchResultItem(
                     user = user,
                     onClick = moveToDetail,
                     modifier =
-                        Modifier
-                            .align(
-                                Alignment.TopStart,
-                            ).padding(top = 20.dp),
+                    Modifier
+                        .align(
+                            Alignment.TopStart,
+                        ).padding(top = 20.dp),
                 )
             }
             if (loading) {
@@ -336,9 +336,9 @@ private fun SearchItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -359,30 +359,30 @@ private fun HomeItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .clickable(onClick = onClick)
-                .padding(12.dp),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
             modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
-                    .clip(CircleShape),
+            Modifier
+                .padding(horizontal = 8.dp)
+                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
+                .clip(CircleShape),
             component =
-                rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
+            rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
         Text(
             text = user.login,
@@ -399,31 +399,31 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .clickable(onClick = onClick),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
             modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .size(80.dp)
-                    .clip(
-                        CircleShape,
-                    ),
+            Modifier
+                .padding(horizontal = 8.dp)
+                .size(80.dp)
+                .clip(
+                    CircleShape,
+                ),
             component =
-                rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
+            rememberImageComponent {
+                +ShimmerPlugin(
+                    Shimmer.Flash(
+                        baseColor = Color.White,
+                        highlightColor = Color.LightGray,
+                    ),
+                )
+            },
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {

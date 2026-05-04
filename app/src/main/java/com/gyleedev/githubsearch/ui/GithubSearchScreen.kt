@@ -80,9 +80,9 @@ fun GithubSearchScreen(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier =
-                modifier
-                    .padding(bottom = innerPadding.calculateBottomPadding())
-                    .statusBarsPadding(),
+            modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .statusBarsPadding(),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
@@ -96,12 +96,12 @@ fun GithubSearchScreen(
             composable(
                 route = "${BottomNavItem.Detail.screenRoute}/{id}",
                 arguments =
-                    listOf(
-                        navArgument("id") {
-                            type = NavType.StringType
-                            nullable = false
-                        },
-                    ),
+                listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                        nullable = false
+                    },
+                ),
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
@@ -121,8 +121,8 @@ fun GithubSearchScreen(
                     requestAuthentication = { onAuthenticationRequest() },
                     versionName = BuildConfig.VERSION_NAME,
                     modifier =
-                        Modifier
-                            .fillMaxSize(),
+                    Modifier
+                        .fillMaxSize(),
                 )
             }
         }
@@ -156,9 +156,9 @@ fun BottomNavigation(
                         imageVector = item.icons,
                         contentDescription = stringResource(id = item.title),
                         modifier =
-                            Modifier
-                                .width(26.dp)
-                                .height(26.dp),
+                        Modifier
+                            .width(26.dp)
+                            .height(26.dp),
                     )
                 },
                 label = { Text(stringResource(id = item.title), fontSize = 9.sp) },

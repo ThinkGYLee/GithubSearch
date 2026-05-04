@@ -11,17 +11,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel
-    @Inject
-    constructor(
-        private val getAccessTokenUseCase: GetAccessTokenUseCase,
-    ) : BaseViewModel() {
-        private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
-        val alertLoginSuccess: SharedFlow<Boolean> = _alertLoginSuccess
+@Inject
+constructor(
+    private val getAccessTokenUseCase: GetAccessTokenUseCase,
+) : BaseViewModel() {
+    private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
+    val alertLoginSuccess: SharedFlow<Boolean> = _alertLoginSuccess
 
-        fun getAccessToken(code: String) {
-            viewModelScope.launch {
-                val result = getAccessTokenUseCase(code)
-                _alertLoginSuccess.emit(result)
-            }
+    fun getAccessToken(code: String) {
+        viewModelScope.launch {
+            val result = getAccessTokenUseCase(code)
+            _alertLoginSuccess.emit(result)
         }
     }
+}

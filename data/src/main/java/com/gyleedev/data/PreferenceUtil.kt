@@ -22,10 +22,9 @@ class PreferenceUtil(
         accessPreference.edit().putString(key, str).apply()
     }
 
-    fun isKeyExist(): Boolean =
-        accessPreference.getString("Token", "").let {
-            !it.isNullOrEmpty()
-        }
+    fun isKeyExist(): Boolean = accessPreference.getString("Token", "").let {
+        !it.isNullOrEmpty()
+    }
 
     fun deleteKey() {
         setString(str = "")

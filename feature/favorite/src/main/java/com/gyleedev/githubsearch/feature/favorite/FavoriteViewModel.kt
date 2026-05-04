@@ -16,41 +16,41 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel
-    @Inject
-    constructor(
-        private val updateFavoriteUseCase: UpdateFavoriteStatusUseCase,
-        private val getFavoritesUseCase: GetFavoritesUseCase,
-    ) : BaseViewModel() {
-        private val filterState = MutableStateFlow(FilterStatus.ALL)
+@Inject
+constructor(
+    private val updateFavoriteUseCase: UpdateFavoriteStatusUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+) : BaseViewModel() {
+    private val filterState = MutableStateFlow(FilterStatus.ALL)
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        val items =
-            filterState
-                .flatMapLatest {
-                    getFavoritesUseCase(it)
-                }.cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val items =
+        filterState
+            .flatMapLatest {
+                getFavoritesUseCase(it)
+            }.cachedIn(viewModelScope)
 
-        fun userFilterAll() {
-            viewModelScope.launch {
-                filterState.emit(FilterStatus.ALL)
-            }
-        }
-
-        fun userFilterHasRepos() {
-            viewModelScope.launch {
-                filterState.emit(FilterStatus.REPO)
-            }
-        }
-
-        fun userFilterNoRepos() {
-            viewModelScope.launch {
-                filterState.emit(FilterStatus.NOREPO)
-            }
-        }
-
-        fun updateFavoriteStatus(user: UserModel) {
-            viewModelScope.launch {
-                updateFavoriteUseCase(user.login)
-            }
+    fun userFilterAll() {
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.ALL)
         }
     }
+
+    fun userFilterHasRepos() {
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.REPO)
+        }
+    }
+
+    fun userFilterNoRepos() {
+        viewModelScope.launch {
+            filterState.emit(FilterStatus.NOREPO)
+        }
+    }
+
+    fun updateFavoriteStatus(user: UserModel) {
+        viewModelScope.launch {
+            updateFavoriteUseCase(user.login)
+        }
+    }
+}

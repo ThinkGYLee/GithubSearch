@@ -42,39 +42,37 @@ data class UserEntity(
     val favorite: Boolean,
 )
 
-fun UserModel.toEntity(): UserEntity =
-    UserEntity(
-        id = 0,
-        userId = login,
-        name = name,
-        followers = followers,
-        following = following,
-        company = company,
-        avatar = avatar,
-        email = email,
-        bio = bio,
-        repos = repos,
-        createdDate = createdDate,
-        updatedDate = updatedDate,
-        reposAddress = reposAddress,
-        blogUrl = blogUrl,
-        favorite = favorite,
-    )
+fun UserModel.toEntity(): UserEntity = UserEntity(
+    id = 0,
+    userId = login,
+    name = name,
+    followers = followers,
+    following = following,
+    company = company,
+    avatar = avatar,
+    email = email,
+    bio = bio,
+    repos = repos,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    reposAddress = reposAddress,
+    blogUrl = blogUrl,
+    favorite = favorite,
+)
 
-fun UserEntity.toModel(): UserModel =
-    UserModel(
-        login = userId,
-        name = name,
-        followers = followers,
-        following = following,
-        company = company,
-        avatar = avatar,
-        email = email,
-        bio = bio,
-        repos = repos,
-        createdDate = createdDate,
-        updatedDate = updatedDate,
-        reposAddress = reposAddress,
-        blogUrl = blogUrl,
-        favorite = favorite,
-    )
+fun UserEntity.toModel(): UserModel = UserModel(
+    login = userId,
+    name = name,
+    followers = followers,
+    following = following,
+    company = company,
+    avatar = avatar,
+    email = email,
+    bio = bio,
+    repos = repos,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    reposAddress = reposAddress,
+    blogUrl = blogUrl,
+    favorite = favorite,
+)

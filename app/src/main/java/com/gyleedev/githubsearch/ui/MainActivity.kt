@@ -31,10 +31,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle =
-                SystemBarStyle.auto(
-                    darkScrim = android.graphics.Color.TRANSPARENT,
-                    lightScrim = android.graphics.Color.TRANSPARENT,
-                ),
+            SystemBarStyle.auto(
+                darkScrim = android.graphics.Color.TRANSPARENT,
+                lightScrim = android.graphics.Color.TRANSPARENT,
+            ),
         )
         setContent {
             GithubSearchTheme {

@@ -8,7 +8,6 @@ data class RevokeRequest(
     val accessToken: String,
 )
 
-fun RevokeRequestBody.toRequest(): RevokeRequest =
-    RevokeRequest(
-        accessToken = accessToken,
-    )
+fun RevokeRequestBody.toRequest(): RevokeRequest = RevokeRequest(
+    accessToken = accessToken,
+)

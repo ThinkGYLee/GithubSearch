@@ -13,10 +13,9 @@ class FavoritePagingSource(
     private val dao: UserDao,
     private val status: FilterStatus,
 ) : PagingSource<Int, UserEntity>() {
-    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? =
-        state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.prevKey
-        }
+    override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? = state.anchorPosition?.let { anchorPosition ->
+        state.closestPageToPosition(anchorPosition)?.prevKey
+    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserEntity> {
         val page = params.key ?: 1

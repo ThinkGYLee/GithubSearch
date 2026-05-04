@@ -95,17 +95,17 @@ fun SettingScreen(
 
         Column(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .padding(paddingValues),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(paddingValues),
         ) {
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .height(48.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -116,15 +116,15 @@ fun SettingScreen(
 
             Card(
                 colors =
-                    if (isDark) {
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    } else {
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                        )
-                    },
+                if (isDark) {
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    )
+                } else {
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.elevatedCardElevation(),
             ) {
@@ -175,10 +175,10 @@ fun SettingScreen(
 
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .height(48.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -189,15 +189,15 @@ fun SettingScreen(
 
             Card(
                 colors =
-                    if (isDark) {
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        )
-                    } else {
-                        CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                        )
-                    },
+                if (isDark) {
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    )
+                } else {
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.elevatedCardElevation(),
             ) {
@@ -343,11 +343,11 @@ private fun SettingRow(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .clickable(onClick = onClick, role = Role.Button)
-                .padding(horizontal = 16.dp),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable(onClick = onClick, role = Role.Button)
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -455,16 +455,16 @@ fun RadioButtons(
         items.forEach { item ->
             Row(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .selectable(
-                            selected = selectedIndex == items.indexOf(item),
-                            onClick = {
-                                onIndexChange(items.indexOf(item))
-                            },
-                            role = Role.RadioButton,
-                        ).padding(bottom = 3.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .selectable(
+                        selected = selectedIndex == items.indexOf(item),
+                        onClick = {
+                            onIndexChange(items.indexOf(item))
+                        },
+                        role = Role.RadioButton,
+                    ).padding(bottom = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
