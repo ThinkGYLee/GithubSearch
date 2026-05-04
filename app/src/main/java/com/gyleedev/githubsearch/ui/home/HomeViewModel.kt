@@ -8,8 +8,8 @@ import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.model.UserWrapper
-import com.gyleedev.githubsearch.domain.usecase.HomeGetUsersUseCase
-import com.gyleedev.githubsearch.domain.usecase.HomeSearchUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
+import com.gyleedev.githubsearch.domain.usecase.SearchUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    getUsersUseCase: HomeGetUsersUseCase,
-    private val searchUserUseCase: HomeSearchUserUseCase,
+    getUsersUseCase: GetUsersUseCase,
+    private val searchUserUseCase: SearchUserUseCase,
 ) : BaseViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery

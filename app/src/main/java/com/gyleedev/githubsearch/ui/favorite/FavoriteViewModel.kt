@@ -5,8 +5,8 @@ import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.core.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.usecase.FavoriteGetFavoritesUseCase
-import com.gyleedev.githubsearch.domain.usecase.FavoriteUpdateFavoriteStatusUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetFavoritesUseCase
+import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val updateFavoriteUseCase: FavoriteUpdateFavoriteStatusUseCase,
-    private val favoriteGetFavoritesUseCase: FavoriteGetFavoritesUseCase,
+    private val updateFavoriteUseCase: UpdateFavoriteStatusUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
 ) : BaseViewModel() {
 
     private val filterState = MutableStateFlow(FilterStatus.ALL)
@@ -25,7 +25,7 @@ class FavoriteViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val items = filterState
         .flatMapLatest {
-            favoriteGetFavoritesUseCase(it)
+            getFavoritesUseCase(it)
         }.cachedIn(viewModelScope)
 
     fun userFilterAll() {
