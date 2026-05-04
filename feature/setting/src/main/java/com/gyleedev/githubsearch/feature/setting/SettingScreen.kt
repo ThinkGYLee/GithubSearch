@@ -1,4 +1,4 @@
-package com.gyleedev.setting
+package com.gyleedev.githubsearch.feature.setting
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
@@ -60,7 +60,7 @@ fun SettingScreen(
     modifier: Modifier = Modifier,
     versionName: String,
     requestAuthentication: () -> Unit,
-    viewModel: SettingViewModel = hiltViewModel()
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val isDark = isSystemInDarkTheme()
 

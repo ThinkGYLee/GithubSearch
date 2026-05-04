@@ -1,4 +1,4 @@
-package com.gyleedev.home
+package com.gyleedev.githubsearch.feature.home
 
 import android.os.Build
 import android.widget.Toast
@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -78,25 +78,20 @@ fun HomeScreen(
     val context = LocalContext.current
     val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
+    val unknownHostException = stringResource(id = DesignSystemR.string.unknown_host_exception)
+    val socketException = stringResource(id = DesignSystemR.string.socket_exception)
+    val httpException = stringResource(id = DesignSystemR.string.http_exception)
+    val etcException = stringResource(id = DesignSystemR.string.etc_exception)
+    val noSuchUserMessage = stringResource(id = HomeR.string.search_result_no_user)
+
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
             viewModel.stopLoading()
             val message = when (fetchState) {
-                FetchState.WRONG_CONNECTION -> {
-                    context.getString(DesignSystemR.string.unknown_host_exception)
-                }
-
-                FetchState.BAD_INTERNET -> {
-                    context.getString(DesignSystemR.string.socket_exception)
-                }
-
-                FetchState.PARSE_ERROR -> {
-                    context.getString(DesignSystemR.string.http_exception)
-                }
-
-                FetchState.FAIL -> {
-                    context.getString(DesignSystemR.string.etc_exception)
-                }
+                FetchState.WRONG_CONNECTION -> unknownHostException
+                FetchState.BAD_INTERNET -> socketException
+                FetchState.PARSE_ERROR -> httpException
+                FetchState.FAIL -> etcException
             }
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
@@ -108,7 +103,7 @@ fun HomeScreen(
                 SearchStatus.NO_SUCH_USER -> {
                     Toast.makeText(
                         context,
-                        context.getString(HomeR.string.search_result_no_user),
+                        noSuchUserMessage,
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
@@ -116,7 +111,7 @@ fun HomeScreen(
                 SearchStatus.BAD_NETWORK -> {
                     Toast.makeText(
                         context,
-                        context.getString(DesignSystemR.string.http_exception),
+                        httpException,
                         Toast.LENGTH_SHORT,
                     ).show()
                 }

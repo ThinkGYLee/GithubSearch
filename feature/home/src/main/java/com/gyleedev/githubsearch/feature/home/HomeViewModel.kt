@@ -1,4 +1,4 @@
-package com.gyleedev.home
+package com.gyleedev.githubsearch.feature.home
 
 import android.os.Build
 import androidx.annotation.RequiresExtension

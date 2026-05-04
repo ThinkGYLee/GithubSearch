@@ -1,4 +1,4 @@
-package com.gyleedev.detail
+package com.gyleedev.githubsearch.feature.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
