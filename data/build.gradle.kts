@@ -1,30 +1,30 @@
+import com.gyleedev.build_logic.getApiKey
+
 plugins {
     alias(libs.plugins.library)
+    id("gyleedev.android.library")
+    id("gyleedev.android.room")
+    id("gyleedev.android.retrofit")
+    id("gyleedev.android.hilt")
 }
 
 android {
     namespace = "com.gyleedev.data"
-    compileSdk = 36
-
+    buildFeatures {
+        buildConfig = true
+    }
+    // app 모듈에 정의된 getApiKey 로직을 사용하여 필드 추가
     defaultConfig {
-        minSdk = 33
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+        buildConfigField("String", "CLIENT_ID", "\"${getApiKey("CLIENT_ID")}\"")
+        buildConfigField("String", "CLIENT_SECRET", "\"${getApiKey("CLIENT_SECRET")}\"")
     }
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(libs.room.paging)
+    implementation(libs.paging.runtime.ktx)
+    implementation(libs.kotlin.coroutines)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
