@@ -10,7 +10,6 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 
 @Dao
 interface UserDao {
-
     @Query("SELECT * FROM user")
     fun getUsers(): PagingSource<Int, UserEntity>
 
@@ -24,7 +23,10 @@ interface UserDao {
     fun getUsersNonRepo(): PagingSource<Int, UserEntity>
 
     @Query("SELECT * FROM user WHERE favorite = :favorite LIMIT 10 OFFSET (:page-1)*10")
-    fun getFavorite(page: Int, favorite: Boolean = true): List<UserEntity>
+    fun getFavorite(
+        page: Int,
+        favorite: Boolean = true,
+    ): List<UserEntity>
 
     @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
     fun getUser(id: String): UserEntity?
@@ -38,11 +40,12 @@ interface UserDao {
     @Update
     fun updateUser(user: UserEntity)
 
-    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
-        FilterStatus.ALL -> getUsersAll()
-        FilterStatus.REPO -> getUsersRepo()
-        FilterStatus.NOREPO -> getUsersNonRepo()
-    }
+    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> =
+        when (status) {
+            FilterStatus.ALL -> getUsersAll()
+            FilterStatus.REPO -> getUsersRepo()
+            FilterStatus.NOREPO -> getUsersNonRepo()
+        }
 
     @Query("DELETE FROM user")
     fun resetUser()

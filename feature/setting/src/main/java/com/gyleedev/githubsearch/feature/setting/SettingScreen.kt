@@ -94,16 +94,18 @@ fun SettingScreen(
     ) { paddingValues ->
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(paddingValues),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .height(48.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -113,15 +115,16 @@ fun SettingScreen(
             }
 
             Card(
-                colors = if (isDark) {
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    )
-                } else {
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    )
-                },
+                colors =
+                    if (isDark) {
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
+                    } else {
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        )
+                    },
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.elevatedCardElevation(),
             ) {
@@ -171,10 +174,11 @@ fun SettingScreen(
             }
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .height(48.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .height(48.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -184,15 +188,16 @@ fun SettingScreen(
             }
 
             Card(
-                colors = if (isDark) {
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    )
-                } else {
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    )
-                },
+                colors =
+                    if (isDark) {
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        )
+                    } else {
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        )
+                    },
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.elevatedCardElevation(),
             ) {
@@ -337,11 +342,12 @@ private fun SettingRow(
     trailingContent: @Composable () -> Unit,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable(onClick = onClick, role = Role.Button)
-            .padding(horizontal = 16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .clickable(onClick = onClick, role = Role.Button)
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -366,31 +372,33 @@ private fun RadioButtonDialog(
 ) {
     val stringResourceList: List<Int>
 
-    val defaultIndex = when (items) {
-        is SettingDialogItem.Theme -> {
-            val data = items.content
-            stringResourceList = data.map { it.content }
-            data.indexOf(
-                data.find {
-                    it.type == AppCompatDelegate.getDefaultNightMode()
-                },
-            )
+    val defaultIndex =
+        when (items) {
+            is SettingDialogItem.Theme -> {
+                val data = items.content
+                stringResourceList = data.map { it.content }
+                data.indexOf(
+                    data.find {
+                        it.type == AppCompatDelegate.getDefaultNightMode()
+                    },
+                )
+            }
+
+            is SettingDialogItem.Language -> {
+                val data = items.content
+                stringResourceList = data.map { it.content }
+                data.indexOf(
+                    data.find {
+                        it.type == AppCompatDelegate.getApplicationLocales()
+                    },
+                )
+            }
         }
 
-        is SettingDialogItem.Language -> {
-            val data = items.content
-            stringResourceList = data.map { it.content }
-            data.indexOf(
-                data.find {
-                    it.type == AppCompatDelegate.getApplicationLocales()
-                },
-            )
+    val selectedIndex =
+        remember {
+            mutableIntStateOf(defaultIndex)
         }
-    }
-
-    val selectedIndex = remember {
-        mutableIntStateOf(defaultIndex)
-    }
 
     AlertDialog(
         title = {
@@ -437,21 +445,26 @@ private fun RadioButtonDialog(
 }
 
 @Composable
-fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun RadioButtons(
+    selectedIndex: Int,
+    items: List<Int>,
+    onIndexChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.padding(top = 10.dp)) {
         items.forEach { item ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .selectable(
-                        selected = selectedIndex == items.indexOf(item),
-                        onClick = {
-                            onIndexChange(items.indexOf(item))
-                        },
-                        role = Role.RadioButton,
-                    )
-                    .padding(bottom = 3.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .selectable(
+                            selected = selectedIndex == items.indexOf(item),
+                            onClick = {
+                                onIndexChange(items.indexOf(item))
+                            },
+                            role = Role.RadioButton,
+                        ).padding(bottom = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
@@ -466,37 +479,49 @@ fun RadioButtons(selectedIndex: Int, items: List<Int>, onIndexChange: (Int) -> U
 }
 
 sealed interface SettingDialogItem {
-    data class Theme(val content: List<ThemeItem>) : SettingDialogItem
+    data class Theme(
+        val content: List<ThemeItem>,
+    ) : SettingDialogItem
 
-    data class Language(val content: List<LanguageItem>) : SettingDialogItem
+    data class Language(
+        val content: List<LanguageItem>,
+    ) : SettingDialogItem
 }
 
-data class ThemeItem(val type: Int, val content: Int)
-
-data class LanguageItem(val type: LocaleListCompat, val content: Int)
-
-val themeList = listOf(
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_YES,
-        SettingR.string.filter_dark_theme,
-    ),
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_NO,
-        SettingR.string.filter_light_theme,
-    ),
-    ThemeItem(
-        AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
-        SettingR.string.filter_default_theme,
-    ),
+data class ThemeItem(
+    val type: Int,
+    val content: Int,
 )
 
-val languageList = listOf(
-    LanguageItem(
-        LocaleListCompat.create(Locale.KOREA),
-        SettingR.string.setting_korean,
-    ),
-    LanguageItem(
-        LocaleListCompat.create(Locale.ENGLISH),
-        SettingR.string.setting_english,
-    ),
+data class LanguageItem(
+    val type: LocaleListCompat,
+    val content: Int,
 )
+
+val themeList =
+    listOf(
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_YES,
+            SettingR.string.filter_dark_theme,
+        ),
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_NO,
+            SettingR.string.filter_light_theme,
+        ),
+        ThemeItem(
+            AppCompatDelegate.MODE_NIGHT_UNSPECIFIED,
+            SettingR.string.filter_default_theme,
+        ),
+    )
+
+val languageList =
+    listOf(
+        LanguageItem(
+            LocaleListCompat.create(Locale.KOREA),
+            SettingR.string.setting_korean,
+        ),
+        LanguageItem(
+            LocaleListCompat.create(Locale.ENGLISH),
+            SettingR.string.setting_english,
+        ),
+    )

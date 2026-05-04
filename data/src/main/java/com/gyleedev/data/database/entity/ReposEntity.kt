@@ -17,7 +17,6 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
             onDelete = ForeignKey.CASCADE,
         ),
     ],
-
 )
 data class ReposEntity(
     @PrimaryKey(autoGenerate = true)
@@ -39,22 +38,24 @@ data class ReposEntity(
     val favorite: Boolean,
 )
 
-fun ReposEntity.toModel(): RepositoryModel = RepositoryModel(
-    name = name,
-    userGithubId = userGithubId,
-    description = description,
-    language = language,
-    stargazer = stargazer,
-    favorite = favorite,
-)
+fun ReposEntity.toModel(): RepositoryModel =
+    RepositoryModel(
+        name = name,
+        userGithubId = userGithubId,
+        description = description,
+        language = language,
+        stargazer = stargazer,
+        favorite = favorite,
+    )
 
-fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity = ReposEntity(
-    id = 0,
-    userEntityId = userEntityId,
-    userGithubId = userGithubId,
-    description = description,
-    name = name,
-    stargazer = stargazer,
-    language = language,
-    favorite = favorite,
-)
+fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity =
+    ReposEntity(
+        id = 0,
+        userEntityId = userEntityId,
+        userGithubId = userGithubId,
+        description = description,
+        name = name,
+        stargazer = stargazer,
+        language = language,
+        favorite = favorite,
+    )

@@ -50,7 +50,7 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun DetailScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val list by viewModel.itemList.collectAsStateWithLifecycle()
     val status by viewModel.favoriteStatus.collectAsStateWithLifecycle()
@@ -73,16 +73,18 @@ fun DetailScreen(
                         if (status) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
-                                contentDescription = stringResource(
-                                    id = R.string.icon_content_description_favorite_filled,
-                                ),
+                                contentDescription =
+                                    stringResource(
+                                        id = R.string.icon_content_description_favorite_filled,
+                                    ),
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = stringResource(
-                                    id = R.string.icon_content_description_favorite_bordered,
-                                ),
+                                contentDescription =
+                                    stringResource(
+                                        id = R.string.icon_content_description_favorite_bordered,
+                                    ),
                             )
                         }
                     }
@@ -93,10 +95,11 @@ fun DetailScreen(
         modifier = modifier,
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(vertical = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(vertical = 4.dp),
         ) {
             items(list.size) { current ->
                 when (list[current]) {
@@ -126,34 +129,35 @@ fun DetailScreen(
 }
 
 @Composable
-private fun DetailUserTitleItem(
-    user: DetailFeed.UserProfile
-) {
+private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
     val data = user.userModel
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
         GlideImage(
             imageModel = { data.avatar },
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .heightIn(max = 80.dp, min = 20.dp)
-                .widthIn(max = 80.dp, min = 20.dp)
-                .clip(CircleShape),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
+            modifier =
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .heightIn(max = 80.dp, min = 20.dp)
+                    .widthIn(max = 80.dp, min = 20.dp)
+                    .clip(CircleShape),
+            component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -189,9 +193,7 @@ private fun DetailUserTitleItem(
 }
 
 @Composable
-private fun DetailUserInfoItem(
-    user: DetailFeed.UserDetail
-) {
+private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
     val data = user.userModel
 
     Column(modifier = Modifier.padding(12.dp)) {
@@ -219,18 +221,20 @@ private fun DetailUserInfoItem(
         val company = data.company
         if (company != null) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Apartment,
                     contentDescription = null,
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                    modifier =
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 Text(text = company)
             }
@@ -239,18 +243,20 @@ private fun DetailUserInfoItem(
         val email = data.email
         if (email != null) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Mail,
                     contentDescription = null,
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                    modifier =
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 Text(text = email)
             }
@@ -258,18 +264,20 @@ private fun DetailUserInfoItem(
 
         if (data.blogUrl != "") {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Link,
                     contentDescription = null,
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                    modifier =
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 data.blogUrl?.let { Text(text = it) }
             }
@@ -288,9 +296,7 @@ private fun DetailRepoTitle() {
 }
 
 @Composable
-private fun DetailRepoItem(
-    repos: DetailFeed.RepoDetail
-) {
+private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
     val data = repos.repositoryModel
 
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
@@ -315,10 +321,11 @@ private fun DetailRepoItem(
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .width(24.dp)
-                    .height(24.dp),
+                modifier =
+                    Modifier
+                        .padding(vertical = 8.dp)
+                        .width(24.dp)
+                        .height(24.dp),
                 tint = Yellow,
             )
             Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
@@ -331,9 +338,10 @@ private fun DetailRepoItem(
 private fun DetailRepoNoItem() {
     Text(
         text = stringResource(id = R.string.detail_repo_no_item),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 12.dp),
         style = MaterialTheme.typography.titleMedium,
     )
 }

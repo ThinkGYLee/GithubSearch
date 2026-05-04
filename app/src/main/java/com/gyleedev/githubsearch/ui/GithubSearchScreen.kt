@@ -43,10 +43,17 @@ import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
 
-sealed class BottomNavItem(val title: Int, val icons: ImageVector, val screenRoute: String) {
+sealed class BottomNavItem(
+    val title: Int,
+    val icons: ImageVector,
+    val screenRoute: String,
+) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
+
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
+
     data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
+
     data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
 }
 
@@ -72,9 +79,10 @@ fun GithubSearchScreen(
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
-            modifier = modifier
-                .padding(bottom = innerPadding.calculateBottomPadding())
-                .statusBarsPadding(),
+            modifier =
+                modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .statusBarsPadding(),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
@@ -87,12 +95,13 @@ fun GithubSearchScreen(
 
             composable(
                 route = "${BottomNavItem.Detail.screenRoute}/{id}",
-                arguments = listOf(
-                    navArgument("id") {
-                        type = NavType.StringType
-                        nullable = false
-                    },
-                ),
+                arguments =
+                    listOf(
+                        navArgument("id") {
+                            type = NavType.StringType
+                            nullable = false
+                        },
+                    ),
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
@@ -111,8 +120,9 @@ fun GithubSearchScreen(
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
                     versionName = BuildConfig.VERSION_NAME,
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier =
+                        Modifier
+                            .fillMaxSize(),
                 )
             }
         }
@@ -120,12 +130,16 @@ fun GithubSearchScreen(
 }
 
 @Composable
-fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Favorite,
-        BottomNavItem.Setting,
-    )
+fun BottomNavigation(
+    navController: NavHostController,
+    modifier: Modifier,
+) {
+    val items =
+        listOf(
+            BottomNavItem.Home,
+            BottomNavItem.Favorite,
+            BottomNavItem.Setting,
+        )
 
     androidx.compose.material.BottomNavigation(
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -141,9 +155,10 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier) {
                     Icon(
                         imageVector = item.icons,
                         contentDescription = stringResource(id = item.title),
-                        modifier = Modifier
-                            .width(26.dp)
-                            .height(26.dp),
+                        modifier =
+                            Modifier
+                                .width(26.dp)
+                                .height(26.dp),
                     )
                 },
                 label = { Text(stringResource(id = item.title), fontSize = 9.sp) },

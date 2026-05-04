@@ -6,7 +6,9 @@ import com.gyleedev.data.database.dao.UserDao
 import com.gyleedev.data.database.entity.UserEntity
 import java.io.IOException
 
-class UserPagingSource(private val dao: UserDao) : PagingSource<Int, UserEntity>() {
+class UserPagingSource(
+    private val dao: UserDao,
+) : PagingSource<Int, UserEntity>() {
     override fun getRefreshKey(state: PagingState<Int, UserEntity>): Int? =
         state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)

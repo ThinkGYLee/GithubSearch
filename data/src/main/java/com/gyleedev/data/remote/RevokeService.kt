@@ -8,5 +8,8 @@ import retrofit2.http.Path
 
 interface RevokeService {
     @HTTP(method = "DELETE", path = "applications/{client_id}/grant", hasBody = true)
-    suspend fun revoke(@Path("client_id") clientId: String, @Body accessToken: RevokeRequest): RevokeResponse
+    suspend fun revoke(
+        @Path("client_id") clientId: String,
+        @Body accessToken: RevokeRequest,
+    ): RevokeResponse
 }

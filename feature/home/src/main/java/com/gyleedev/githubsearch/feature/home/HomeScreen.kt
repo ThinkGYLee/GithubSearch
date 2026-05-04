@@ -87,12 +87,13 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
             viewModel.stopLoading()
-            val message = when (fetchState) {
-                FetchState.WRONG_CONNECTION -> unknownHostException
-                FetchState.BAD_INTERNET -> socketException
-                FetchState.PARSE_ERROR -> httpException
-                FetchState.FAIL -> etcException
-            }
+            val message =
+                when (fetchState) {
+                    FetchState.WRONG_CONNECTION -> unknownHostException
+                    FetchState.BAD_INTERNET -> socketException
+                    FetchState.PARSE_ERROR -> httpException
+                    FetchState.FAIL -> etcException
+                }
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -101,19 +102,21 @@ fun HomeScreen(
         viewModel.errorAlert.collect { status ->
             when (status) {
                 SearchStatus.NO_SUCH_USER -> {
-                    Toast.makeText(
-                        context,
-                        noSuchUserMessage,
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            noSuchUserMessage,
+                            Toast.LENGTH_SHORT,
+                        ).show()
                 }
 
                 SearchStatus.BAD_NETWORK -> {
-                    Toast.makeText(
-                        context,
-                        httpException,
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            httpException,
+                            Toast.LENGTH_SHORT,
+                        ).show()
                 }
 
                 else -> {
@@ -177,9 +180,10 @@ fun HomeScreen(
             else -> {
                 if (users.itemCount > 0) {
                     SearchItemList(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues),
                         users = users,
                         onClick = { moveToDetail(it) },
                     )
@@ -270,47 +274,51 @@ private fun EmbeddedSearchBar(
                 )
             }
         },
-        trailingIcon = if (isSearchActive && query.isNotEmpty()) {
-            {
-                IconButton(
-                    onClick = {
-                        onQueryChange("")
-                        onSearchItemReset()
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Close,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+        trailingIcon =
+            if (isSearchActive && query.isNotEmpty()) {
+                {
+                    IconButton(
+                        onClick = {
+                            onQueryChange("")
+                            onSearchItemReset()
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
-            }
-        } else {
-            null
-        },
-        colors = SearchBarDefaults.colors(
-            containerColor = if (isSearchActive) {
-                MaterialTheme.colorScheme.background
             } else {
-                MaterialTheme.colorScheme.surfaceContainerLow
+                null
             },
-        ),
+        colors =
+            SearchBarDefaults.colors(
+                containerColor =
+                    if (isSearchActive) {
+                        MaterialTheme.colorScheme.background
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerLow
+                    },
+            ),
         tonalElevation = 0.dp,
     ) {
         Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp),
         ) {
             if (user != null) {
                 SearchResultItem(
                     user = user,
                     onClick = moveToDetail,
-                    modifier = Modifier
-                        .align(
-                            Alignment.TopStart,
-                        )
-                        .padding(top = 20.dp),
+                    modifier =
+                        Modifier
+                            .align(
+                                Alignment.TopStart,
+                            ).padding(top = 20.dp),
                 )
             }
             if (loading) {
@@ -327,9 +335,10 @@ private fun SearchItemList(
     onClick: (String) -> Unit,
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -346,31 +355,34 @@ private fun SearchItemList(
 private fun HomeItem(
     user: UserModel,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp, max = 100.dp)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
-                .clip(CircleShape),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
+            modifier =
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
+                    .clip(CircleShape),
+            component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
         Text(
             text = user.login,
@@ -383,32 +395,35 @@ private fun HomeItem(
 private fun SearchResultItem(
     user: UserModel,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .size(80.dp)
-                .clip(
-                    CircleShape,
-                ),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
+            modifier =
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(80.dp)
+                    .clip(
+                        CircleShape,
                     ),
-                )
-            },
+            component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
@@ -440,9 +455,7 @@ private fun SearchResultItem(
 }
 
 @Composable
-private fun NoItem(
-    modifier: Modifier = Modifier
-) {
+private fun NoItem(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
