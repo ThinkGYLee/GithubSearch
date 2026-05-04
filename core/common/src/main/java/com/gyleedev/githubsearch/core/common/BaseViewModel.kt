@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.core
+package com.gyleedev.githubsearch.core.common
 
 import android.net.http.HttpException
 import android.os.Build

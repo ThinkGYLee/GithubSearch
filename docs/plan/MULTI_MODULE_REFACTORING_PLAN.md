@@ -30,7 +30,7 @@
     - 이동 대상: `app/.../ui/theme/` (Color.kt, Theme.kt, Type.kt)
     - 목적지: `core/designsystem/.../core/designsystem/theme/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.theme` -> `com.gyleedev.githubsearch.core.designsystem.theme`
-- [ ] **:core:common**: 안드로이드/비즈니스 공통 로직 분리
+- [x] **:core:common**: 안드로이드/비즈니스 공통 로직 분리
     - 모듈 생성: `core/common` 추가 (Android Library)
     - 이동 대상:
         - `app/.../core/BaseViewModel.kt` -> `core/common/.../core/common/BaseViewModel.kt`

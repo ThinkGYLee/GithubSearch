@@ -2,7 +2,7 @@ package com.gyleedev.githubsearch.ui.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.githubsearch.core.BaseViewModel
+import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.usecase.GetUserFeedUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusAndRefreshFeedUseCase
