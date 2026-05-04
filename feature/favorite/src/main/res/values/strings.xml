@@ -6,8 +6,4 @@
     <string name="filter_list_has_repos">User Has Public Repository</string>
     <string name="filter_list_no_repos">User Has No Repository</string>
     <string name="filter_list_all">All</string>
-    <string name="text_filter_title">Filter</string>
-    <string name="text_filter_content">Set Filter Conditions</string>
-    <string name="text_filter_cancel">Cancel</string>
-    <string name="text_filter_confirm">Confirm</string>
 </resources>

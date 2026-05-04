@@ -36,11 +36,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
-import com.gyleedev.githubsearch.ui.setting.SettingScreen
+import com.gyleedev.githubsearch.feature.setting.SettingScreen
 
 sealed class BottomNavItem(val title: Int, val icons: ImageVector, val screenRoute: String) {
     data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
@@ -106,9 +107,10 @@ fun GithubSearchScreen(
                 )
             }
 
-            composable(route = BottomNavItem.Setting.screenRoute) {
+            composable(BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
+                    versionName = BuildConfig.VERSION_NAME,
                     modifier = Modifier
                         .fillMaxSize(),
                 )

@@ -254,7 +254,7 @@ fun FilterDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
             Text(
-                text = stringResource(id = FavoriteR.string.text_filter_title),
+                text = stringResource(id = DesignSystemR.string.text_filter_title),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
@@ -262,7 +262,7 @@ fun FilterDialog(
         text = {
             Column {
                 Text(
-                    text = stringResource(id = FavoriteR.string.text_filter_content),
+                    text = stringResource(id = DesignSystemR.string.text_filter_content),
                     modifier = Modifier.padding(bottom = 5.dp),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -277,7 +277,7 @@ fun FilterDialog(
         },
         dismissButton = {
             TextButton(onClick = { onChangeState(false) }) {
-                Text(text = stringResource(id = FavoriteR.string.text_filter_cancel))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_cancel))
             }
         },
         confirmButton = {
@@ -287,7 +287,7 @@ fun FilterDialog(
                     onChangeState(false)
                 },
             ) {
-                Text(text = stringResource(id = FavoriteR.string.text_filter_confirm))
+                Text(text = stringResource(id = DesignSystemR.string.text_filter_confirm))
             }
         },
     )

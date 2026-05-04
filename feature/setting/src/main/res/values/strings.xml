@@ -1,0 +1,24 @@
+<resources>
+    <string name="title_setting">Setting</string>
+    <string name="setting_title">Application</string>
+    <string name="setting_theme">Theme</string>
+    <string name="setting_language">Language</string>
+    <string name="setting_login">Github Login</string>
+    <string name="setting_reset">Initialize Data</string>
+    <string name="setting_information">Information</string>
+    <string name="setting_version">Version</string>
+    <string name="setting_term">Terms and Conditions</string>
+    <string name="dialog_log_out_title">Logout</string>
+    <string name="dialog_log_out_content">Do you want to logout?</string>
+    <string name="dialog_log_in_title">Login</string>
+    <string name="dialog_log_in_content">Do you want to login?</string>
+    <string name="dialog_reset_title">Reset</string>
+    <string name="dialog_reset_content">Do you want to initialize data?</string>
+    <string name="dialog_answer_yes">Yes</string>
+    <string name="dialog_answer_no">No</string>
+    <string name="filter_dark_theme">Dark</string>
+    <string name="filter_light_theme">Light</string>
+    <string name="filter_default_theme">System Default</string>
+    <string name="setting_korean">Korean</string>
+    <string name="setting_english">English</string>
+</resources>

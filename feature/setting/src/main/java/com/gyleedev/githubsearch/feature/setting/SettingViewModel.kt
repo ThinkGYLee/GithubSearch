@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.ui.setting
+package com.gyleedev.githubsearch.feature.setting
 
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.common.BaseViewModel

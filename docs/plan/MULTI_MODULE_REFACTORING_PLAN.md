@@ -54,7 +54,7 @@
     - 이동 대상: `app/.../ui/favorite/` (FavoriteScreen.kt, FavoriteViewModel.kt)
     - 목적지: `feature/favorite/.../feature/favorite/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.favorite` -> `com.gyleedev.githubsearch.feature.favorite`
-- [ ] **:feature:setting**: 설정 화면 마이그레이션
+- [x] **:feature:setting**: 설정 화면 마이그레이션
     - 이동 대상: `app/.../ui/setting/` (SettingScreen.kt, SettingViewModel.kt)
     - 목적지: `feature/setting/.../feature/setting/`
     - 패키지명 변경: `com.gyleedev.githubsearch.ui.setting` -> `com.gyleedev.githubsearch.feature.setting`
