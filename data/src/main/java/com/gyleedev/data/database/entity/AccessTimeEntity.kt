@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import java.time.Instant
 
 @Entity(tableName = "access_time")
-data class AccessTime(
+data class AccessTimeEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long,

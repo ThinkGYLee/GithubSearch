@@ -9,7 +9,7 @@ import com.gyleedev.data.PreferenceUtil
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
 import com.gyleedev.data.database.dao.UserDao
-import com.gyleedev.data.database.entity.AccessTime
+import com.gyleedev.data.database.entity.AccessTimeEntity
 import com.gyleedev.data.database.entity.UserEntity
 import com.gyleedev.data.database.entity.toEntity
 import com.gyleedev.data.database.entity.toModel
@@ -205,7 +205,7 @@ class GitHubRepositoryImpl @Inject constructor(
         val accessTime = accessTimeDao.getTimeByGithubId(id)
         if (accessTime != null) {
             accessTimeDao.updateTime(
-                AccessTime(
+                AccessTimeEntity(
                     id = accessTime.id,
                     githubId = accessTime.githubId,
                     accessTime = Instant.now(),
@@ -213,7 +213,7 @@ class GitHubRepositoryImpl @Inject constructor(
             )
         } else {
             accessTimeDao.insertTime(
-                AccessTime(
+                AccessTimeEntity(
                     id = 0,
                     githubId = id,
                     accessTime = Instant.now(),

@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
 import com.gyleedev.data.database.dao.UserDao
-import com.gyleedev.data.database.entity.AccessTime
+import com.gyleedev.data.database.entity.AccessTimeEntity
 import com.gyleedev.data.database.entity.ReposEntity
 import com.gyleedev.data.database.entity.UserEntity
 
@@ -14,7 +14,7 @@ import com.gyleedev.data.database.entity.UserEntity
     entities = [
         UserEntity::class,
         ReposEntity::class,
-        AccessTime::class,
+        AccessTimeEntity::class,
     ],
     version = 1,
     exportSchema = true,

@@ -5,21 +5,21 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.gyleedev.data.database.entity.AccessTime
+import com.gyleedev.data.database.entity.AccessTimeEntity
 
 @Dao
 interface AccessTimeDao {
     @Query("SELECT * FROM access_time WHERE github_id = :id  COLLATE NOCASE")
-    fun getTimeByGithubId(id: String): AccessTime?
+    fun getTimeByGithubId(id: String): AccessTimeEntity?
 
     @Insert
-    fun insertTime(accessTime: AccessTime)
+    fun insertTime(accessTimeEntity: AccessTimeEntity)
 
     @Delete
-    fun deleteTime(accessTime: AccessTime)
+    fun deleteTime(accessTimeEntity: AccessTimeEntity)
 
     @Update
-    fun updateTime(accessTime: AccessTime)
+    fun updateTime(accessTimeEntity: AccessTimeEntity)
 
     @Query("DELETE FROM access_time")
     fun resetAccessTime()
