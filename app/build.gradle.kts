@@ -62,27 +62,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    ksp(libs.room.compiler)
-    implementation(libs.room.paging)
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-
     implementation(libs.paging.compose)
-    implementation(libs.paging.runtime.ktx)
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
 
     implementation(libs.kotlin.coroutines)
-    implementation(libs.kotlin.stdlib)
 
     implementation(libs.landscapist.glide)
     implementation(libs.landscapist.placeholder)
-
-    implementation(libs.retrofit2.retrofit)
-    implementation(libs.retrofit2.converter.gson)
-    implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.google.gson)
 
     implementation(libs.hilt.navigation.compose)
 
