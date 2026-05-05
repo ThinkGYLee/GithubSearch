@@ -21,6 +21,7 @@ import com.gyleedev.data.remote.TypeAccess
 import com.gyleedev.data.remote.TypeApi
 import com.gyleedev.data.remote.TypeRevoke
 import com.gyleedev.data.remote.request.toRequest
+import com.gyleedev.data.remote.response.UserResponse
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
@@ -76,31 +77,21 @@ constructor(
         pagingData.map { it.toModel() }
     }
 
-    // Home에서 user정보를 요청하는 함수
-    override suspend fun getUserAtHome(id: String): UserSearchResult = withContext(Dispatchers.IO) {
-        val user = userDao.getUserByGithubId(id)
-        if (user != null) {
-            UserSearchResult.FromDatabase(data = user.toModel())
-        } else {
-            getUserFromGithub(id)
-        }
+    override fun getUserAtHome(id: String): Flow<UserModel?> = userDao.getUserByGithubId(id).map { it?.toModel() }
+
+    private suspend fun insertUserToDatabase(userResponse: UserResponse) {
+        userDao.insertUser(userResponse.toModel().toEntity())
     }
 
-    private suspend fun getUserFromGithub(id: String): UserSearchResult = try {
+    override suspend fun fetchUserFromGithub(id: String): SearchStatus = try {
         val userResponse = githubApiService.getUser(id)
-        UserSearchResult.Success(
-            status = SearchStatus.SUCCESS,
-            data = userResponse.toModel(),
-        )
+        insertUserToDatabase(userResponse)
+        updateAccessTime(id)
+        SearchStatus.SUCCESS
     } catch (e: Exception) {
-        val status = exceptionToStatusUtil(e)
-        UserSearchResult.Failure(
-            status = status,
-        )
+        exceptionToStatusUtil(e)
     } catch (e: UnknownError) {
-        UserSearchResult.Failure(
-            status = SearchStatus.BAD_NETWORK,
-        )
+        SearchStatus.BAD_NETWORK
     }
 
     // 마지막 액세스 시간 가져오기
