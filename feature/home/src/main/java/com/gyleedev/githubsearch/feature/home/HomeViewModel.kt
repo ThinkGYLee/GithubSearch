@@ -21,16 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /*
-   홈 문제점 개편안
-   1. stability 해결
-   2. searchbar deprecate 된거 말고 m3 expressive 로 수정
-   3. 기능 수정
-    3-1. 서치바 debounce 걸어서 검색어 넣었을 때 결과물 있으면 결과 물 넣어.
-    3-2. 웹 찔러서 결과물 받아왔으면 repo 정보 상관 없이 일단 넣어. repo는 detail 에서
-    3-3. 검색 버튼을 넣던가 뭐 해야지 엔터로만 검색이 웬말?
-    3-4. 뭔가 보여주는 정보를 추가해
-    3-5. baseviewmodel의 에러처리법 보고 에러 처리법 다시 익혀. 저거 왜쓰나 몰라
-    3-6. 홈에 정렬을 넣던가 해야할듯
+    3-5. baseviewmodel의 에러처리법 보고 에러처리 개선안 고안
  */
 @HiltViewModel
 class HomeViewModel
@@ -55,7 +46,7 @@ constructor(
         HomeUiState.Success(
             searchQuery = query,
             searchedUser = user,
-            isLoading = isLoading
+            isLoading = isLoading,
         )
     }.stateIn(
         scope = viewModelScope,
