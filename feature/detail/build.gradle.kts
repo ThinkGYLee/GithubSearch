@@ -15,3 +15,4 @@ dependencies {
     implementation(libs.landscapist.placeholder)
     implementation(libs.androidx.material.icons)
 }
+composeCompiler { reportsDestination = layout.buildDirectory.dir("compose_reports") }

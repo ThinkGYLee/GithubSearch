@@ -14,3 +14,4 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.androidx.material.icons)
 }
+composeCompiler { reportsDestination = layout.buildDirectory.dir("compose_reports") }

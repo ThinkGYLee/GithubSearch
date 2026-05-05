@@ -1,7 +1,6 @@
 package com.gyleedev.githubsearch.feature.home
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresExtension
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
@@ -9,9 +8,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -31,7 +33,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,13 +48,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.githubsearch.domain.model.FetchState
@@ -72,21 +74,18 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val users = viewModel.users.collectAsLazyPagingItems()
-    val user by viewModel.userInfo.collectAsStateWithLifecycle()
-    val loading by viewModel.loading.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val query by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     val unknownHostException = stringResource(id = DesignSystemR.string.unknown_host_exception)
     val socketException = stringResource(id = DesignSystemR.string.socket_exception)
     val httpException = stringResource(id = DesignSystemR.string.http_exception)
     val etcException = stringResource(id = DesignSystemR.string.etc_exception)
     val noSuchUserMessage = stringResource(id = HomeR.string.search_result_no_user)
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.fetchState.collect { fetchState ->
-            viewModel.stopLoading()
             val message =
                 when (fetchState) {
                     FetchState.WRONG_CONNECTION -> unknownHostException
@@ -94,7 +93,10 @@ fun HomeScreen(
                     FetchState.PARSE_ERROR -> httpException
                     FetchState.FAIL -> etcException
                 }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            snackBarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short,
+            )
         }
     }
 
@@ -102,21 +104,17 @@ fun HomeScreen(
         viewModel.errorAlert.collect { status ->
             when (status) {
                 SearchStatus.NO_SUCH_USER -> {
-                    Toast
-                        .makeText(
-                            context,
-                            noSuchUserMessage,
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                    snackBarHostState.showSnackbar(
+                        message = noSuchUserMessage,
+                        duration = SnackbarDuration.Short,
+                    )
                 }
 
                 SearchStatus.BAD_NETWORK -> {
-                    Toast
-                        .makeText(
-                            context,
-                            httpException,
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                    snackBarHostState.showSnackbar(
+                        message = httpException,
+                        duration = SnackbarDuration.Short,
+                    )
                 }
 
                 else -> {
@@ -138,88 +136,67 @@ fun HomeScreen(
     LaunchedEffect(isSearchActive) {
         requestBottomBarStatus(isSearchActive)
     }
+    if (uiState is HomeUiState.Success) {
+        Scaffold(
+            topBar = {
+                EmbeddedSearchBar(
+                    onQueryChange = viewModel::updateSearchId,
+                    isSearchActive = isSearchActive,
+                    query = (uiState as HomeUiState.Success).searchQuery,
+                    onActiveChanged = { isSearchActive = it },
+                    onSearch = viewModel::getUser,
+                    onSearchItemReset = viewModel::resetQuery,
+                    moveToDetail = { (uiState as HomeUiState.Success).searchedUser?.let { moveToDetail(it.login) } },
+                    user = (uiState as HomeUiState.Success).searchedUser,
+                    loading = (uiState as HomeUiState.Success).isLoading,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+            modifier = modifier.fillMaxSize(),
+        ) { paddingValues ->
 
-    Scaffold(
-        topBar = {
-            EmbeddedSearchBar(
-                onQueryChange = viewModel::updateSearchId,
-                isSearchActive = isSearchActive,
-                query = query,
-                onActiveChanged = { isSearchActive = it },
-                onSearch = viewModel::getUser,
-                onSearchItemReset = viewModel::resetUser,
-                moveToDetail = { user?.let { moveToDetail(it.login) } },
-                user = user,
-                loading = loading,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        modifier = modifier.fillMaxSize(),
-    ) { paddingValues ->
-
-        when (users.loadState.refresh) {
-            is LoadState.Loading -> {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Box(
-                        modifier = Modifier,
-                        Alignment.Center,
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier)
-                    }
-                }
-            }
-
-            is LoadState.Error -> {
+            if (users.itemCount > 0) {
+                SearchItemList(
+                    modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    users = users,
+                    onClick = { moveToDetail(it) },
+                )
+            } else {
                 NoItem(
                     modifier = Modifier.padding(paddingValues),
                 )
             }
 
-            else -> {
-                if (users.itemCount > 0) {
-                    SearchItemList(
-                        modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        users = users,
-                        onClick = { moveToDetail(it) },
-                    )
-                } else {
-                    NoItem(
-                        modifier = Modifier.padding(paddingValues),
-                    )
-                }
+            if (showRequestAuthenticationDialog) {
+                AlertDialog(
+                    onDismissRequest = { showRequestAuthenticationDialog = false },
+                    title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
+                    text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showRequestAuthenticationDialog = false
+                                requestAuthentication()
+                            },
+                        ) {
+                            Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showRequestAuthenticationDialog = false
+                            },
+                        ) {
+                            Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+                        }
+                    },
+                )
             }
-        }
-
-        if (showRequestAuthenticationDialog) {
-            AlertDialog(
-                onDismissRequest = { showRequestAuthenticationDialog = false },
-                title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
-                text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showRequestAuthenticationDialog = false
-                            requestAuthentication()
-                        },
-                    ) {
-                        Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = {
-                            showRequestAuthenticationDialog = false
-                        },
-                    ) {
-                        Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
-                    }
-                },
-            )
         }
     }
 }
@@ -239,90 +216,91 @@ private fun EmbeddedSearchBar(
     modifier: Modifier = Modifier,
 ) {
     val animatePadding by animateDpAsState(
-        targetValue = if (isSearchActive) 0.dp else 20.dp,
+        targetValue = if (isSearchActive) 0.dp else 24.dp,
         label = "animatePadding",
     )
-
     SearchBar(
-        query = query,
-        onQueryChange = { changedQuery ->
-            onQueryChange(changedQuery)
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                expanded = isSearchActive,
+                onExpandedChange = onActiveChanged,
+                placeholder = { Text(text = "search") },
+                leadingIcon = {
+                    if (isSearchActive) {
+                        IconButton(
+                            onClick = {
+                                onActiveChanged(false)
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (isSearchActive && query.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                onQueryChange("")
+                                onSearchItemReset()
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                },
+            )
         },
-        onSearch = onSearch,
-        active = isSearchActive,
-        onActiveChange = { onActiveChanged(it) },
-        modifier = modifier.padding(horizontal = animatePadding),
-        placeholder = { Text(stringResource(id = HomeR.string.placeholder_searchbar)) },
-        leadingIcon = {
-            if (isSearchActive) {
-                IconButton(
-                    onClick = {
-                        onActiveChanged(false)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            } else {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        },
-        trailingIcon =
-        if (isSearchActive && query.isNotEmpty()) {
-            {
-                IconButton(
-                    onClick = {
-                        onQueryChange("")
-                        onSearchItemReset()
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Close,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-        } else {
-            null
-        },
-        colors =
-        SearchBarDefaults.colors(
-            containerColor =
-            if (isSearchActive) {
-                MaterialTheme.colorScheme.background
-            } else {
-                MaterialTheme.colorScheme.surfaceContainerLow
-            },
-        ),
-        tonalElevation = 0.dp,
+        expanded = isSearchActive,
+        onExpandedChange = onActiveChanged,
+        windowInsets = if (isSearchActive) WindowInsets(0, 0, 0, 0) else SearchBarDefaults.windowInsets,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = animatePadding),
     ) {
         Box(
             modifier =
-            modifier
+            Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 12.dp)
+                .navigationBarsPadding()
+                .imePadding(),
         ) {
             if (user != null) {
                 SearchResultItem(
                     user = user,
                     onClick = moveToDetail,
-                    modifier =
-                    Modifier
-                        .align(
-                            Alignment.TopStart,
-                        ).padding(top = 20.dp),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .align(Alignment.TopCenter),
                 )
             }
             if (loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            Button(
+                onClick = { onSearch(query) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
+            ) {
+                Text("검색하세요")
             }
         }
     }

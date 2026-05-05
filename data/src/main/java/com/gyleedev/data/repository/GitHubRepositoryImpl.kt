@@ -28,7 +28,7 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeRequestBody
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.domain.model.UserSearchResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -77,28 +77,28 @@ constructor(
     }
 
     // Home에서 user정보를 요청하는 함수
-    override suspend fun getUserAtHome(id: String): UserWrapper = withContext(Dispatchers.IO) {
+    override suspend fun getUserAtHome(id: String): UserSearchResult = withContext(Dispatchers.IO) {
         val user = userDao.getUserByGithubId(id)
         if (user != null) {
-            UserWrapper.FromDatabase(data = user.toModel())
+            UserSearchResult.FromDatabase(data = user.toModel())
         } else {
             getUserFromGithub(id)
         }
     }
 
-    private suspend fun getUserFromGithub(id: String): UserWrapper = try {
+    private suspend fun getUserFromGithub(id: String): UserSearchResult = try {
         val userResponse = githubApiService.getUser(id)
-        UserWrapper.Success(
+        UserSearchResult.Success(
             status = SearchStatus.SUCCESS,
             data = userResponse.toModel(),
         )
     } catch (e: Exception) {
         val status = exceptionToStatusUtil(e)
-        UserWrapper.Failure(
+        UserSearchResult.Failure(
             status = status,
         )
     } catch (e: UnknownError) {
-        UserWrapper.Failure(
+        UserSearchResult.Failure(
             status = SearchStatus.BAD_NETWORK,
         )
     }
@@ -119,31 +119,31 @@ constructor(
     }
 
     // 유저정보 없거나 오래됐을때 깃헙에서 유저정보 가져오기
-    private suspend fun insertUserFromGithub(id: String): UserWrapper = try {
+    private suspend fun insertUserFromGithub(id: String): UserSearchResult = try {
         val userRemote = githubApiService.getUser(id)
         val entityId = userDao.insertUser(userRemote.toModel().toEntity())
         insertRepos(id, entityId)
         updateAccessTime(id)
-        UserWrapper.Success(
+        UserSearchResult.Success(
             status = SearchStatus.SUCCESS,
             data = userRemote.toModel(),
         )
     } catch (e: Exception) {
         val status = exceptionToStatusUtil(e)
-        UserWrapper.Failure(
+        UserSearchResult.Failure(
             status = status,
         )
     } catch (e: UnknownError) {
-        UserWrapper.Failure(
+        UserSearchResult.Failure(
             status = SearchStatus.BAD_NETWORK,
         )
     }
 
-    private suspend fun updateUserFromGithub(id: String): UserWrapper {
+    private suspend fun updateUserFromGithub(id: String): UserSearchResult {
         try {
             val userResponse = githubApiService.getUser(id)
             val userRemote =
-                UserWrapper.Success(
+                UserSearchResult.Success(
                     status = SearchStatus.SUCCESS,
                     data = userResponse.toModel(),
                 )
@@ -179,11 +179,11 @@ constructor(
             }
         } catch (e: Exception) {
             val status = exceptionToStatusUtil(e)
-            return UserWrapper.Failure(
+            return UserSearchResult.Failure(
                 status = status,
             )
         } catch (e: UnknownError) {
-            return UserWrapper.Failure(
+            return UserSearchResult.Failure(
                 status = SearchStatus.BAD_NETWORK,
             )
         }
@@ -231,13 +231,13 @@ constructor(
         }
     }
 
-    override suspend fun getDetailUser(githubId: String): UserWrapper = withContext(Dispatchers.IO) {
+    override suspend fun getDetailUser(githubId: String): UserSearchResult = withContext(Dispatchers.IO) {
         val lastAccess = getLastAccessById(githubId)
         if (lastAccess != null) {
             if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
                 val user = getUser(githubId)
                 if (user != null) {
-                    UserWrapper.FromDatabase(
+                    UserSearchResult.FromDatabase(
                         data = user,
                     )
                 } else {
@@ -251,7 +251,7 @@ constructor(
         }
     }
 
-    override suspend fun updateUserFavorite(id: String): UserWrapper = try {
+    override suspend fun updateUserFavorite(id: String): UserSearchResult = try {
         val user = userDao.getUser(id)
         if (user != null) {
             userDao.updateUser(
@@ -275,17 +275,17 @@ constructor(
             )
             val updatedUser = userDao.getUser(id)
             if (updatedUser != null) {
-                UserWrapper.FromDatabase(
+                UserSearchResult.FromDatabase(
                     data = updatedUser.toModel(),
                 )
             } else {
-                UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
+                UserSearchResult.Failure(status = SearchStatus.BAD_NETWORK)
             }
         } else {
-            UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
+            UserSearchResult.Failure(status = SearchStatus.BAD_NETWORK)
         }
     } catch (e: Exception) {
-        UserWrapper.Failure(status = SearchStatus.BAD_NETWORK)
+        UserSearchResult.Failure(status = SearchStatus.BAD_NETWORK)
     }
 
     override suspend fun getAccessToken(code: String): GithubAccessModel? {

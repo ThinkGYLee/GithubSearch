@@ -2,33 +2,27 @@ package com.gyleedev.githubsearch.ui
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.BottomNavigationItem
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -74,15 +68,14 @@ fun GithubSearchScreen(
                 BottomNavigation(navController = navController, modifier = Modifier)
             }
         },
-        modifier = Modifier.navigationBarsPadding(),
+        // Scaffold가 자동으로 주입하는 inset 무시
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
-            modifier =
-            modifier
-                .padding(bottom = innerPadding.calculateBottomPadding())
-                .statusBarsPadding(),
+            modifier = modifier
+                .consumeWindowInsets(innerPadding),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
                 HomeScreen(
@@ -120,9 +113,7 @@ fun GithubSearchScreen(
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
                     versionName = BuildConfig.VERSION_NAME,
-                    modifier =
-                    Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
@@ -140,32 +131,21 @@ fun BottomNavigation(
             BottomNavItem.Favorite,
             BottomNavItem.Setting,
         )
-
-    androidx.compose.material.BottomNavigation(
-        backgroundColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier,
+    NavigationBar(
+        modifier = modifier.fillMaxWidth(),
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach { item ->
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = {
                     Icon(
                         imageVector = item.icons,
                         contentDescription = stringResource(id = item.title),
-                        modifier =
-                        Modifier
-                            .width(26.dp)
-                            .height(26.dp),
                     )
                 },
-                label = { Text(stringResource(id = item.title), fontSize = 9.sp) },
-                selectedContentColor = MaterialTheme.colorScheme.primary,
-                unselectedContentColor = Gray,
                 selected = currentRoute == item.screenRoute,
-                alwaysShowLabel = false,
                 onClick = {
                     navController.navigate(item.screenRoute) {
                         navController.graph.startDestinationRoute?.let {

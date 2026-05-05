@@ -6,13 +6,13 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.domain.model.UserSearchResult
 import kotlinx.coroutines.flow.Flow
 
 interface GitHubRepository {
     fun getUsers(): Flow<PagingData<UserModel>>
 
-    suspend fun getUserAtHome(id: String): UserWrapper
+    suspend fun getUserAtHome(id: String): UserSearchResult
 
     suspend fun getLastAccessById(id: String): AccessTime?
 
@@ -20,9 +20,9 @@ interface GitHubRepository {
 
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
 
-    suspend fun getDetailUser(githubId: String): UserWrapper
+    suspend fun getDetailUser(githubId: String): UserSearchResult
 
-    suspend fun updateUserFavorite(id: String): UserWrapper
+    suspend fun updateUserFavorite(id: String): UserSearchResult
 
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 
