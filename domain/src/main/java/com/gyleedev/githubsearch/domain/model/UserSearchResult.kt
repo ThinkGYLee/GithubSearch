@@ -1,16 +1,16 @@
 package com.gyleedev.githubsearch.domain.model
 
-sealed interface UserWrapper {
+sealed interface UserSearchResult {
     data class FromDatabase(
         val data: UserModel,
-    ) : UserWrapper
+    ) : UserSearchResult
 
     data class Success(
         val status: SearchStatus,
         val data: UserModel,
-    ) : UserWrapper
+    ) : UserSearchResult
 
     data class Failure(
         val status: SearchStatus,
-    ) : UserWrapper
+    ) : UserSearchResult
 }

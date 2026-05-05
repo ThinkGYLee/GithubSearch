@@ -1,7 +1,7 @@
 package com.gyleedev.githubsearch.domain.usecase
 
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.domain.model.UserWrapper
+import com.gyleedev.githubsearch.domain.model.UserSearchResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,15 +15,15 @@ constructor(
     suspend operator fun invoke(id: String): List<DetailFeed> = withContext(Dispatchers.IO) {
         val userModel =
             when (val user = repository.getDetailUser(id)) {
-                is UserWrapper.FromDatabase -> {
+                is UserSearchResult.FromDatabase -> {
                     user.data
                 }
 
-                is UserWrapper.Success -> {
+                is UserSearchResult.Success -> {
                     user.data
                 }
 
-                is UserWrapper.Failure -> {
+                is UserSearchResult.Failure -> {
                     null
                 }
             }
