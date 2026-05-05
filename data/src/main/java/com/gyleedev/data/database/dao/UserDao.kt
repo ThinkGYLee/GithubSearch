@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.gyleedev.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.domain.model.FilterStatus
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -32,10 +33,10 @@ interface UserDao {
     fun getUser(id: String): UserEntity?
 
     @Query("SELECT * FROM user WHERE user_id = :userId COLLATE NOCASE")
-    fun getUserByGithubId(userId: String): UserEntity?
+    fun getUserByGithubId(userId: String): Flow<UserEntity?>
 
     @Insert
-    fun insertUser(user: UserEntity): Long
+    suspend fun insertUser(user: UserEntity): Long
 
     @Update
     fun updateUser(user: UserEntity)
