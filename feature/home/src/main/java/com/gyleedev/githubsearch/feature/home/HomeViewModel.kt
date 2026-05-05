@@ -7,15 +7,22 @@ import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.model.UserSearchResult
+import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUserUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
-import com.gyleedev.githubsearch.domain.usecase.SearchUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,11 +35,27 @@ class HomeViewModel
 @Inject
 constructor(
     getUsersUseCase: GetUsersUseCase,
-    private val searchUserUseCase: SearchUserUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val fetchUserUseCase: FetchUserUseCase,
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
-    private val searchedUser = MutableStateFlow<UserModel?>(null)
     private val isLoading = MutableStateFlow(false)
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private val searchedUser: StateFlow<UserModel?> = searchQuery
+        .debounce(300L)
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            if (query.isBlank()) {
+                flowOf(null)
+            } else {
+                getUserUseCase(query)
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = null,
+        )
 
     val users = getUsersUseCase().cachedIn(viewModelScope)
 
@@ -55,22 +78,12 @@ constructor(
     )
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun getUser(id: String) {
+    fun searchUser(id: String) {
         viewModelScope.launch(exceptionHandler) {
             isLoading.emit(true)
-            val result = searchUserUseCase(id)
-            when (result) {
-                is UserSearchResult.FromDatabase -> {
-                    searchedUser.emit(result.data)
-                }
-
-                is UserSearchResult.Success -> {
-                    searchedUser.emit(result.data)
-                }
-
-                is UserSearchResult.Failure -> {
-                    alertResponseFail(result.status)
-                }
+            val status = fetchUserUseCase(id)
+            if (status != SearchStatus.SUCCESS) {
+                alertResponseFail(status)
             }
             isLoading.emit(false)
         }
@@ -91,12 +104,6 @@ constructor(
     fun updateSearchId(id: String) {
         viewModelScope.launch {
             searchQuery.emit(id)
-        }
-    }
-
-    fun resetQuery() {
-        viewModelScope.launch {
-            searchedUser.emit(null)
         }
     }
 }
