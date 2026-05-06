@@ -5,8 +5,8 @@ import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetRepositoryUseCase @Inject constructor(
+class GetReposWithFlowUseCase @Inject constructor(
     private val repository: GitHubRepository,
 ) {
-    operator fun invoke(id: String): Flow<List<RepositoryModel>> = repository.getReposFromDatabaseByFlow(id)
+    operator fun invoke(id: String): Flow<List<RepositoryModel>> = repository.getReposWithFlow(id)
 }
