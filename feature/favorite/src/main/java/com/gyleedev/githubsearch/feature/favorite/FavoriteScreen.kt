@@ -153,13 +153,19 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp),
     ) {
-        items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
-            val user = users[index] as UserModel
-            FavoriteItem(
-                user,
-                onClick = { onClick(user.login) },
-                onLongClick = { onLongClick(it) },
-            )
+        items(
+            users.itemCount,
+            key = { index ->
+                users[index]?.login ?: "placeholder_$index"
+            },
+        ) { index ->
+            users[index]?.let { user ->
+                FavoriteItem(
+                    user = user,
+                    onClick = { onClick(user.login) },
+                    onLongClick = { onLongClick(it) },
+                )
+            }
         }
     }
 }
