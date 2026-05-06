@@ -70,7 +70,7 @@ fun DetailScreen(
                 },
                 actions = {
                     IconButton(onClick = viewModel::updateFavoriteStatus) {
-                        if (user == null || !(user as UserModel).favorite) {
+                        if (user == null || (user as UserModel).favorite) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
                                 contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),

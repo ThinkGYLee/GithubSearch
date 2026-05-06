@@ -8,7 +8,7 @@ import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
-import com.gyleedev.githubsearch.domain.usecase.GetUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,14 +28,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /*
-    3-5. baseviewmodel의 에러처리법 보고 에러처리 개선안 고안
+    BaseViewModel의 에러처리법 보고 에러처리 개선안 고안
+    1. UserList 가져오는거
+    2. Search 했을 때 query 가지고 debounce 로 가져오는거
+    3. web fetch 해서 User 가져오는거
  */
 @HiltViewModel
-class HomeViewModel
-@Inject
-constructor(
+class HomeViewModel @Inject constructor(
     getUsersUseCase: GetUsersUseCase,
-    private val getUserUseCase: GetUserUseCase,
+    private val getUserWithFlowUseCase: GetUserWithFlowUseCase,
     private val fetchUserUseCase: FetchUserUseCase,
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
@@ -49,7 +50,7 @@ constructor(
             if (query.isBlank()) {
                 flowOf(null)
             } else {
-                getUserUseCase(query)
+                getUserWithFlowUseCase(query)
             }
         }.stateIn(
             scope = viewModelScope,

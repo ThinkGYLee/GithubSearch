@@ -5,31 +5,34 @@ import com.gyleedev.githubsearch.domain.model.AccessTime
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
-import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.model.UserSearchResult
 import kotlinx.coroutines.flow.Flow
 
 interface GitHubRepository {
     fun getUsers(): Flow<PagingData<UserModel>>
 
-    fun getUserAtHome(id: String): Flow<UserModel?>
-
-    suspend fun fetchUserFromGithub(id: String): SearchStatus
-
-    suspend fun updateUser(id: Long, githubId: String)
-
-    suspend fun updateRepos(id: Long, githubId: String)
+    fun getUserWithFlow(id: String): Flow<UserModel?>
 
     suspend fun getLastAccessById(id: String): AccessTime?
 
-    suspend fun getUser(id: String): UserModel?
+    suspend fun fetchUser(id: String): UserModel?
 
-    suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
+    suspend fun fetchRepos(id: String): List<RepositoryModel>
 
-    fun getReposFromDatabaseByFlow(githubId: String): Flow<List<RepositoryModel>>
+    suspend fun insertUser(userModel: UserModel)
 
-    suspend fun updateUserFavorite(id: String): UserSearchResult
+    suspend fun insertRepositoryList(
+        userEntityId: Long,
+        list: List<RepositoryModel>,
+    )
+
+    suspend fun upsertAccessTime(githubId: String, isRepoFetched: Boolean = true)
+
+    suspend fun upsertUser(user: UserModel)
+
+    suspend fun getUserId(id: String): Long?
+
+    fun getReposWithFlow(githubId: String): Flow<List<RepositoryModel>>
 
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 

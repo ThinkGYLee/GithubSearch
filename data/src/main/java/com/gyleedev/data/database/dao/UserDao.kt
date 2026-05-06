@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Upsert
 import com.gyleedev.data.database.entity.UserEntity
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import kotlinx.coroutines.flow.Flow
@@ -23,14 +23,8 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE favorite = true AND repos =0")
     fun getUsersNonRepo(): PagingSource<Int, UserEntity>
 
-    @Query("SELECT * FROM user WHERE favorite = :favorite LIMIT 10 OFFSET (:page-1)*10")
-    fun getFavorite(
-        page: Int,
-        favorite: Boolean = true,
-    ): List<UserEntity>
-
     @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
-    fun getUser(id: String): UserEntity?
+    suspend fun getUser(id: String): UserEntity?
 
     @Query("SELECT * FROM user WHERE user_id = :userId COLLATE NOCASE")
     fun getUserByGithubId(userId: String): Flow<UserEntity?>
@@ -38,8 +32,8 @@ interface UserDao {
     @Insert
     suspend fun insertUser(user: UserEntity): Long
 
-    @Update
-    fun updateUser(user: UserEntity)
+    @Upsert
+    suspend fun upsertUser(user: UserEntity)
 
     fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
         FilterStatus.ALL -> getUsersAll()
@@ -48,5 +42,5 @@ interface UserDao {
     }
 
     @Query("DELETE FROM user")
-    fun resetUser()
+    suspend fun resetUser()
 }

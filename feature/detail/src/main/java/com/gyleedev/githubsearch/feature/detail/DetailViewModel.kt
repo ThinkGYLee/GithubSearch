@@ -3,11 +3,10 @@ package com.gyleedev.githubsearch.feature.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.common.BaseViewModel
-import com.gyleedev.githubsearch.domain.model.DetailFeed
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.domain.usecase.GetRepositoryUseCase
-import com.gyleedev.githubsearch.domain.usecase.GetUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetReposWithFlowUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateUserFromGithubUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,13 +21,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*
+1. user Flow로 받아오는 거
+2. repos flow로 받아오는 거
+3. user, repo 업데이트(싱크 맞추는 기능)
+4. favoriteState 업데이트
+ */
 @HiltViewModel
-class DetailViewModel
-@Inject
-constructor(
+class DetailViewModel @Inject constructor(
     private val updateUserFromGithubUseCase: UpdateUserFromGithubUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val getRepositoryUseCase: GetRepositoryUseCase,
+    private val getUserWithFlowUseCase: GetUserWithFlowUseCase,
+    private val getReposWithFlowUseCase: GetReposWithFlowUseCase,
     private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
@@ -50,7 +53,7 @@ constructor(
             if (query.isBlank()) {
                 flowOf(null)
             } else {
-                getUserUseCase(query)
+                getUserWithFlowUseCase(query)
             }
         }.stateIn(
             scope = viewModelScope,
@@ -64,7 +67,7 @@ constructor(
             if (query.isBlank()) {
                 flowOf(emptyList())
             } else {
-                getRepositoryUseCase(query)
+                getReposWithFlowUseCase(query)
             }
         }.stateIn(
             scope = viewModelScope,
@@ -78,7 +81,9 @@ constructor(
 
     fun updateFavoriteStatus() {
         viewModelScope.launch {
-            updateFavoriteStatusUseCase(id = userId.value)
+            user.value?.let {
+                updateFavoriteStatusUseCase(it)
+            }
         }
     }
 }

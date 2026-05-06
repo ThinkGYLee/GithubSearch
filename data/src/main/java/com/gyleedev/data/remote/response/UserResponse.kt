@@ -20,6 +20,7 @@ data class UserResponse(
 )
 
 fun UserResponse.toModel(): UserModel = UserModel(
+    id = 0L,
     name = name,
     login = login,
     followers = followers,

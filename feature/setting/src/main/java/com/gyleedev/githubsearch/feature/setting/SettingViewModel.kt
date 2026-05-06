@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+/*
+1. 데이터 리셋
+2. 권한 리셋
+3. 로그인 상태 체크
+ */
 @HiltViewModel
-class SettingViewModel
-@Inject
-constructor(
+class SettingViewModel @Inject constructor(
     private val resetDataUseCase: ResetDataUseCase,
     private val revokeApplicationUseCase: RevokeApplicationUseCase,
     private val checkLoginStatusUseCase: CheckLoginStatusUseCase,

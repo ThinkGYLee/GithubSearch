@@ -1,16 +1,14 @@
 package com.gyleedev.githubsearch.domain.usecase
 
+import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class UpdateFavoriteStatusUseCase
-@Inject
-constructor(
+class UpdateFavoriteStatusUseCase @Inject constructor(
     private val repository: GitHubRepository,
 ) {
-    suspend operator fun invoke(id: String) = withContext(Dispatchers.IO) {
-        repository.updateUserFavorite(id)
+    suspend operator fun invoke(user: UserModel) {
+        val updateUser = user.copy(favorite = !user.favorite)
+        repository.upsertUser(updateUser)
     }
 }
