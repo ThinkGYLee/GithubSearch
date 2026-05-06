@@ -266,8 +266,8 @@ fun FilterDialog(
                     Modifier
                         .fillMaxWidth()
                         .selectable(
-                            selected = selectedFilter == FilterStatus.ALL,
-                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                            selected = selectedFilter == FilterStatus.REPO,
+                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
                             role = Role.RadioButton,
                         ),
                     verticalAlignment = Alignment.CenterVertically,
