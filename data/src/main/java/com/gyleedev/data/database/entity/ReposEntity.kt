@@ -3,6 +3,7 @@ package com.gyleedev.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 
@@ -17,6 +18,7 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
             onDelete = ForeignKey.CASCADE,
         ),
     ],
+    indices = [Index(value = ["user_entity_id", "name"], unique = true)],
 )
 data class ReposEntity(
     @PrimaryKey(autoGenerate = true)
