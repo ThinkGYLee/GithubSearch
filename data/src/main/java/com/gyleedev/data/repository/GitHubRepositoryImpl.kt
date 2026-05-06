@@ -236,10 +236,30 @@ constructor(
     override suspend fun updateUserFavorite(id: String): UserSearchResult = try {
         val user = userDao.getUser(id)
         if (user != null) {
-            userDao.updateUser(UserEntity(id = user.id))
+            userDao.updateUser(
+                UserEntity(
+                    id = user.id,
+                    userId = user.userId,
+                    name = user.name,
+                    followers = user.followers,
+                    following = user.following,
+                    company = user.company,
+                    avatar = user.avatar,
+                    email = user.email,
+                    bio = user.bio,
+                    repos = user.repos,
+                    createdDate = user.createdDate,
+                    updatedDate = user.updatedDate,
+                    reposAddress = user.reposAddress,
+                    blogUrl = user.blogUrl,
+                    favorite = !user.favorite,
+                ),
+            )
             val updatedUser = userDao.getUser(id)
             if (updatedUser != null) {
-                UserSearchResult.FromDatabase(data = updatedUser.toModel())
+                UserSearchResult.FromDatabase(
+                    data = updatedUser.toModel(),
+                )
             } else {
                 UserSearchResult.Failure(status = SearchStatus.BAD_NETWORK)
             }
