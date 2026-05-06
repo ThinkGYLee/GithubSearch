@@ -17,13 +17,17 @@ interface GitHubRepository {
 
     suspend fun fetchUserFromGithub(id: String): SearchStatus
 
+    suspend fun updateUser(id: Long, githubId: String)
+
+    suspend fun updateRepos(id: Long, githubId: String)
+
     suspend fun getLastAccessById(id: String): AccessTime?
 
     suspend fun getUser(id: String): UserModel?
 
     suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>?
 
-    suspend fun getDetailUser(githubId: String): UserSearchResult
+    fun getReposFromDatabaseByFlow(githubId: String): Flow<List<RepositoryModel>>
 
     suspend fun updateUserFavorite(id: String): UserSearchResult
 
