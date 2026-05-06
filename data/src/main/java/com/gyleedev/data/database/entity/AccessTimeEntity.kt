@@ -14,4 +14,6 @@ data class AccessTimeEntity(
     val githubId: String,
     @ColumnInfo(name = "access_time")
     val accessTime: Instant,
+    @ColumnInfo(name = "is_repo_fetched")
+    val isRepoFetched: Boolean,
 )

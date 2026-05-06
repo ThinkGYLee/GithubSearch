@@ -21,6 +21,7 @@ import com.gyleedev.data.remote.TypeAccess
 import com.gyleedev.data.remote.TypeApi
 import com.gyleedev.data.remote.TypeRevoke
 import com.gyleedev.data.remote.request.toRequest
+import com.gyleedev.data.remote.response.RepoResponse
 import com.gyleedev.data.remote.response.UserResponse
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
@@ -86,7 +87,7 @@ constructor(
     override suspend fun fetchUserFromGithub(id: String): SearchStatus = try {
         val userResponse = githubApiService.getUser(id)
         insertUserToDatabase(userResponse)
-        updateAccessTime(id)
+        updateAccessTime(id = id, isRepoFetched = false)
         SearchStatus.SUCCESS
     } catch (e: Exception) {
         exceptionToStatusUtil(e)
@@ -94,9 +95,26 @@ constructor(
         SearchStatus.BAD_NETWORK
     }
 
+    private suspend fun fetchUserFromGithub1(id: String): UserModel? = try {
+        githubApiService.getUser(id).toModel()
+    } catch (e: Exception) {
+        null
+    }
+
+    private suspend fun fetchRepoResponse(id: String): List<RepoResponse> = try {
+        githubApiService.getRepos(id)
+    } catch (e: Exception) {
+        emptyList<RepoResponse>()
+    }
+
     // 마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTimeModel? = accessTimeDao.getTimeByGithubId(id)?.let {
-        AccessTimeModel(it.id, it.githubId, it.accessTime)
+        AccessTimeModel(
+            id = it.id,
+            githubId = it.githubId,
+            accessTime = it.accessTime,
+            isRepoFetched = it.isRepoFetched,
+        )
     }
 
     // 유저정보 가져오기
@@ -114,7 +132,7 @@ constructor(
         val userRemote = githubApiService.getUser(id)
         val entityId = userDao.insertUser(userRemote.toModel().toEntity())
         insertRepos(id, entityId)
-        updateAccessTime(id)
+        updateAccessTime(id, true)
         UserSearchResult.Success(
             status = SearchStatus.SUCCESS,
             data = userRemote.toModel(),
@@ -128,56 +146,6 @@ constructor(
         UserSearchResult.Failure(
             status = SearchStatus.BAD_NETWORK,
         )
-    }
-
-    private suspend fun updateUserFromGithub(id: String): UserSearchResult {
-        try {
-            val userResponse = githubApiService.getUser(id)
-            val userRemote =
-                UserSearchResult.Success(
-                    status = SearchStatus.SUCCESS,
-                    data = userResponse.toModel(),
-                )
-            val userLocal = userDao.getUser(id)
-
-            if (userLocal != null) {
-                val updateUser =
-                    UserEntity(
-                        id = userLocal.id,
-                        userId = userRemote.data.login,
-                        name = userRemote.data.name,
-                        followers = userRemote.data.followers,
-                        following = userRemote.data.following,
-                        avatar = userRemote.data.avatar,
-                        company = userRemote.data.company,
-                        email = userRemote.data.email,
-                        bio = userRemote.data.bio,
-                        blogUrl = userRemote.data.blogUrl,
-                        createdDate = userRemote.data.createdDate,
-                        updatedDate = userRemote.data.updatedDate,
-                        repos = userRemote.data.repos,
-                        reposAddress = userRemote.data.reposAddress,
-                        favorite = userLocal.favorite,
-                    )
-                userDao.updateUser(updateUser)
-                if (userResponse.repos > 0) {
-                    insertRepos(id, userLocal.id)
-                }
-                updateAccessTime(id)
-                return userRemote
-            } else {
-                return insertUserFromGithub(id)
-            }
-        } catch (e: Exception) {
-            val status = exceptionToStatusUtil(e)
-            return UserSearchResult.Failure(
-                status = status,
-            )
-        } catch (e: UnknownError) {
-            return UserSearchResult.Failure(
-                status = SearchStatus.BAD_NETWORK,
-            )
-        }
     }
 
     // 레포정보 삽입
@@ -194,6 +162,23 @@ constructor(
         }
     }
 
+    private suspend fun insertRepos1(
+        githubId: String,
+        userEntityId: Long,
+        list: List<RepoResponse>,
+    ) {
+        try {
+            println("insert repos")
+            val mappedList = list.map {
+                it.toModel(id = githubId).toEntity(userEntityId = userEntityId)
+            }.also { println("mappedList ${it.size}") }
+            reposDao.deleteRepos(githubId)
+            reposDao.insertRepos(mappedList)
+        } catch (e: Throwable) {
+            insertRepos(githubId, userEntityId)
+        }
+    }
+
     // db에서 레포정보 가져오기
     override suspend fun getReposFromDatabase(githubId: String): List<RepositoryModel>? = try {
         reposDao.getReposByGithubId(githubId).map { it.toModel() }
@@ -201,7 +186,10 @@ constructor(
         getReposFromDatabase(githubId)
     }
 
-    private fun updateAccessTime(id: String) {
+    override fun getReposFromDatabaseByFlow(githubId: String): Flow<List<RepositoryModel>> = reposDao.getReposByGithubIdWithFlow(githubId).map { it.map { it.toModel() } }
+
+    private suspend fun updateAccessTime(id: String, isRepoFetched: Boolean) {
+        println("update")
         val accessTime = accessTimeDao.getTimeByGithubId(id)
         if (accessTime != null) {
             accessTimeDao.updateTime(
@@ -209,7 +197,8 @@ constructor(
                     id = accessTime.id,
                     githubId = accessTime.githubId,
                     accessTime = Instant.now(),
-                ),
+                    isRepoFetched = isRepoFetched,
+                ).also { println(it) },
             )
         } else {
             accessTimeDao.insertTime(
@@ -217,28 +206,30 @@ constructor(
                     id = 0,
                     githubId = id,
                     accessTime = Instant.now(),
-                ),
+                    isRepoFetched = false,
+                ).also { println(it) },
             )
         }
     }
 
-    override suspend fun getDetailUser(githubId: String): UserSearchResult = withContext(Dispatchers.IO) {
-        val lastAccess = getLastAccessById(githubId)
-        if (lastAccess != null) {
-            if (Instant.now().toEpochMilli() - lastAccess.accessTime.toEpochMilli() < 3600000) {
-                val user = getUser(githubId)
-                if (user != null) {
-                    UserSearchResult.FromDatabase(
-                        data = user,
-                    )
-                } else {
-                    insertUserFromGithub(githubId)
-                }
-            } else {
-                updateUserFromGithub(githubId)
-            }
-        } else {
-            insertUserFromGithub(githubId)
+    override suspend fun updateUser(id: Long, githubId: String) {
+        val response = fetchUserFromGithub1(githubId)
+        response?.let {
+            userDao.updateUser(it.toEntity().copy(id = id))
+        }
+    }
+
+    override suspend fun updateRepos(id: Long, githubId: String) {
+        val response = fetchRepoResponse(githubId).also {
+            println("response $it")
+        }
+        if (response.isNotEmpty()) {
+            println("not empty")
+            insertRepos1(
+                githubId = githubId,
+                userEntityId = id,
+                list = response,
+            )
         }
     }
 

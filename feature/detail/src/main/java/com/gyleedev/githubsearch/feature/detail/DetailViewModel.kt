@@ -4,11 +4,21 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.DetailFeed
-import com.gyleedev.githubsearch.domain.usecase.GetUserFeedUseCase
-import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusAndRefreshFeedUseCase
+import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.usecase.GetRepositoryUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
+import com.gyleedev.githubsearch.domain.usecase.UpdateUserFromGithubUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,53 +26,59 @@ import javax.inject.Inject
 class DetailViewModel
 @Inject
 constructor(
-    private val getUserFeedUseCase: GetUserFeedUseCase,
-    private val updateFavoriteStatusAndRefreshFeedUseCase: UpdateFavoriteStatusAndRefreshFeedUseCase,
+    private val updateUserFromGithubUseCase: UpdateUserFromGithubUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val getRepositoryUseCase: GetRepositoryUseCase,
+    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
-    private val _itemList = MutableStateFlow<List<DetailFeed>>(emptyList())
-    val itemList: StateFlow<List<DetailFeed>> = _itemList
-
-    private val _favoriteStatus = MutableStateFlow(false)
-    val favoriteStatus: StateFlow<Boolean> = _favoriteStatus
+    private val userId = MutableStateFlow("")
 
     init {
         val id = savedStateHandle.get<String>("id")
         viewModelScope.launch {
             if (id != null) {
-                getItems(id)
+                userId.emit(id)
+                updateUserAndRepositoryData()
             }
         }
     }
 
-    private fun getItems(user: String) {
-        viewModelScope.launch {
-            _itemList.emit(getUserFeedUseCase(user))
-            setInitialFavoriteStatus(_itemList.value)
-        }
-    }
-
-    private fun setInitialFavoriteStatus(list: List<DetailFeed>) {
-        val user =
-            if (list[0] is DetailFeed.UserProfile) {
-                list[0] as DetailFeed.UserProfile
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val user: StateFlow<UserModel?> = userId
+        .flatMapLatest { query ->
+            if (query.isBlank()) {
+                flowOf(null)
             } else {
-                null
+                getUserUseCase(query)
             }
-        viewModelScope.launch {
-            if (user != null) {
-                _favoriteStatus.emit(user.userModel.favorite)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = null,
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val repo: StateFlow<List<RepositoryModel>> = userId
+        .flatMapLatest { query ->
+            if (query.isBlank()) {
+                flowOf(emptyList())
+            } else {
+                getRepositoryUseCase(query)
             }
-        }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = emptyList(),
+        )
+
+    private suspend fun updateUserAndRepositoryData() {
+        updateUserFromGithubUseCase(userId.value)
     }
 
     fun updateFavoriteStatus() {
         viewModelScope.launch {
-            if (itemList.value.isNotEmpty() && itemList.value[0] is DetailFeed.UserProfile) {
-                val userProfile = itemList.value[0] as DetailFeed.UserProfile
-                _itemList.emit(updateFavoriteStatusAndRefreshFeedUseCase(userProfile.userModel.login))
-                _favoriteStatus.emit(!_favoriteStatus.value)
-            }
+            updateFavoriteStatusUseCase(id = userId.value)
         }
     }
 }

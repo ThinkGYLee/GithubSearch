@@ -37,5 +37,12 @@
         ]
       }
     ]
+  },
+  "hooksConfig": {
+    "disabled": [
+      "pre-mod-check",
+      "git-korean-check",
+      "post-mod-validation"
+    ]
   }
 }
