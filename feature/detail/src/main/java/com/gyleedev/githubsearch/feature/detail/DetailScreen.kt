@@ -70,7 +70,7 @@ fun DetailScreen(
                 },
                 actions = {
                     IconButton(onClick = viewModel::updateFavoriteStatus) {
-                        if (user == null || !(user as UserModel).favorite) {
+                        if (user == null || (user as UserModel).favorite) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
                                 contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
@@ -90,9 +90,9 @@ fun DetailScreen(
     ) {
         LazyColumn(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(vertical = 4.dp),
+                Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 4.dp),
             contentPadding = it,
         ) {
             item {
@@ -123,30 +123,30 @@ private fun DetailUserItem(
     Column(modifier = Modifier.padding(12.dp)) {
         Row(
             modifier =
-            modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(12.dp),
+                modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
         ) {
             GlideImage(
                 imageModel = { user.avatar },
                 modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
+                    Modifier
+                        .padding(horizontal = 8.dp)
+                        .heightIn(max = 80.dp, min = 20.dp)
+                        .widthIn(max = 80.dp, min = 20.dp)
+                        .clip(CircleShape),
                 component =
-                rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
+                    rememberImageComponent {
+                        +ShimmerPlugin(
+                            Shimmer.Flash(
+                                baseColor = Color.White,
+                                highlightColor = Color.LightGray,
+                            ),
+                        )
+                    },
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -204,9 +204,9 @@ private fun DetailUserItem(
         if (company != null) {
             Row(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -214,9 +214,9 @@ private fun DetailUserItem(
                     imageVector = Icons.Filled.Apartment,
                     contentDescription = null,
                     modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 Text(text = company)
             }
@@ -226,9 +226,9 @@ private fun DetailUserItem(
         if (email != null) {
             Row(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -236,9 +236,9 @@ private fun DetailUserItem(
                     imageVector = Icons.Filled.Mail,
                     contentDescription = null,
                     modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 Text(text = email)
             }
@@ -247,9 +247,9 @@ private fun DetailUserItem(
         if (user.blogUrl != "") {
             Row(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -257,9 +257,9 @@ private fun DetailUserItem(
                     imageVector = Icons.Filled.Link,
                     contentDescription = null,
                     modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
+                        Modifier
+                            .width(24.dp)
+                            .height(24.dp),
                 )
                 user.blogUrl?.let { Text(text = it) }
             }
@@ -302,10 +302,10 @@ private fun DetailRepoItem(model: RepositoryModel) {
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
                 modifier =
-                Modifier
-                    .padding(vertical = 8.dp)
-                    .width(24.dp)
-                    .height(24.dp),
+                    Modifier
+                        .padding(vertical = 8.dp)
+                        .width(24.dp)
+                        .height(24.dp),
                 tint = Yellow,
             )
             Text(text = model.stargazer.toString(), modifier = Modifier.padding(8.dp))
@@ -319,9 +319,9 @@ private fun DetailRepoNoItem() {
     Text(
         text = stringResource(id = R.string.detail_repo_no_item),
         modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 12.dp),
         style = MaterialTheme.typography.titleMedium,
     )
 }
