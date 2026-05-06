@@ -15,6 +15,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*
+필터, 소트 종류가 많아지면 uiState 사용 고려
+지금은 보일러 플레이트가 늘 뿐
+ */
 @HiltViewModel
 class FavoriteViewModel
 @Inject
