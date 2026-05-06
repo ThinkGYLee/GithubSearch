@@ -5,9 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ResetDataUseCase
-@Inject
-constructor(
+class ResetDataUseCase @Inject constructor(
     private val repository: GitHubRepository,
 ) {
     suspend operator fun invoke() {
