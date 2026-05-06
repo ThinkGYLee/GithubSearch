@@ -44,7 +44,7 @@ class FavoriteViewModel @Inject constructor(
 
     fun updateFavoriteStatus(user: UserModel) {
         viewModelScope.launch {
-            updateFavoriteUseCase(user.login)
+            updateFavoriteUseCase(user)
         }
     }
 }
