@@ -24,10 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,8 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -58,16 +59,12 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val users = viewModel.items.collectAsLazyPagingItems()
-    users.refresh()
+    val selectedFilter by viewModel.filterState.collectAsStateWithLifecycle()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
     val user =
         remember {
             mutableStateOf<UserModel?>(null)
-        }
-    val selectedItem =
-        remember {
-            mutableIntStateOf(2)
         }
 
     Scaffold(
@@ -137,23 +134,8 @@ fun FavoriteScreen(
     if (showFilterDialog.value) {
         FilterDialog(
             onChangeState = { showFilterDialog.value = it },
-            onFilterChange = {
-                when (selectedItem.intValue) {
-                    0 -> {
-                        viewModel.userFilterHasRepos()
-                    }
-
-                    1 -> {
-                        viewModel.userFilterNoRepos()
-                    }
-
-                    2 -> {
-                        viewModel.userFilterAll()
-                    }
-                }
-            },
-            selectedItemId = selectedItem.intValue,
-            onSelectedItemChange = { selectedItem.intValue = it },
+            selectedFilter = selectedFilter,
+            onSelectedItemChange = viewModel::updateFilter,
         )
     }
 }
@@ -171,13 +153,19 @@ private fun FavoriteItemList(
             .fillMaxSize()
             .padding(vertical = 12.dp),
     ) {
-        items(users.itemCount, key = { users[it]!!.login }, contentType = { 0 }) { index ->
-            val user = users[index] as UserModel
-            FavoriteItem(
-                user,
-                onClick = { onClick(user.login) },
-                onLongClick = { onLongClick(it) },
-            )
+        items(
+            users.itemCount,
+            key = { index ->
+                users[index]?.login ?: "placeholder_$index"
+            },
+        ) { index ->
+            users[index]?.let { user ->
+                FavoriteItem(
+                    user = user,
+                    onClick = { onClick(user.login) },
+                    onLongClick = { onLongClick(it) },
+                )
+            }
         }
     }
 }
@@ -245,18 +233,11 @@ private fun NoItem(modifier: Modifier) {
 
 @Composable
 fun FilterDialog(
-    selectedItemId: Int,
+    selectedFilter: FilterStatus,
     onChangeState: (Boolean) -> Unit,
-    onFilterChange: () -> Unit,
-    onSelectedItemChange: (Int) -> Unit,
+    onSelectedItemChange: (FilterStatus) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val declarations =
-        listOf(
-            stringResource(id = FavoriteR.string.filter_list_has_repos),
-            stringResource(id = FavoriteR.string.filter_list_no_repos),
-            stringResource(id = FavoriteR.string.filter_list_all),
-        )
-
     AlertDialog(
         onDismissRequest = { onChangeState(false) },
         title = {
@@ -268,80 +249,64 @@ fun FilterDialog(
         },
         text = {
             Column {
-                Text(
-                    text = stringResource(id = DesignSystemR.string.text_filter_content),
-                    modifier = Modifier.padding(bottom = 5.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                RadioButtons(
-                    selectedItemId = selectedItemId,
-                    RadioItems(declarations),
-                    selectedItem = { string ->
-                        declarations.indexOf(string).also { onSelectedItemChange(it) }
-                    },
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onChangeState(false) }) {
-                Text(text = stringResource(id = DesignSystemR.string.text_filter_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onFilterChange()
-                    onChangeState(false)
-                },
-            ) {
-                Text(text = stringResource(id = DesignSystemR.string.text_filter_confirm))
-            }
-        },
-    )
-}
-
-@Composable
-fun RadioButtons(
-    selectedItemId: Int,
-    items: RadioItems,
-    selectedItem: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val selectedValue = remember { mutableStateOf("") }
-    val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
-    val onChangeState: (String) -> Unit = {
-        selectedValue.value = it
-        selectedItem(selectedValue.value)
-    }
-
-    Column(modifier = modifier.padding(top = 10.dp)) {
-        val declaration = items.list
-        declaration.forEach { item ->
-            Column {
                 Row(
                     modifier =
                     Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 48.dp)
                         .selectable(
-                            selected = isSelectedItem(item),
-                            onClick = { onChangeState(item) },
+                            selected = selectedFilter == FilterStatus.ALL,
+                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
                             role = Role.RadioButton,
-                        ).padding(bottom = 3.dp),
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
-                        selected = declaration[selectedItemId] == item,
-                        onClick = null,
+                        selected = selectedFilter == FilterStatus.ALL,
+                        onClick = { onSelectedItemChange(FilterStatus.ALL) },
                         modifier = Modifier.padding(end = 5.dp),
                     )
-                    Text(text = item, style = MaterialTheme.typography.labelMedium)
+                    Text(text = stringResource(FavoriteR.string.filter_list_all))
+                }
+                Row(
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.REPO,
+                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                            role = Role.RadioButton,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = selectedFilter == FilterStatus.REPO,
+                        onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                        modifier = Modifier.padding(end = 5.dp),
+                    )
+                    Text(text = stringResource(FavoriteR.string.filter_list_has_repos))
+                }
+                Row(
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.NOREPO,
+                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                            role = Role.RadioButton,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = selectedFilter == FilterStatus.NOREPO,
+                        onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                        modifier = Modifier.padding(end = 5.dp),
+                    )
+                    Text(text = stringResource(FavoriteR.string.filter_list_no_repos))
                 }
             }
-        }
-    }
+        },
+        modifier = modifier,
+        dismissButton = {},
+        confirmButton = {},
+    )
 }
-
-data class RadioItems(
-    val list: List<String>,
-)

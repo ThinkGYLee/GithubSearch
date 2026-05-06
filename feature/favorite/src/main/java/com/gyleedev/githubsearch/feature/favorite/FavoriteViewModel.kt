@@ -10,10 +10,15 @@ import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*
+필터, 소트 종류가 많아지면 uiState 사용 고려
+지금은 보일러 플레이트가 늘 뿐
+ */
 @HiltViewModel
 class FavoriteViewModel
 @Inject
@@ -21,30 +26,19 @@ constructor(
     private val updateFavoriteUseCase: UpdateFavoriteStatusUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
 ) : BaseViewModel() {
-    private val filterState = MutableStateFlow(FilterStatus.ALL)
+    private val _filterState = MutableStateFlow(FilterStatus.ALL)
+    val filterState: StateFlow<FilterStatus> = _filterState
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val items =
-        filterState
+        _filterState
             .flatMapLatest {
                 getFavoritesUseCase(it)
             }.cachedIn(viewModelScope)
 
-    fun userFilterAll() {
+    fun updateFilter(status: FilterStatus) {
         viewModelScope.launch {
-            filterState.emit(FilterStatus.ALL)
-        }
-    }
-
-    fun userFilterHasRepos() {
-        viewModelScope.launch {
-            filterState.emit(FilterStatus.REPO)
-        }
-    }
-
-    fun userFilterNoRepos() {
-        viewModelScope.launch {
-            filterState.emit(FilterStatus.NOREPO)
+            _filterState.emit(status)
         }
     }
 
