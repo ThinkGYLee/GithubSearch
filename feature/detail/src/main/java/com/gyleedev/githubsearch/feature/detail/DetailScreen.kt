@@ -39,7 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
-import com.gyleedev.githubsearch.domain.model.DetailFeed
+import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.domain.model.UserModel
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
@@ -52,12 +53,11 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     onClick: () -> Unit,
 ) {
-    val list by viewModel.itemList.collectAsStateWithLifecycle()
-    val status by viewModel.favoriteStatus.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsStateWithLifecycle()
+    val repos by viewModel.repo.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            // TODO TopAppBar 앱 공통으로
             TopAppBar(
                 title = { Text(text = "") },
                 navigationIcon = {
@@ -70,21 +70,15 @@ fun DetailScreen(
                 },
                 actions = {
                     IconButton(onClick = viewModel::updateFavoriteStatus) {
-                        if (status) {
+                        if (user == null || !(user as UserModel).favorite) {
                             Icon(
                                 imageVector = Icons.Filled.Favorite,
-                                contentDescription =
-                                stringResource(
-                                    id = R.string.icon_content_description_favorite_filled,
-                                ),
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription =
-                                stringResource(
-                                    id = R.string.icon_content_description_favorite_bordered,
-                                ),
+                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
                             )
                         }
                     }
@@ -92,112 +86,100 @@ fun DetailScreen(
                 modifier = Modifier,
             )
         },
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) {
         LazyColumn(
             modifier =
             Modifier
                 .fillMaxSize()
-                .padding(it)
                 .padding(vertical = 4.dp),
+            contentPadding = it,
         ) {
-            items(list.size) { current ->
-                when (list[current]) {
-                    is DetailFeed.UserProfile -> {
-                        DetailUserTitleItem(list[current] as DetailFeed.UserProfile)
-                    }
-
-                    is DetailFeed.UserDetail -> {
-                        DetailUserInfoItem(user = list[current] as DetailFeed.UserDetail)
-                    }
-
-                    is DetailFeed.RepoTitle -> {
-                        DetailRepoTitle()
-                    }
-
-                    is DetailFeed.RepoDetail -> {
-                        DetailRepoItem(repos = list[current] as DetailFeed.RepoDetail)
-                    }
-
-                    else -> {
-                        DetailRepoNoItem()
-                    }
+            item {
+                user?.let {
+                    DetailUserItem(it)
                 }
+            }
+
+            item {
+                DetailRepoTitle()
+            }
+
+            items(
+                count = repos.size,
+                key = { index -> repos[index].name ?: "repository_$index" },
+            ) { index ->
+                DetailRepoItem(repos[index])
             }
         }
     }
 }
 
 @Composable
-private fun DetailUserTitleItem(user: DetailFeed.UserProfile) {
-    val data = user.userModel
-
-    Row(
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround,
-    ) {
-        GlideImage(
-            imageModel = { data.avatar },
-            modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .heightIn(max = 80.dp, min = 20.dp)
-                .widthIn(max = 80.dp, min = 20.dp)
-                .clip(CircleShape),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
-        )
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = data.repos.toString(),
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(id = R.string.detail_user_title_repos),
-            )
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = data.followers.toString(),
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(id = R.string.detail_user_title_follower),
-            )
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = data.following.toString(),
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(id = R.string.detail_user_title_following),
-            )
-        }
-    }
-}
-
-@Composable
-private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
-    val data = user.userModel
-
+private fun DetailUserItem(
+    user: UserModel,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = Modifier.padding(12.dp)) {
-        data.name?.let {
+        Row(
+            modifier =
+            modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            GlideImage(
+                imageModel = { user.avatar },
+                modifier =
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .heightIn(max = 80.dp, min = 20.dp)
+                    .widthIn(max = 80.dp, min = 20.dp)
+                    .clip(CircleShape),
+                component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
+            )
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = user.repos.toString(),
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(id = R.string.detail_user_title_repos),
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = user.followers.toString(),
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(id = R.string.detail_user_title_follower),
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = user.following.toString(),
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(id = R.string.detail_user_title_following),
+                )
+            }
+        }
+        user.name?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,
@@ -206,11 +188,11 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             )
         }
         Text(
-            text = data.login,
+            text = user.login,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(12.dp),
         )
-        data.bio?.let {
+        user.bio?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.bodyLarge,
@@ -218,7 +200,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             )
         }
 
-        val company = data.company
+        val company = user.company
         if (company != null) {
             Row(
                 modifier =
@@ -240,7 +222,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             }
         }
 
-        val email = data.email
+        val email = user.email
         if (email != null) {
             Row(
                 modifier =
@@ -262,7 +244,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
             }
         }
 
-        if (data.blogUrl != "") {
+        if (user.blogUrl != "") {
             Row(
                 modifier =
                 Modifier
@@ -279,7 +261,7 @@ private fun DetailUserInfoItem(user: DetailFeed.UserDetail) {
                         .width(24.dp)
                         .height(24.dp),
                 )
-                data.blogUrl?.let { Text(text = it) }
+                user.blogUrl?.let { Text(text = it) }
             }
         }
     }
@@ -296,18 +278,16 @@ private fun DetailRepoTitle() {
 }
 
 @Composable
-private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
-    val data = repos.repositoryModel
-
+private fun DetailRepoItem(model: RepositoryModel) {
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
-        data.name?.let {
+        model.name?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
         }
-        data.description?.let {
+        model.description?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.labelMedium,
@@ -328,8 +308,8 @@ private fun DetailRepoItem(repos: DetailFeed.RepoDetail) {
                     .height(24.dp),
                 tint = Yellow,
             )
-            Text(text = data.stargazer.toString(), modifier = Modifier.padding(8.dp))
-            data.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
+            Text(text = model.stargazer.toString(), modifier = Modifier.padding(8.dp))
+            model.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
         }
     }
 }
