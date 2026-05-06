@@ -22,5 +22,5 @@ interface ReposDao {
     suspend fun deleteRepos(githubId: String)
 
     @Query("DELETE FROM repos")
-    fun resetRepos()
+    suspend fun resetRepos()
 }
