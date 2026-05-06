@@ -8,7 +8,7 @@ import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
-import com.gyleedev.githubsearch.domain.usecase.GetUserUseCase
+import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getUsersUseCase: GetUsersUseCase,
-    private val getUserUseCase: GetUserUseCase,
+    private val getUserWithFlowUseCase: GetUserWithFlowUseCase,
     private val fetchUserUseCase: FetchUserUseCase,
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
             if (query.isBlank()) {
                 flowOf(null)
             } else {
-                getUserUseCase(query)
+                getUserWithFlowUseCase(query)
             }
         }.stateIn(
             scope = viewModelScope,
