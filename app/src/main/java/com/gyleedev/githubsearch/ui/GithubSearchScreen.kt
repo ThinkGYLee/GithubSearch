@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Home
@@ -75,6 +76,7 @@ fun GithubSearchScreen(
             navController = navController,
             startDestination = BottomNavItem.Home.screenRoute,
             modifier = modifier
+                .padding(innerPadding)
                 .consumeWindowInsets(innerPadding),
         ) {
             composable(route = BottomNavItem.Home.screenRoute) {
