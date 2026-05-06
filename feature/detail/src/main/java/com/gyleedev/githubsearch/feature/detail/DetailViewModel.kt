@@ -21,11 +21,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+/*
+1. user Flow로 받아오는 거
+2. repos flow로 받아오는 거
+3. user, repo 업데이트(싱크 맞추는 기능)
+4. favoriteState 업데이트
+ */
 @HiltViewModel
-class DetailViewModel
-@Inject
-constructor(
+class DetailViewModel @Inject constructor(
     private val updateUserFromGithubUseCase: UpdateUserFromGithubUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val getRepositoryUseCase: GetRepositoryUseCase,

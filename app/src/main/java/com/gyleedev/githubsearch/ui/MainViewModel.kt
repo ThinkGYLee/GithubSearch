@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*
+getAccessTokenUseCase -> repositoryGetAccessToken 있으면 repositorySaveToken
+하고 리턴
+ */
 @HiltViewModel
-class MainViewModel
-@Inject
-constructor(
+class MainViewModel @Inject constructor(
     private val getAccessTokenUseCase: GetAccessTokenUseCase,
 ) : BaseViewModel() {
     private val _alertLoginSuccess = MutableSharedFlow<Boolean>()

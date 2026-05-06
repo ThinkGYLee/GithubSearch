@@ -18,11 +18,11 @@ import javax.inject.Inject
 /*
 필터, 소트 종류가 많아지면 uiState 사용 고려
 지금은 보일러 플레이트가 늘 뿐
+1. update filterState
+2. favorite 리스트 가져오는거
  */
 @HiltViewModel
-class FavoriteViewModel
-@Inject
-constructor(
+class FavoriteViewModel @Inject constructor(
     private val updateFavoriteUseCase: UpdateFavoriteStatusUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
 ) : BaseViewModel() {

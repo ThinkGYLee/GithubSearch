@@ -41,9 +41,7 @@ import java.time.Instant
 import javax.inject.Inject
 import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 
-class GitHubRepositoryImpl
-@Inject
-constructor(
+class GitHubRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val reposDao: ReposDao,
     private val accessTimeDao: AccessTimeDao,
@@ -52,6 +50,27 @@ constructor(
     @TypeRevoke private val revokeService: RevokeService,
     private val preferenceUtil: PreferenceUtil,
 ) : GitHubRepository {
+    /*
+    세팅
+        1. 데이터 리셋
+        2. 권한 리셋
+        3. 로그인 상태 체크
+    홈
+        1. UserList 가져오는거
+        2. Search 했을 때 query 가지고 debounce 로 가져오는거
+        3. web fetch 해서 User 가져오는거
+    페이보릿
+        1. update filterState
+        2. favorite 리스트 가져오는거
+    디테일
+        1. user Flow로 받아오는 거
+        2. repos flow로 받아오는 거
+        3. user, repo 업데이트(싱크 맞추는 기능)
+        4. favoriteState 업데이트
+    메인
+        1. 토큰 가져오기
+        2. 토큰 저장하기
+     */
     override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
         config =
         PagingConfig(
