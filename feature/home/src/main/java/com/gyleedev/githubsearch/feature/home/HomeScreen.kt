@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -159,9 +158,9 @@ fun HomeScreen(
             if (users.itemCount > 0) {
                 SearchItemList(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     users = users,
                     onClick = { moveToDetail(it) },
                 )
@@ -269,18 +268,17 @@ private fun EmbeddedSearchBar(
         },
         expanded = isSearchActive,
         onExpandedChange = onActiveChanged,
-        windowInsets = if (isSearchActive) WindowInsets(0, 0, 0, 0) else SearchBarDefaults.windowInsets,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = animatePadding),
     ) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .navigationBarsPadding()
-                .imePadding(),
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .navigationBarsPadding()
+                    .imePadding(),
         ) {
             if (user != null) {
                 SearchResultItem(
@@ -314,9 +312,9 @@ private fun SearchItemList(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -337,30 +335,30 @@ private fun HomeItem(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp, max = 100.dp)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
             modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
-                .clip(CircleShape),
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
+                    .clip(CircleShape),
             component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
         Text(
             text = user.login,
@@ -377,31 +375,31 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = onClick),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         GlideImage(
             imageModel = { user.avatar },
             modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .size(80.dp)
-                .clip(
-                    CircleShape,
-                ),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
+                Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(80.dp)
+                    .clip(
+                        CircleShape,
                     ),
-                )
-            },
+            component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
