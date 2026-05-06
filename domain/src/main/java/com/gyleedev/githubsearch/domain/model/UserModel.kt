@@ -1,6 +1,7 @@
 package com.gyleedev.githubsearch.domain.model
 
 data class UserModel(
+    val id: Long,
     val name: String?,
     val login: String,
     val followers: Int,
