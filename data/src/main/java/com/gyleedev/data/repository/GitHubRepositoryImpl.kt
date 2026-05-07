@@ -5,13 +5,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.gyleedev.data.BuildConfig
-import com.gyleedev.data.PreferenceUtil
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
 import com.gyleedev.data.database.dao.UserDao
 import com.gyleedev.data.database.entity.AccessTimeEntity
 import com.gyleedev.data.database.entity.toEntity
 import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.data.preference.TokenPreference
 import com.gyleedev.data.remote.AccessService
 import com.gyleedev.data.remote.GithubApiService
 import com.gyleedev.data.remote.RevokeService
@@ -40,7 +40,7 @@ class GitHubRepositoryImpl @Inject constructor(
     @TypeApi private val githubApiService: GithubApiService,
     @TypeAccess private val accessService: AccessService,
     @TypeRevoke private val revokeService: RevokeService,
-    private val preferenceUtil: PreferenceUtil,
+    private val tokenPreference: TokenPreference,
 ) : GitHubRepository {
     /*
     세팅
@@ -180,7 +180,7 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveAccessToken(token: String) {
-        preferenceUtil.setString(str = token)
+        tokenPreference.setString(str = token)
     }
 
     // Setting
@@ -191,7 +191,7 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun revokeApplication() {
-        val accessToken = preferenceUtil.getString(defValue = "")
+        val accessToken = tokenPreference.getString()
         if (accessToken.isNotEmpty() || accessToken.isNotBlank()) {
             revokeService.revoke(
                 clientId = BuildConfig.CLIENT_ID,
@@ -200,9 +200,9 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(preferenceUtil.isKeyExist())
+    override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(tokenPreference.isKeyExist())
 
     override suspend fun deleteAccessToken() {
-        preferenceUtil.deleteKey()
+        tokenPreference.deleteKey()
     }
 }
