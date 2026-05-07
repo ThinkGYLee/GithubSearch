@@ -12,7 +12,7 @@ class TokenInterceptor @Inject constructor(
         val accessToken = tokenPreference.getString()
         val builder = chain.request().newBuilder()
 
-        if (accessToken != "") {
+        if (accessToken.isNotBlank()) {
             builder.addHeader("Authorization", "token $accessToken")
         }
         return chain.proceed(builder.build())

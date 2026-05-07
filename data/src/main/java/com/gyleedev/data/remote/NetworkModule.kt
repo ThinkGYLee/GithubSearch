@@ -15,8 +15,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    private val apiUrl = "https://api.github.com"
-    private val accessUrl = "https://github.com"
+    private val apiUrl = BuildConfig.API_URL
+    private val accessUrl = BuildConfig.ACCESS_URL
 
     @Singleton
     @Provides

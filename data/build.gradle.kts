@@ -16,6 +16,9 @@ android {
     defaultConfig {
         buildConfigField("String", "CLIENT_ID", "\"${getApiKey("CLIENT_ID")}\"")
         buildConfigField("String", "CLIENT_SECRET", "\"${getApiKey("CLIENT_SECRET")}\"")
+        buildConfigField("String", "API_URL", "\"https://api.github.com\"")
+        buildConfigField("String", "ACCESS_URL", "\"https://github.com\"")
+
     }
 }
 
