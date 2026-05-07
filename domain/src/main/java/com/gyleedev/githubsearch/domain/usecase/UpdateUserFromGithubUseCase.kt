@@ -31,6 +31,7 @@ class UpdateUserFromGithubUseCase @Inject constructor(
                     if (fetchedRepos.isNotEmpty()) {
                         repository.insertRepositoryList(entityId, fetchedRepos)
                     }
+                    repository.upsertAccessTime(id = access.id, githubId = id, isRepoFetched = true)
                 }
 
                 // 시간 경과와 상관없이 repo 가 fetch 되지 않았을 때
@@ -42,9 +43,9 @@ class UpdateUserFromGithubUseCase @Inject constructor(
                             repository.insertRepositoryList(entityId, fetchedRepos)
                         }
                     }
+                    repository.upsertAccessTime(id = access.id, githubId = id, isRepoFetched = true)
                 }
             }
-            repository.upsertAccessTime(id, isRepoFetched = true)
         }
     }
 }
