@@ -2,13 +2,13 @@ package com.gyleedev.githubsearch.feature.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.GetReposWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateUserFromGithubUseCase
+import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

@@ -1,16 +1,17 @@
 package com.gyleedev.githubsearch.feature.setting
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.ResetDataUseCase
 import com.gyleedev.githubsearch.domain.usecase.RevokeApplicationUseCase
+import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 /*
 1. 데이터 리셋
 2. 권한 리셋

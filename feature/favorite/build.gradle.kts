@@ -9,6 +9,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":core:common"))
+    implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
 
     implementation(libs.landscapist.glide)
