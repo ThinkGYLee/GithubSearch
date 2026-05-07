@@ -92,6 +92,7 @@ class GitHubRepositoryImpl @Inject constructor(
             it.toModel()
         }
     }
+    // flowOn 디스페처 지정을 할때 안할때의 차이? 해야되나 안해도 괜찮나?
 
     override fun getUserWithFlow(id: String): Flow<UserModel?> = userDao.getUserByGithubId(id).map { it?.toModel() }
 
@@ -120,9 +121,11 @@ class GitHubRepositoryImpl @Inject constructor(
         userDao.insertUser(userModel.toEntity())
     }
 
-    override suspend fun upsertAccessTime(githubId: String, isRepoFetched: Boolean) {
+    // 지금 갱신이 안되는 느낌
+    // 유닛 테스트 코드 짜봐
+    override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
-            id = 0L,
+            id = id,
             githubId = githubId,
             accessTime = Instant.now(),
             isRepoFetched = isRepoFetched,
@@ -130,17 +133,10 @@ class GitHubRepositoryImpl @Inject constructor(
         accessTimeDao.upsertAccessTime(entity)
     }
 
-    override suspend fun fetchUser(id: String): UserModel? = try {
-        githubApiService.getUser(id).toModel()
-    } catch (e: Exception) {
-        null
-    }
+    override suspend fun fetchUser(id: String): UserModel? = githubApiService.getUser(id).toModel()
 
-    override suspend fun fetchRepos(id: String): List<RepositoryModel> = try {
-        githubApiService.getRepos(id).map { it.toModel(id = id) }
-    } catch (e: Exception) {
-        emptyList<RepositoryModel>()
-    }
+    override suspend fun fetchRepos(id: String): List<RepositoryModel> = githubApiService.getRepos(id)
+        .map { response -> response.toModel(id = id) }
 
     // 마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTimeModel? = accessTimeDao.getTimeByGithubId(id)?.let {
@@ -197,15 +193,10 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun revokeApplication() {
         val accessToken = preferenceUtil.getString(defValue = "")
         if (accessToken.isNotEmpty() || accessToken.isNotBlank()) {
-            try {
-                revokeService.revoke(
-                    clientId = BuildConfig.CLIENT_ID,
-                    accessToken = RevokeRequestBody(accessToken).toRequest(),
-                )
-            } catch (e: Exception) {
-                // 예외처리
-                println(e)
-            }
+            revokeService.revoke(
+                clientId = BuildConfig.CLIENT_ID,
+                accessToken = RevokeRequestBody(accessToken).toRequest(),
+            )
         }
     }
 
