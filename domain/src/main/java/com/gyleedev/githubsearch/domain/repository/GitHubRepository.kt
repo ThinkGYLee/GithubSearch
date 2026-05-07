@@ -26,7 +26,7 @@ interface GitHubRepository {
         list: List<RepositoryModel>,
     )
 
-    suspend fun upsertAccessTime(githubId: String, isRepoFetched: Boolean = true)
+    suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean = true)
 
     suspend fun upsertUser(user: UserModel)
 
