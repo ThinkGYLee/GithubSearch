@@ -18,9 +18,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -37,20 +35,6 @@ import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
 
-sealed class BottomNavItem(
-    val title: Int,
-    val icons: ImageVector,
-    val screenRoute: String,
-) {
-    data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
-
-    data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
-
-    data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
-
-    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
-}
-
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchScreen(
@@ -58,14 +42,25 @@ fun GithubSearchScreen(
     navController: NavHostController = rememberNavController(),
     onAuthenticationRequest: () -> Unit,
 ) {
-    var bottomBarStatus by rememberSaveable {
-        mutableStateOf(true)
-    }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
         bottomBar = {
-            if (bottomBarStatus) {
-                BottomNavigation(navController = navController, modifier = Modifier)
+            if (currentRoute != "DETAIL/{id}") {
+                BottomNavigation(
+                    currentRoute = currentRoute,
+                    onClick = { route ->
+                        navController.navigate(route) {
+                            navController.graph.startDestinationRoute?.let {
+                                popUpTo(it) { saveState = true }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    modifier = Modifier,
+                )
             }
         },
         // Scaffold가 자동으로 주입하는 inset 무시
@@ -83,7 +78,6 @@ fun GithubSearchScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
                     requestAuthentication = { onAuthenticationRequest() },
-                    requestBottomBarStatus = { bottomBarStatus = !it },
                 )
             }
 
@@ -122,21 +116,21 @@ fun GithubSearchScreen(
 
 @Composable
 fun BottomNavigation(
-    navController: NavHostController,
+    currentRoute: String?,
+    onClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    val items =
+    val items = remember {
         listOf(
             BottomNavItem.Home,
             BottomNavItem.Favorite,
             BottomNavItem.Setting,
         )
+    }
+
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
         items.forEach { item ->
             NavigationBarItem(
                 icon = {
@@ -146,16 +140,22 @@ fun BottomNavigation(
                     )
                 },
                 selected = currentRoute == item.screenRoute,
-                onClick = {
-                    navController.navigate(item.screenRoute) {
-                        navController.graph.startDestinationRoute?.let {
-                            popUpTo(it) { saveState = true }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
+                onClick = { onClick(item.screenRoute) },
             )
         }
     }
+}
+
+sealed class BottomNavItem(
+    val title: Int,
+    val icons: ImageVector,
+    val screenRoute: String,
+) {
+    data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
+
+    data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
+
+    data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
+
+    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
 }
