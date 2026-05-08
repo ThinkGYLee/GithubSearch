@@ -54,6 +54,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -343,23 +344,7 @@ private fun HomeItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        GlideImage(
-            imageModel = { user.avatar },
-            modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .sizeIn(minWidth = 20.dp, minHeight = 20.dp, maxWidth = 80.dp, maxHeight = 80.dp)
-                .clip(CircleShape),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
-        )
+        UserAvatar(avatar = user.avatar)
         Text(
             text = user.login,
             fontWeight = FontWeight.Bold,
