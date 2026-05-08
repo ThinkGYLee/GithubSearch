@@ -155,9 +155,9 @@ fun HomeScreen(
             if (users.itemCount > 0) {
                 SearchItemList(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     users = users,
                     onClick = { moveToDetail(it) },
                 )
@@ -271,11 +271,11 @@ private fun EmbeddedSearchBar(
     ) {
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp)
-                    .navigationBarsPadding()
-                    .imePadding(),
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp)
+                .navigationBarsPadding()
+                .imePadding(),
         ) {
             if (user != null) {
                 SearchResultItem(
@@ -309,9 +309,9 @@ private fun SearchItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -332,11 +332,11 @@ private fun HomeItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .clickable(onClick = onClick)
-                .padding(12.dp),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .clickable(onClick = onClick)
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -356,10 +356,10 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .clickable(onClick = onClick),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

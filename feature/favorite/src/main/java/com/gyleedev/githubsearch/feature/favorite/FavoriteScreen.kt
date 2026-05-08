@@ -78,9 +78,9 @@ fun FavoriteScreen(
         if (users.itemCount > 0) {
             FavoriteItemList(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(paddingValues),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
                 users = users,
                 onClick = { moveToDetail(it) },
                 onLongClick = {
@@ -140,9 +140,9 @@ private fun FavoriteItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -171,14 +171,14 @@ private fun FavoriteItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .padding(12.dp)
-                .combinedClickable(
-                    onLongClick = { onLongClick(user) },
-                    onClick = onClick,
-                ),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .padding(12.dp)
+            .combinedClickable(
+                onLongClick = { onLongClick(user) },
+                onClick = onClick,
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -225,13 +225,13 @@ fun FilterDialog(
             Column {
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.ALL,
-                                onClick = { onSelectedItemChange(FilterStatus.ALL) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.ALL,
+                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -243,13 +243,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.REPO,
-                                onClick = { onSelectedItemChange(FilterStatus.REPO) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.REPO,
+                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -261,13 +261,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.NOREPO,
-                                onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.NOREPO,
+                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
