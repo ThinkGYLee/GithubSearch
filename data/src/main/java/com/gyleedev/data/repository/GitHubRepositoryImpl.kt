@@ -42,7 +42,7 @@ class GitHubRepositoryImpl @Inject constructor(
     @TypeAccess private val accessService: AccessService,
     @TypeRevoke private val revokeService: RevokeService,
     private val tokenPreference: TokenPreference,
-    private val clock: Clock
+    private val clock: Clock,
 ) : GitHubRepository {
     /*
     세팅
@@ -84,10 +84,10 @@ class GitHubRepositoryImpl @Inject constructor(
     // Home
     override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
         config =
-            PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false,
-            ),
+        PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
         pagingSourceFactory = { userDao.getUsers() },
     ).flow.map { pagingData ->
         pagingData.map {
@@ -101,10 +101,10 @@ class GitHubRepositoryImpl @Inject constructor(
     // Favorite
     override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> = Pager(
         config =
-            PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = false,
-            ),
+        PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ),
         pagingSourceFactory = {
             userDao.getUsers(status)
         },
