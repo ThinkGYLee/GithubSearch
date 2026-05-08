@@ -28,6 +28,10 @@ google-gson = "2.14.0"
 google-material = "1.13.0"
 fragment = "1.8.9"
 jetbrainsKotlinJvm = "2.3.20"
+# 앱 버전 관련 정보
+app-versionCode = "1"
+app-versionName = "1.0.0"
+project-targetSdk = "36"
 
 
 [libraries]
