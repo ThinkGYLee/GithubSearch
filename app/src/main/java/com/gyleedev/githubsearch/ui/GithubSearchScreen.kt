@@ -99,7 +99,7 @@ fun GithubSearchScreen(
             ) {
                 DetailScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { navController.navigateUp() },
+                    onBackClick = { navController.navigateUp() },
                 )
             }
 
