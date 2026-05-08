@@ -23,11 +23,14 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:common"))
     implementation(libs.room.paging)
     implementation(libs.paging.runtime.ktx)
     implementation(libs.kotlin.coroutines)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }
