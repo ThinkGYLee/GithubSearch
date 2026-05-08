@@ -29,6 +29,7 @@ import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
@@ -41,6 +42,7 @@ class GitHubRepositoryImpl @Inject constructor(
     @TypeAccess private val accessService: AccessService,
     @TypeRevoke private val revokeService: RevokeService,
     private val tokenPreference: TokenPreference,
+    private val clock: Clock
 ) : GitHubRepository {
     /*
     세팅
@@ -82,10 +84,10 @@ class GitHubRepositoryImpl @Inject constructor(
     // Home
     override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
         config =
-        PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false,
-        ),
+            PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false,
+            ),
         pagingSourceFactory = { userDao.getUsers() },
     ).flow.map { pagingData ->
         pagingData.map {
@@ -99,10 +101,10 @@ class GitHubRepositoryImpl @Inject constructor(
     // Favorite
     override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> = Pager(
         config =
-        PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false,
-        ),
+            PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false,
+            ),
         pagingSourceFactory = {
             userDao.getUsers(status)
         },
@@ -121,13 +123,12 @@ class GitHubRepositoryImpl @Inject constructor(
         userDao.insertUser(userModel.toEntity())
     }
 
-    // 지금 갱신이 안되는 느낌
     // 유닛 테스트 코드 짜봐
     override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
             id = id,
             githubId = githubId,
-            accessTime = Instant.now(),
+            accessTime = Instant.now(clock),
             isRepoFetched = isRepoFetched,
         )
         accessTimeDao.upsertAccessTime(entity)
