@@ -48,7 +48,10 @@ fun DetailUserInfo(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
         ) {
-            UserAvatar(avatar = avatar)
+            UserAvatar(
+                avatar = avatar,
+                size = 80.dp,
+            )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = repos.toString(),

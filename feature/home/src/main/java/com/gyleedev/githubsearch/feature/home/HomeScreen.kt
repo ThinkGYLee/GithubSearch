@@ -363,7 +363,7 @@ private fun SearchResultItem(
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        UserAvatar(user.avatar)
+        UserAvatar(avatar = user.avatar)
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
             val name = user.name
