@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Close
@@ -45,23 +42,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.feature.home.R as HomeR
 
@@ -70,72 +65,73 @@ import com.gyleedev.githubsearch.feature.home.R as HomeR
 fun HomeScreen(
     moveToDetail: (String) -> Unit,
     requestAuthentication: () -> Unit,
-    requestBottomBarStatus: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val users = viewModel.users.collectAsLazyPagingItems()
-
+    var showRequestAuthenticationDialog by remember { mutableStateOf(false) }
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
     val unknownHostException = stringResource(id = DesignSystemR.string.unknown_host_exception)
     val socketException = stringResource(id = DesignSystemR.string.socket_exception)
     val httpException = stringResource(id = DesignSystemR.string.http_exception)
     val etcException = stringResource(id = DesignSystemR.string.etc_exception)
     val noSuchUserMessage = stringResource(id = HomeR.string.search_result_no_user)
     val snackBarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchState.collect { fetchState ->
-            val message =
-                when (fetchState) {
-                    FetchState.WRONG_CONNECTION -> unknownHostException
-                    FetchState.BAD_INTERNET -> socketException
-                    FetchState.PARSE_ERROR -> httpException
-                    FetchState.FAIL -> etcException
-                }
-            snackBarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short,
-            )
+    LaunchedEffect(viewModel.fetchState, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.fetchState.collectLatest { fetchState ->
+                val message =
+                    when (fetchState) {
+                        FetchState.WRONG_CONNECTION -> unknownHostException
+                        FetchState.BAD_INTERNET -> socketException
+                        FetchState.PARSE_ERROR -> httpException
+                        FetchState.FAIL -> etcException
+                    }
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short,
+                )
+            }
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.errorAlert.collect { status ->
-            when (status) {
-                SearchStatus.NO_SUCH_USER -> {
-                    snackBarHostState.showSnackbar(
-                        message = noSuchUserMessage,
-                        duration = SnackbarDuration.Short,
-                    )
-                }
+    LaunchedEffect(viewModel.errorAlert, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.errorAlert.collectLatest { status ->
+                when (status) {
+                    SearchStatus.NO_SUCH_USER -> {
+                        snackBarHostState.showSnackbar(
+                            message = noSuchUserMessage,
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
 
-                SearchStatus.BAD_NETWORK -> {
-                    snackBarHostState.showSnackbar(
-                        message = httpException,
-                        duration = SnackbarDuration.Short,
-                    )
-                }
+                    SearchStatus.BAD_NETWORK -> {
+                        snackBarHostState.showSnackbar(
+                            message = httpException,
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
 
-                else -> {
-                    println("no information error $status")
+                    else -> {
+                        println("no information error $status")
+                    }
                 }
             }
         }
     }
-    var showRequestAuthenticationDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.requestAuthentication.collect {
-            showRequestAuthenticationDialog = true
+    LaunchedEffect(viewModel.requestAuthentication, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.requestAuthentication.collect {
+                showRequestAuthenticationDialog = true
+            }
         }
     }
 
-    var isSearchActive by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(isSearchActive) {
-        requestBottomBarStatus(isSearchActive)
-    }
     if (uiState is HomeUiState.Success) {
         Scaffold(
             topBar = {
@@ -159,9 +155,9 @@ fun HomeScreen(
             if (users.itemCount > 0) {
                 SearchItemList(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     users = users,
                     onClick = { moveToDetail(it) },
                 )
@@ -275,11 +271,11 @@ private fun EmbeddedSearchBar(
     ) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .navigationBarsPadding()
-                .imePadding(),
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .navigationBarsPadding()
+                    .imePadding(),
         ) {
             if (user != null) {
                 SearchResultItem(
@@ -313,9 +309,9 @@ private fun SearchItemList(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -336,11 +332,11 @@ private fun HomeItem(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp, max = 100.dp)
+                .clickable(onClick = onClick)
+                .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -360,32 +356,14 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = onClick),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        GlideImage(
-            imageModel = { user.avatar },
-            modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .size(80.dp)
-                .clip(
-                    CircleShape,
-                ),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
-        )
+        UserAvatar(user.avatar)
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
             val name = user.name
