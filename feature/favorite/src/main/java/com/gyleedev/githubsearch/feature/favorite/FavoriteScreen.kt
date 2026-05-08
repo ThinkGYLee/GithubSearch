@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.AlertDialog
@@ -31,8 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -42,12 +38,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 
@@ -62,10 +55,8 @@ fun FavoriteScreen(
     val selectedFilter by viewModel.filterState.collectAsStateWithLifecycle()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
-    val user =
-        remember {
-            mutableStateOf<UserModel?>(null)
-        }
+    // TODO 이걸 왜 focus 하는지 확인하고 로직 바꿀 것.
+    val user = remember { mutableStateOf<UserModel?>(null) }
 
     Scaffold(
         topBar = {
@@ -87,9 +78,9 @@ fun FavoriteScreen(
         if (users.itemCount > 0) {
             FavoriteItemList(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(paddingValues),
                 users = users,
                 onClick = { moveToDetail(it) },
                 onLongClick = {
@@ -149,9 +140,9 @@ private fun FavoriteItemList(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -180,35 +171,18 @@ private fun FavoriteItem(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .padding(12.dp)
-            .combinedClickable(
-                onLongClick = { onLongClick(user) },
-                onClick = onClick,
-            ),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp, max = 100.dp)
+                .padding(12.dp)
+                .combinedClickable(
+                    onLongClick = { onLongClick(user) },
+                    onClick = onClick,
+                ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        GlideImage(
-            imageModel = { user.avatar },
-            modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .heightIn(max = 80.dp, min = 20.dp)
-                .widthIn(max = 80.dp, min = 20.dp)
-                .clip(CircleShape),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
-        )
+        UserAvatar(avatar = user.avatar)
         Text(
             text = user.login,
             fontWeight = FontWeight.Bold,
@@ -251,13 +225,13 @@ fun FilterDialog(
             Column {
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.ALL,
-                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.ALL,
+                                onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -269,13 +243,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.REPO,
-                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.REPO,
+                                onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -287,13 +261,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.NOREPO,
-                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.NOREPO,
+                                onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
