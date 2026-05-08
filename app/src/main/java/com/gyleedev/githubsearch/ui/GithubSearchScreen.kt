@@ -31,7 +31,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
@@ -114,7 +113,6 @@ fun GithubSearchScreen(
             composable(BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
                     requestAuthentication = { onAuthenticationRequest() },
-                    versionName = BuildConfig.VERSION_NAME,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
