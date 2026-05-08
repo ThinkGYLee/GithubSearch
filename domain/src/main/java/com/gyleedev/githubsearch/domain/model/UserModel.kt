@@ -10,7 +10,7 @@ data class UserModel(
     val company: String?,
     val email: String?,
     val bio: String?,
-    val repos: Int,
+    val repoCount: Int,
     val createdDate: String?,
     val updatedDate: String?,
     val reposAddress: String,

@@ -31,7 +31,7 @@ data class UserEntity(
     @ColumnInfo(name = "bio")
     val bio: String?,
     @ColumnInfo(name = "repos")
-    val repos: Int,
+    val repoCount: Int,
     @ColumnInfo(name = "createdDate")
     val createdDate: String?,
     @ColumnInfo(name = "updatedDate")
@@ -54,7 +54,7 @@ fun UserModel.toEntity(): UserEntity = UserEntity(
     avatar = avatar,
     email = email,
     bio = bio,
-    repos = repos,
+    repoCount = repoCount,
     createdDate = createdDate,
     updatedDate = updatedDate,
     reposAddress = reposAddress,
@@ -72,7 +72,7 @@ fun UserEntity.toModel(): UserModel = UserModel(
     avatar = avatar,
     email = email,
     bio = bio,
-    repos = repos,
+    repoCount = repoCount,
     createdDate = createdDate,
     updatedDate = updatedDate,
     reposAddress = reposAddress,

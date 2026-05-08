@@ -2,11 +2,11 @@ package com.gyleedev.githubsearch.feature.favorite
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.GetFavoritesUseCase
 import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteStatusUseCase
+import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

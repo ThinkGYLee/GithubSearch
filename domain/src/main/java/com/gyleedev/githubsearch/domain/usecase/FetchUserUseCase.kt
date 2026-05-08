@@ -11,7 +11,7 @@ class FetchUserUseCase @Inject constructor(
         val user = repository.fetchUser(query)
         if (user != null) {
             repository.insertUser(user)
-            repository.upsertAccessTime(query, false)
+            repository.upsertAccessTime(id = 0L, githubId = query, isRepoFetched = false)
         }
         SearchStatus.SUCCESS
     } catch (e: Exception) {

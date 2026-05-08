@@ -1,12 +1,10 @@
 package com.gyleedev.data.remote
 
-import android.content.Context
 import com.gyleedev.data.BuildConfig
-import com.gyleedev.data.PreferenceUtil
+import com.gyleedev.data.preference.TokenPreference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,22 +15,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    private val apiUrl = "https://api.github.com"
-    private val accessUrl = "https://github.com"
-
-    // TODO 이동
-    @Singleton
-    @Provides
-    fun providePreferenceUtil(
-        @ApplicationContext context: Context,
-    ): PreferenceUtil = PreferenceUtil(context)
+    private val apiUrl = BuildConfig.API_URL
+    private val accessUrl = BuildConfig.ACCESS_URL
 
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiOkHttpClient(preferenceUtil: PreferenceUtil): OkHttpClient = if (BuildConfig.DEBUG) {
+    fun provideApiOkHttpClient(tokenPreference: TokenPreference): OkHttpClient = if (BuildConfig.DEBUG) {
         val loggingInterceptor = HttpLoggingInterceptor()
-        val tokenInterceptor = TokenInterceptor(preferenceUtil)
+        val tokenInterceptor = TokenInterceptor(tokenPreference)
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
         OkHttpClient

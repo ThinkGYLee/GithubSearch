@@ -16,6 +16,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
+
         compileOptions.apply {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
@@ -30,6 +31,7 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
     configure<KotlinAndroidProjectExtension> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
         }
     }
 }

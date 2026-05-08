@@ -1,8 +1,8 @@
 package com.gyleedev.githubsearch.ui
 
 import androidx.lifecycle.viewModelScope
-import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.usecase.GetAccessTokenUseCase
+import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

@@ -16,16 +16,21 @@ android {
     defaultConfig {
         buildConfigField("String", "CLIENT_ID", "\"${getApiKey("CLIENT_ID")}\"")
         buildConfigField("String", "CLIENT_SECRET", "\"${getApiKey("CLIENT_SECRET")}\"")
+        buildConfigField("String", "API_URL", "\"https://api.github.com\"")
+        buildConfigField("String", "ACCESS_URL", "\"https://github.com\"")
     }
 }
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:common"))
     implementation(libs.room.paging)
     implementation(libs.paging.runtime.ktx)
     implementation(libs.kotlin.coroutines)
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }

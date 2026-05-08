@@ -4,12 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.gyleedev.githubsearch.core.common.BaseViewModel
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
+import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

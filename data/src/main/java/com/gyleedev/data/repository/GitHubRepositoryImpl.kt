@@ -5,13 +5,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.gyleedev.data.BuildConfig
-import com.gyleedev.data.PreferenceUtil
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
 import com.gyleedev.data.database.dao.UserDao
 import com.gyleedev.data.database.entity.AccessTimeEntity
 import com.gyleedev.data.database.entity.toEntity
 import com.gyleedev.data.database.entity.toModel
+import com.gyleedev.data.preference.TokenPreference
 import com.gyleedev.data.remote.AccessService
 import com.gyleedev.data.remote.GithubApiService
 import com.gyleedev.data.remote.RevokeService
@@ -29,6 +29,7 @@ import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
@@ -40,7 +41,8 @@ class GitHubRepositoryImpl @Inject constructor(
     @TypeApi private val githubApiService: GithubApiService,
     @TypeAccess private val accessService: AccessService,
     @TypeRevoke private val revokeService: RevokeService,
-    private val preferenceUtil: PreferenceUtil,
+    private val tokenPreference: TokenPreference,
+    private val clock: Clock,
 ) : GitHubRepository {
     /*
     세팅
@@ -92,6 +94,7 @@ class GitHubRepositoryImpl @Inject constructor(
             it.toModel()
         }
     }
+    // flowOn 디스페처 지정을 할때 안할때의 차이? 해야되나 안해도 괜찮나?
 
     override fun getUserWithFlow(id: String): Flow<UserModel?> = userDao.getUserByGithubId(id).map { it?.toModel() }
 
@@ -120,27 +123,21 @@ class GitHubRepositoryImpl @Inject constructor(
         userDao.insertUser(userModel.toEntity())
     }
 
-    override suspend fun upsertAccessTime(githubId: String, isRepoFetched: Boolean) {
+    // 유닛 테스트 코드 짜봐
+    override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
-            id = 0L,
+            id = id,
             githubId = githubId,
-            accessTime = Instant.now(),
+            accessTime = Instant.now(clock),
             isRepoFetched = isRepoFetched,
         )
         accessTimeDao.upsertAccessTime(entity)
     }
 
-    override suspend fun fetchUser(id: String): UserModel? = try {
-        githubApiService.getUser(id).toModel()
-    } catch (e: Exception) {
-        null
-    }
+    override suspend fun fetchUser(id: String): UserModel? = githubApiService.getUser(id).toModel()
 
-    override suspend fun fetchRepos(id: String): List<RepositoryModel> = try {
-        githubApiService.getRepos(id).map { it.toModel(id = id) }
-    } catch (e: Exception) {
-        emptyList<RepositoryModel>()
-    }
+    override suspend fun fetchRepos(id: String): List<RepositoryModel> = githubApiService.getRepos(id)
+        .map { response -> response.toModel(id = id) }
 
     // 마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTimeModel? = accessTimeDao.getTimeByGithubId(id)?.let {
@@ -184,7 +181,7 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveAccessToken(token: String) {
-        preferenceUtil.setString(str = token)
+        tokenPreference.setString(str = token)
     }
 
     // Setting
@@ -195,23 +192,18 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun revokeApplication() {
-        val accessToken = preferenceUtil.getString(defValue = "")
+        val accessToken = tokenPreference.getString()
         if (accessToken.isNotEmpty() || accessToken.isNotBlank()) {
-            try {
-                revokeService.revoke(
-                    clientId = BuildConfig.CLIENT_ID,
-                    accessToken = RevokeRequestBody(accessToken).toRequest(),
-                )
-            } catch (e: Exception) {
-                // 예외처리
-                println(e)
-            }
+            revokeService.revoke(
+                clientId = BuildConfig.CLIENT_ID,
+                accessToken = RevokeRequestBody(accessToken).toRequest(),
+            )
         }
     }
 
-    override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(preferenceUtil.isKeyExist())
+    override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(tokenPreference.isKeyExist())
 
     override suspend fun deleteAccessToken() {
-        preferenceUtil.deleteKey()
+        tokenPreference.deleteKey()
     }
 }

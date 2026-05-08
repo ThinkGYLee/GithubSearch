@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.AlertDialog
@@ -31,8 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -42,12 +38,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 
@@ -62,10 +55,8 @@ fun FavoriteScreen(
     val selectedFilter by viewModel.filterState.collectAsStateWithLifecycle()
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showFilterDialog = remember { mutableStateOf(false) }
-    val user =
-        remember {
-            mutableStateOf<UserModel?>(null)
-        }
+    // TODO 이걸 왜 focus 하는지 확인하고 로직 바꿀 것.
+    val user = remember { mutableStateOf<UserModel?>(null) }
 
     Scaffold(
         topBar = {
@@ -191,24 +182,7 @@ private fun FavoriteItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        GlideImage(
-            imageModel = { user.avatar },
-            modifier =
-            Modifier
-                .padding(horizontal = 8.dp)
-                .heightIn(max = 80.dp, min = 20.dp)
-                .widthIn(max = 80.dp, min = 20.dp)
-                .clip(CircleShape),
-            component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
-        )
+        UserAvatar(avatar = user.avatar)
         Text(
             text = user.login,
             fontWeight = FontWeight.Bold,

@@ -1,4 +1,4 @@
-package com.gyleedev.githubsearch.core.common.util
+package com.gyleedev.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope

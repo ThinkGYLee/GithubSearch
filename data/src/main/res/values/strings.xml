@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="data_module_name">Data Module</string>
+    <string name="preference_file_key">AccessToken</string>
+    <string name="token_key">Token</string>
+</resources>

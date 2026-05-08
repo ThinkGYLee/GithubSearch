@@ -1,25 +1,13 @@
 package com.gyleedev.githubsearch.feature.detail
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,242 +17,150 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.shimmer.Shimmer
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.gyleedev.githubsearch.feature.detail.component.DetailRepoInfo
+import com.gyleedev.githubsearch.feature.detail.component.DetailUserInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
-    onClick: () -> Unit,
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
-    val repos by viewModel.repo.collectAsStateWithLifecycle()
+    val repoList by viewModel.repo.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = "") },
-                navigationIcon = {
-                    IconButton(onClick = onClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.icon_content_description_arrow_back),
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = viewModel::updateFavoriteStatus) {
-                        if (user == null || (user as UserModel).favorite) {
-                            Icon(
-                                imageVector = Icons.Filled.Favorite,
-                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
-                            )
-                        }
-                    }
-                },
-                modifier = Modifier,
+            DetailAppBar(
+                onBackClick = onBackClick,
+                onFavoriteClick = viewModel::updateFavoriteStatus,
+                favorite = user?.favorite,
             )
         },
         modifier = modifier.fillMaxSize(),
-    ) {
-        LazyColumn(
-            modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(vertical = 4.dp),
-            contentPadding = it,
-        ) {
-            item {
-                user?.let {
-                    DetailUserItem(it)
-                }
-            }
-
-            item {
-                DetailRepoTitle()
-            }
-
-            items(
-                count = repos.size,
-                key = { index -> repos[index].name ?: "repository_$index" },
-            ) { index ->
-                DetailRepoItem(repos[index])
+    ) { paddingValues ->
+        if (user != null) {
+            with(user as UserModel) {
+                DetailScreen(
+                    avatar = avatar,
+                    repoCount = repoCount,
+                    followers = followers,
+                    following = following,
+                    name = name,
+                    login = login,
+                    bio = bio,
+                    company = company,
+                    email = email,
+                    blogUrl = blogUrl,
+                    repoList = repoList,
+                    paddingValues = paddingValues,
+                )
             }
         }
     }
 }
 
 @Composable
-private fun DetailUserItem(
-    user: UserModel,
+private fun DetailScreen(
+    avatar: String,
+    repoCount: Int,
+    followers: Int,
+    following: Int,
+    name: String?,
+    login: String,
+    bio: String?,
+    company: String?,
+    email: String?,
+    blogUrl: String?,
+    repoList: List<RepositoryModel>,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = Modifier.padding(12.dp)) {
-        Row(
-            modifier =
-            modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-        ) {
-            GlideImage(
-                imageModel = { user.avatar },
-                modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .heightIn(max = 80.dp, min = 20.dp)
-                    .widthIn(max = 80.dp, min = 20.dp)
-                    .clip(CircleShape),
-                component =
-                rememberImageComponent {
-                    +ShimmerPlugin(
-                        Shimmer.Flash(
-                            baseColor = Color.White,
-                            highlightColor = Color.LightGray,
-                        ),
-                    )
-                },
-            )
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = user.repos.toString(),
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(id = R.string.detail_user_title_repos),
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = user.followers.toString(),
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(id = R.string.detail_user_title_follower),
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = user.following.toString(),
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(id = R.string.detail_user_title_following),
-                )
-            }
-        }
-        user.name?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(12.dp),
-            )
-        }
-        Text(
-            text = user.login,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(12.dp),
-        )
-        user.bio?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(12.dp),
+    LazyColumn(
+        modifier =
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 4.dp),
+        contentPadding = paddingValues,
+    ) {
+        item {
+            DetailUserInfo(
+                avatar = avatar,
+                repos = repoCount,
+                followers = followers,
+                following = following,
+                name = name,
+                login = login,
+                bio = bio,
+                company = company,
+                email = email,
+                blogUrl = blogUrl,
             )
         }
 
-        val company = user.company
-        if (company != null) {
-            Row(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Apartment,
-                    contentDescription = null,
-                    modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
-                )
-                Text(text = company)
-            }
-        }
+        item { DetailRepoTitle() }
 
-        val email = user.email
-        if (email != null) {
-            Row(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Mail,
-                    contentDescription = null,
-                    modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
-                )
-                Text(text = email)
-            }
-        }
+        items(
+            count = repoList.size,
+            key = { index ->
+                repoList[index].name ?: "repository_$index"
+            },
+        ) { index ->
+            DetailRepoInfo(
+                name = repoList[index].name,
+                description = repoList[index].description,
+                language = repoList[index].language,
+                stargazer = repoList[index].stargazer,
 
-        if (user.blogUrl != "") {
-            Row(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Link,
-                    contentDescription = null,
-                    modifier =
-                    Modifier
-                        .width(24.dp)
-                        .height(24.dp),
-                )
-                user.blogUrl?.let { Text(text = it) }
-            }
+            )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DetailAppBar(
+    onBackClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+    favorite: Boolean?,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = { Text(text = "") },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(id = R.string.icon_content_description_arrow_back),
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onFavoriteClick) {
+                if (favorite == true) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.FavoriteBorder,
+                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -274,54 +170,5 @@ private fun DetailRepoTitle() {
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-    )
-}
-
-@Composable
-private fun DetailRepoItem(model: RepositoryModel) {
-    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
-        model.name?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-        }
-        model.description?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.padding(vertical = 4.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = null,
-                modifier =
-                Modifier
-                    .padding(vertical = 8.dp)
-                    .width(24.dp)
-                    .height(24.dp),
-                tint = Yellow,
-            )
-            Text(text = model.stargazer.toString(), modifier = Modifier.padding(8.dp))
-            model.language?.let { Text(text = it, modifier = Modifier.padding(8.dp)) }
-        }
-    }
-}
-
-@Composable
-private fun DetailRepoNoItem() {
-    Text(
-        text = stringResource(id = R.string.detail_repo_no_item),
-        modifier =
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
-        style = MaterialTheme.typography.titleMedium,
     )
 }

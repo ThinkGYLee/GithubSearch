@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.gyleedev.build_logic.configureKotlinAndroid
+import com.gyleedev.build_logic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -16,9 +17,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
-                defaultConfig.versionCode = 1
-                defaultConfig.versionName = "1.0.0"
+                defaultConfig.targetSdk = libs.findVersion("project-targetSdk").get().requiredVersion.toInt()
+                defaultConfig.versionCode = libs.findVersion("app-versionCode").get().requiredVersion.toInt()
+                defaultConfig.versionName = libs.findVersion("app-versionName").get().requiredVersion
 
                 buildTypes {
                     getByName("release") {
