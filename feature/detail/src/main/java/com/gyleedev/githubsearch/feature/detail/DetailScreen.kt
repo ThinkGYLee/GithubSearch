@@ -87,9 +87,9 @@ private fun DetailScreen(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 4.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp),
         contentPadding = paddingValues,
     ) {
         item {
@@ -107,9 +107,7 @@ private fun DetailScreen(
             )
         }
 
-        item {
-            DetailRepoTitle()
-        }
+        item { DetailRepoTitle() }
 
         items(
             count = repoList.size,
@@ -123,7 +121,7 @@ private fun DetailScreen(
                 language = repoList[index].language,
                 stargazer = repoList[index].stargazer,
 
-            )
+                )
         }
     }
 }
