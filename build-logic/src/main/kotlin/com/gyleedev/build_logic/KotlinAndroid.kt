@@ -31,7 +31,6 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
     configure<KotlinAndroidProjectExtension> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
-            freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
         }
     }
 }

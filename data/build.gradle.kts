@@ -19,6 +19,9 @@ android {
         buildConfigField("String", "API_URL", "\"https://api.github.com\"")
         buildConfigField("String", "ACCESS_URL", "\"https://github.com\"")
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {
