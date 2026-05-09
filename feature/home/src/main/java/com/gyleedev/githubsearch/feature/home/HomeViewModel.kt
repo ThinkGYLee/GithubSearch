@@ -41,6 +41,8 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val isLoading = MutableStateFlow(false)
+    private val isSearchActivated = MutableStateFlow(false)
+    private val showRequestAuthDialog = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private val searchedUser: StateFlow<UserModel?> = searchQuery
@@ -63,14 +65,23 @@ class HomeViewModel @Inject constructor(
     private val _errorAlert = MutableSharedFlow<SearchStatus>()
     val errorAlert: SharedFlow<SearchStatus> = _errorAlert
 
-    private val _requestAuthentication = MutableSharedFlow<Unit>()
-    val requestAuthentication: SharedFlow<Unit> = _requestAuthentication
-
-    val uiState = combine(searchQuery, searchedUser, isLoading) { query, user, isLoading ->
+    val uiState = combine(searchQuery, searchedUser, isLoading, isSearchActivated, showRequestAuthDialog) { query, user, isLoading, searchActivated, showAuth ->
+        val searchResult = if (user == null) {
+            SearchUiState.Empty
+        } else {
+            SearchUiState.Success(
+                login = user.login,
+                avatar = user.avatar,
+                name = user.name,
+                bio = user.bio,
+            )
+        }
         HomeUiState.Success(
             searchQuery = query,
-            searchedUser = user,
             isLoading = isLoading,
+            searchState = searchResult,
+            isSearchActive = searchActivated,
+            showRequestAuthDialog = showAuth,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -84,27 +95,27 @@ class HomeViewModel @Inject constructor(
             isLoading.emit(true)
             val status = fetchUserUseCase(id)
             if (status != SearchStatus.SUCCESS) {
-                alertResponseFail(status)
+                changeDialogState(true)
             }
             isLoading.emit(false)
-        }
-    }
-
-    private suspend fun alertResponseFail(status: SearchStatus) {
-        when (status) {
-            SearchStatus.NEED_AUTHENTICATION -> {
-                _requestAuthentication.emit(Unit)
-            }
-
-            else -> {
-                _errorAlert.emit(status)
-            }
         }
     }
 
     fun updateSearchId(id: String) {
         viewModelScope.launch {
             searchQuery.emit(id)
+        }
+    }
+
+    fun changeSearchBarState(state: Boolean) {
+        viewModelScope.launch {
+            isSearchActivated.emit(state)
+        }
+    }
+
+    fun changeDialogState(state: Boolean) {
+        viewModelScope.launch {
+            showRequestAuthDialog.emit(state)
         }
     }
 }
