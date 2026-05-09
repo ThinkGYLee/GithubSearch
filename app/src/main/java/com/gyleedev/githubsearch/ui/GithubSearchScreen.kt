@@ -16,12 +16,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -34,16 +41,33 @@ import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
+import kotlinx.coroutines.flow.collectLatest
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchScreen(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
-    onAuthenticationRequest: () -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val snackBarHostState = remember { SnackbarHostState() }
+    val loginSuccessMessage = stringResource(id = R.string.log_in_success_message)
+    val loginFailMessage = stringResource(id = R.string.log_in_fail_message)
+
+    LaunchedEffect(viewModel.alertLoginSuccess, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.alertLoginSuccess.collectLatest { result ->
+                val message = if (result) loginSuccessMessage else loginFailMessage
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short,
+                )
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -77,7 +101,7 @@ fun GithubSearchScreen(
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestAuthentication = { onAuthenticationRequest() },
+                    requestAuthentication = viewModel::requestGithubLogin,
                 )
             }
 
@@ -106,7 +130,7 @@ fun GithubSearchScreen(
 
             composable(BottomNavItem.Setting.screenRoute) {
                 SettingScreen(
-                    requestAuthentication = { onAuthenticationRequest() },
+                    requestAuthentication = viewModel::requestGithubLogin,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

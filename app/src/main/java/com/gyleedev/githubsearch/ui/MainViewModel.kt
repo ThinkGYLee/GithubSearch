@@ -1,6 +1,8 @@
 package com.gyleedev.githubsearch.ui
 
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
+import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.domain.usecase.GetAccessTokenUseCase
 import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,10 +22,31 @@ class MainViewModel @Inject constructor(
     private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
     val alertLoginSuccess: SharedFlow<Boolean> = _alertLoginSuccess
 
+    private val _launchOAuthEvent = MutableSharedFlow<String>()
+    val launchOAuthEvent: SharedFlow<String> = _launchOAuthEvent
+
     fun getAccessToken(code: String) {
         viewModelScope.launch {
             val result = getAccessTokenUseCase(code)
             _alertLoginSuccess.emit(result)
+        }
+    }
+
+    fun requestGithubLogin() {
+        val clientId = BuildConfig.CLIENT_ID
+        val loginUrl =
+            Uri.Builder()
+                .scheme("https")
+                .authority("github.com")
+                .appendPath("login")
+                .appendPath("oauth")
+                .appendPath("authorize")
+                .appendQueryParameter("client_id", clientId)
+                .build()
+                .toString()
+
+        viewModelScope.launch {
+            _launchOAuthEvent.emit(loginUrl)
         }
     }
 }
