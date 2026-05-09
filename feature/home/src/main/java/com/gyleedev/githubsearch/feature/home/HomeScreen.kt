@@ -36,10 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -53,6 +50,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
+import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -69,9 +67,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val users = viewModel.users.collectAsLazyPagingItems()
-    var showRequestAuthenticationDialog by remember { mutableStateOf(false) }
-    var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    val userList = viewModel.users.collectAsLazyPagingItems()
     val unknownHostException = stringResource(id = DesignSystemR.string.unknown_host_exception)
     val socketException = stringResource(id = DesignSystemR.string.socket_exception)
     val httpException = stringResource(id = DesignSystemR.string.http_exception)
@@ -124,75 +120,94 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(viewModel.requestAuthentication, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.requestAuthentication.collect {
-                showRequestAuthenticationDialog = true
-            }
-        }
-    }
-
     if (uiState is HomeUiState.Success) {
-        Scaffold(
-            topBar = {
-                EmbeddedSearchBar(
-                    onQueryChange = viewModel::updateSearchId,
-                    isSearchActive = isSearchActive,
-                    query = (uiState as HomeUiState.Success).searchQuery,
-                    onActiveChanged = { isSearchActive = it },
-                    onSearch = viewModel::searchUser,
-                    onSearchItemReset = { viewModel.updateSearchId("") },
-                    moveToDetail = { (uiState as HomeUiState.Success).searchedUser?.let { moveToDetail(it.login) } },
-                    user = (uiState as HomeUiState.Success).searchedUser,
-                    loading = (uiState as HomeUiState.Success).isLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+        val state = uiState as HomeUiState.Success
+        HomeScreen(
+            uiState = state,
+            onSearch = viewModel::searchUser,
+            onSearchItemReset = { viewModel.updateSearchId("") },
+            onActiveChanged = viewModel::changeSearchBarState,
+            onQueryChange = viewModel::updateSearchId,
+            moveToDetail = moveToDetail,
+            userList = userList,
+            snackbarHostState = snackBarHostState,
+            onDismiss = { viewModel.changeDialogState(false) },
+            onConfirm = {
+                viewModel.changeDialogState(false)
+                requestAuthentication()
             },
-            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-            modifier = modifier.fillMaxSize(),
-        ) { paddingValues ->
+            modifier = modifier,
+        )
+    }
+}
 
-            if (users.itemCount > 0) {
-                SearchItemList(
-                    modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    users = users,
-                    onClick = { moveToDetail(it) },
-                )
-            } else {
-                NoItem(
-                    modifier = Modifier.padding(paddingValues),
-                )
-            }
+@Composable
+internal fun HomeScreen(
+    uiState: HomeUiState.Success,
+    userList: LazyPagingItems<UserModel>,
+    snackbarHostState: SnackbarHostState,
+    onSearch: (String) -> Unit,
+    onSearchItemReset: () -> Unit,
+    onActiveChanged: (Boolean) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    moveToDetail: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        topBar = {
+            EmbeddedSearchBar(
+                onQueryChange = onQueryChange,
+                isSearchActive = uiState.isSearchActive,
+                query = uiState.searchQuery,
+                onActiveChanged = onActiveChanged,
+                onSearch = onSearch,
+                onSearchItemReset = onSearchItemReset,
+                moveToDetail = moveToDetail,
+                searchState = uiState.searchState,
+                loading = uiState.isLoading,
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        modifier = modifier.fillMaxSize(),
+    ) { paddingValues ->
 
-            if (showRequestAuthenticationDialog) {
-                AlertDialog(
-                    onDismissRequest = { showRequestAuthenticationDialog = false },
-                    title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
-                    text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showRequestAuthenticationDialog = false
-                                requestAuthentication()
-                            },
-                        ) {
-                            Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
-                        }
-                    },
-                    dismissButton = {
-                        Button(
-                            onClick = {
-                                showRequestAuthenticationDialog = false
-                            },
-                        ) {
-                            Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
-                        }
-                    },
-                )
-            }
+        if (userList.itemCount > 0) {
+            SearchItemList(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                users = userList,
+                onClick = { moveToDetail(it) },
+            )
+        } else {
+            NoItem(
+                modifier = Modifier.padding(paddingValues),
+            )
+        }
+
+        if (uiState.showRequestAuthDialog) {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
+                text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
+                confirmButton = {
+                    Button(
+                        onClick = onConfirm,
+                    ) {
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = onDismiss,
+                    ) {
+                        Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+                    }
+                },
+            )
         }
     }
 }
@@ -203,11 +218,11 @@ private fun EmbeddedSearchBar(
     onQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     query: String,
+    searchState: SearchUiState,
     onActiveChanged: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
     onSearchItemReset: () -> Unit,
-    moveToDetail: () -> Unit,
-    user: UserModel?,
+    moveToDetail: (String) -> Unit,
     loading: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -269,33 +284,35 @@ private fun EmbeddedSearchBar(
             .fillMaxWidth()
             .padding(horizontal = animatePadding),
     ) {
-        Box(
-            modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .navigationBarsPadding()
-                .imePadding(),
-        ) {
-            if (user != null) {
-                SearchResultItem(
-                    user = user,
-                    onClick = moveToDetail,
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .align(Alignment.TopCenter),
-                )
-            }
-            if (loading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-            Button(
-                onClick = { onSearch(query) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+        if (searchState is SearchUiState.Success) {
+            Box(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .navigationBarsPadding()
+                    .imePadding(),
             ) {
-                Text("검색하세요")
+                SearchResultItem(
+                    onClick = moveToDetail,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    login = searchState.login,
+                    name = searchState.name,
+                    bio = searchState.bio,
+                    avatar = searchState.avatar,
+                )
+
+                if (loading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                Button(
+                    onClick = { onSearch(query) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
+                ) {
+                    Text("검색하세요")
+                }
             }
         }
     }
@@ -315,58 +332,41 @@ private fun SearchItemList(
     ) {
         items(
             users.itemCount,
-            key = { users[it]?.login!! },
-            contentType = { 0 },
+            key = { index -> users[index]?.login ?: "key_$index" },
         ) { index ->
             val user = users[index] as UserModel
-            HomeItem(user, onClick = { onClick(user.login) })
+            UserInfoItem(
+                avatar = user.avatar,
+                login = user.login,
+                onClick = { onClick(user.login) },
+                onLongClick = {},
+            )
         }
     }
 }
 
 @Composable
-private fun HomeItem(
-    user: UserModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .clickable(onClick = onClick)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        UserAvatar(avatar = user.avatar)
-        Text(
-            text = user.login,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-}
-
-@Composable
 private fun SearchResultItem(
-    user: UserModel,
-    onClick: () -> Unit,
+    login: String,
+    name: String?,
+    bio: String?,
+    avatar: String,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =
         modifier
+            .padding(top = 20.dp)
             .fillMaxWidth()
             .heightIn(min = 80.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        UserAvatar(avatar = user.avatar)
+        UserAvatar(avatar = avatar)
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
-            val name = user.name
             if (name != null) {
                 Text(
                     text = name,
@@ -376,12 +376,11 @@ private fun SearchResultItem(
             }
 
             Text(
-                text = user.login,
+                text = login,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
 
-            val bio = user.bio
             if (bio != null) {
                 Text(
                     text = bio,
