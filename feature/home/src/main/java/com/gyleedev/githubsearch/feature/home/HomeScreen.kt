@@ -176,9 +176,9 @@ internal fun HomeScreen(
         if (userList.itemCount > 0) {
             SearchItemList(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 users = userList,
                 onClick = { moveToDetail(it) },
             )
@@ -287,11 +287,11 @@ private fun EmbeddedSearchBar(
         if (searchState is SearchUiState.Success) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 12.dp)
-                        .navigationBarsPadding()
-                        .imePadding(),
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .navigationBarsPadding()
+                    .imePadding(),
             ) {
                 SearchResultItem(
                     onClick = moveToDetail,
@@ -326,9 +326,9 @@ private fun SearchItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -356,11 +356,11 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-            modifier
-                .padding(top = 20.dp)
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .clickable(onClick = { onClick(login) }),
+        modifier
+            .padding(top = 20.dp)
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
