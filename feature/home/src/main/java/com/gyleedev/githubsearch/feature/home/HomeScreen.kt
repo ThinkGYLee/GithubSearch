@@ -189,24 +189,9 @@ internal fun HomeScreen(
         }
 
         if (uiState.showRequestAuthDialog) {
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
-                text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
-                confirmButton = {
-                    Button(
-                        onClick = onConfirm,
-                    ) {
-                        Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = onDismiss,
-                    ) {
-                        Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
-                    }
-                },
+            AuthDialog(
+                onConfirm = onConfirm,
+                onDismiss = onDismiss,
             )
         }
     }
@@ -316,6 +301,34 @@ private fun EmbeddedSearchBar(
             }
         }
     }
+}
+
+@Composable
+private fun AuthDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
+        text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
