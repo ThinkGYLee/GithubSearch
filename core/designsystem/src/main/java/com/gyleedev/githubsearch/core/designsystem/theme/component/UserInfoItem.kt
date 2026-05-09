@@ -23,14 +23,14 @@ fun UserInfoItem(
 ) {
     Row(
         modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 80.dp, max = 100.dp)
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                )
-                .padding(12.dp),
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 80.dp, max = 100.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
