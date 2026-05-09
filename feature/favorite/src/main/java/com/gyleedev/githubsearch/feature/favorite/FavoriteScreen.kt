@@ -1,13 +1,10 @@
 package com.gyleedev.githubsearch.feature.favorite
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
@@ -38,7 +35,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
+import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
@@ -151,42 +148,14 @@ private fun FavoriteItemList(
             },
         ) { index ->
             users[index]?.let { user ->
-                FavoriteItem(
-                    user = user,
+                UserInfoItem(
                     onClick = { onClick(user.login) },
-                    onLongClick = { onLongClick(it) },
+                    onLongClick = { onLongClick(user) },
+                    avatar = user.avatar,
+                    login = user.login,
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun FavoriteItem(
-    user: UserModel,
-    onClick: () -> Unit,
-    onLongClick: (UserModel) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .padding(12.dp)
-            .combinedClickable(
-                onLongClick = { onLongClick(user) },
-                onClick = onClick,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        UserAvatar(avatar = user.avatar)
-        Text(
-            text = user.login,
-            fontWeight = FontWeight.Bold,
-        )
     }
 }
 
