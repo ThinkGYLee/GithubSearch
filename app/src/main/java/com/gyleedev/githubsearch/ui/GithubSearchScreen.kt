@@ -1,7 +1,14 @@
 package com.gyleedev.githubsearch.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
+import androidx.browser.auth.AuthTabIntent
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -42,6 +50,7 @@ import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
 import kotlinx.coroutines.flow.collectLatest
+import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -56,6 +65,28 @@ fun GithubSearchScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val loginSuccessMessage = stringResource(id = R.string.log_in_success_message)
     val loginFailMessage = stringResource(id = R.string.log_in_fail_message)
+    val redirectUri = remember { AppBuildConfig.REDIRECT_URI }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        println(result)
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data
+            if (intent != null) {
+                val resultUri = intent.data
+                if (resultUri != null) {
+                    val code = resultUri.getQueryParameter("code")
+                    // 최종적으로 코드를 추출하여 상태를 업데이트
+                    code?.let { code ->
+                        if (code.isNotBlank()) {
+                            viewModel.getAccessToken(code)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(viewModel.alertLoginSuccess, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -64,6 +95,19 @@ fun GithubSearchScreen(
                 snackBarHostState.showSnackbar(
                     message = message,
                     duration = SnackbarDuration.Short,
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel.launchOAuthEvent, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.launchOAuthEvent.collectLatest { loginUri ->
+                println(loginUri)
+                launchAuthTab(
+                    launcher = launcher,
+                    loginUri = loginUri,
+                    redirectUri = redirectUri,
                 )
             }
         }
@@ -168,6 +212,20 @@ fun BottomNavigation(
             )
         }
     }
+}
+
+private fun launchAuthTab(
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    loginUri: String,
+    redirectUri: String,
+) {
+    val authTabIntent = AuthTabIntent.Builder().build()
+    val scheme = redirectUri.toUri().scheme ?: ""
+    authTabIntent.launch(
+        launcher,
+        loginUri.toUri(),
+        scheme,
+    )
 }
 
 sealed class BottomNavItem(
