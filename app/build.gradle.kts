@@ -15,6 +15,7 @@ extensions.configure<ApplicationExtension>("android") {
         applicationId = "com.gyleedev.githubsearch"
         buildConfigField("String", "CLIENT_ID", "\"${getApiKey("CLIENT_ID")}\"")
         buildConfigField("String", "CLIENT_SECRET", "\"${getApiKey("CLIENT_SECRET")}\"")
+        buildConfigField("String", "REDIRECT_URI", "\"${getApiKey("REDIRECT_URI")}\"")
     }
 
     buildFeatures {
