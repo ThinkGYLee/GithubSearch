@@ -142,9 +142,9 @@ private fun FavoriteItemList(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 12.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -226,13 +226,13 @@ fun FilterDialog(
             Column {
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.ALL,
-                                onClick = { onSelectedItemChange(FilterStatus.ALL) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.ALL,
+                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -244,13 +244,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.REPO,
-                                onClick = { onSelectedItemChange(FilterStatus.REPO) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.REPO,
+                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -262,13 +262,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = selectedFilter == FilterStatus.NOREPO,
-                                onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
-                                role = Role.RadioButton,
-                            ),
+                    Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selectedFilter == FilterStatus.NOREPO,
+                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                            role = Role.RadioButton,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
