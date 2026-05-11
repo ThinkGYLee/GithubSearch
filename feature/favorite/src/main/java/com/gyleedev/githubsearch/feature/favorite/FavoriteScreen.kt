@@ -11,7 +11,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,11 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -49,97 +47,104 @@ fun FavoriteScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
     val users = viewModel.items.collectAsLazyPagingItems()
-    val selectedFilter by viewModel.filterState.collectAsStateWithLifecycle()
-    val showDeleteDialog = remember { mutableStateOf(false) }
-    val showFilterDialog = remember { mutableStateOf(false) }
-    // TODO 이걸 왜 focus 하는지 확인하고 로직 바꿀 것.
-    val user = remember { mutableStateOf<UserModel?>(null) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = FavoriteR.string.title_favorite)) },
-                actions = {
-                    IconButton(onClick = { showFilterDialog.value = !showFilterDialog.value }) {
-                        Icon(
-                            imageVector = Icons.Filled.FilterList,
-                            contentDescription = stringResource(id = FavoriteR.string.icon_content_description_filter),
-                        )
-                    }
-                },
-                modifier = Modifier,
-            )
-        },
+        topBar = { FavoriteTopAppBar(onClick = viewModel::updateShowFilterDialog) },
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
-        if (users.itemCount > 0) {
-            FavoriteItemList(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues),
+        if (uiState is FavoriteUiState.Success) {
+            val state = uiState as FavoriteUiState.Success
+            FavoriteScreen(
                 users = users,
-                onClick = { moveToDetail(it) },
-                onLongClick = {
-                    user.value = it
-                    showDeleteDialog.value = true
-                },
-            )
-        } else {
-            NoItem(
+                filterStatus = state.filterState,
+                onFilterDismiss = viewModel::updateShowFilterDialog,
+                onFilterClick = viewModel::updateFilter,
+                onFavoriteDelete = viewModel::updateFavoriteStatus,
+                onDeleteCancel = viewModel::updateShowFavoriteDialog,
+                onItemClick = moveToDetail,
+                onItemLongClick = viewModel::showFavoriteDialog,
+                showFavoriteDialog = state.favoriteDialogState,
+                showFilterDialog = state.filterDialogState,
                 modifier = Modifier.padding(paddingValues),
             )
         }
     }
+}
 
-    if (showDeleteDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog.value = false },
-            title = { Text(text = stringResource(id = FavoriteR.string.text_delete_favorite_title)) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDeleteDialog.value = false
-                        user.value?.let { viewModel.updateFavoriteStatus(it) }
-                    },
-                ) {
-                    Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        showDeleteDialog.value = false
-                        user.value = null
-                    },
-                ) {
-                    Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
-                }
-            },
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun FavoriteScreen(
+    users: LazyPagingItems<UserModel>,
+    filterStatus: FilterStatus,
+    onFilterDismiss: () -> Unit,
+    onFilterClick: (FilterStatus) -> Unit,
+    onFavoriteDelete: () -> Unit,
+    onDeleteCancel: () -> Unit,
+    onItemClick: (String) -> Unit,
+    onItemLongClick: (UserModel) -> Unit,
+    showFavoriteDialog: Boolean,
+    showFilterDialog: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    if (users.itemCount > 0) {
+        FavoriteItemList(
+            modifier = modifier.fillMaxSize(),
+            users = users,
+            onClick = onItemClick,
+            onLongClick = onItemLongClick,
         )
+    } else {
+        NoItem(modifier = modifier)
     }
 
-    if (showFilterDialog.value) {
+    if (showFavoriteDialog) {
+        DeleteFavoriteDialog(
+            onConfirm = onFavoriteDelete,
+            onDismiss = onDeleteCancel,
+        )
+    }
+    if (showFilterDialog) {
         FilterDialog(
-            onChangeState = { showFilterDialog.value = it },
-            selectedFilter = selectedFilter,
-            onSelectedItemChange = viewModel::updateFilter,
+            onDismiss = onFilterDismiss,
+            selectedFilter = filterStatus,
+            onSelectedItemChange = onFilterClick,
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FavoriteTopAppBar(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = FavoriteR.string.title_favorite)) },
+        actions = {
+            IconButton(onClick = onClick) {
+                Icon(
+                    imageVector = Icons.Filled.FilterList,
+                    contentDescription = stringResource(id = FavoriteR.string.icon_content_description_filter),
+                )
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun FavoriteItemList(
     users: LazyPagingItems<UserModel>,
-    modifier: Modifier = Modifier,
     onClick: (String) -> Unit,
     onLongClick: (UserModel) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -175,14 +180,41 @@ private fun NoItem(modifier: Modifier) {
 }
 
 @Composable
+fun DeleteFavoriteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = FavoriteR.string.text_delete_favorite_title)) },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun FilterDialog(
     selectedFilter: FilterStatus,
-    onChangeState: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
     onSelectedItemChange: (FilterStatus) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
-        onDismissRequest = { onChangeState(false) },
+        onDismissRequest = onDismiss,
         title = {
             Text(
                 text = stringResource(id = DesignSystemR.string.text_filter_title),
@@ -194,13 +226,13 @@ fun FilterDialog(
             Column {
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.ALL,
-                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.ALL,
+                                onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -212,13 +244,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.REPO,
-                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.REPO,
+                                onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -230,13 +262,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.NOREPO,
-                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.NOREPO,
+                                onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
