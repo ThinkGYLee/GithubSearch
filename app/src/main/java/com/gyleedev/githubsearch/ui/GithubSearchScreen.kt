@@ -70,7 +70,6 @@ fun GithubSearchScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
-        println(result)
         if (result.resultCode == Activity.RESULT_OK) {
             val intent = result.data
             if (intent != null) {
@@ -103,7 +102,6 @@ fun GithubSearchScreen(
     LaunchedEffect(viewModel.launchOAuthEvent, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.launchOAuthEvent.collectLatest { loginUri ->
-                println(loginUri)
                 launchAuthTab(
                     launcher = launcher,
                     loginUri = loginUri,
