@@ -374,7 +374,7 @@ private fun SearchResultItem(
             .fillMaxWidth()
             .heightIn(min = 80.dp)
             .clickable(onClick = { onClick(login) }),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         UserAvatar(avatar = avatar)
