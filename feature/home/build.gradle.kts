@@ -16,5 +16,8 @@ dependencies {
     implementation(libs.landscapist.placeholder)
     implementation(libs.paging.compose)
     implementation(libs.androidx.material.icons)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 composeCompiler { reportsDestination = layout.buildDirectory.dir("compose_reports") }
