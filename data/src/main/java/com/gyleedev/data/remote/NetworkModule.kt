@@ -93,18 +93,13 @@ class NetworkModule {
     @TypeRevoke
     fun provideRevokeOkHttpClient(): OkHttpClient {
         val revokeInterceptor = RevokeInterceptor()
-        val interceptor =
-            if (BuildConfig.DEBUG) {
-                val loggingInterceptor = HttpLoggingInterceptor()
-                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-
-                OkHttpClient
-                    .Builder()
-                    .addNetworkInterceptor(loggingInterceptor)
-            } else {
-                OkHttpClient.Builder()
-            }
-        return interceptor.addInterceptor(revokeInterceptor).build()
+        val builder = OkHttpClient.Builder()
+        if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor()
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+            builder.addNetworkInterceptor(loggingInterceptor)
+        }
+        return builder.addInterceptor(revokeInterceptor).build()
     }
 
     @Singleton
@@ -112,8 +107,7 @@ class NetworkModule {
     @TypeRevoke
     fun provideRevokeRetrofit(
         @TypeRevoke okHttpClient: OkHttpClient,
-    ): Retrofit = Retrofit
-        .Builder()
+    ): Retrofit = Retrofit.Builder()
         .client(okHttpClient)
         .baseUrl(apiUrl)
         .addConverterFactory(GsonConverterFactory.create())

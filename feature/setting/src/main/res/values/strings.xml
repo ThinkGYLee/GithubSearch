@@ -21,4 +21,7 @@
     <string name="filter_default_theme">System Default</string>
     <string name="setting_korean">Korean</string>
     <string name="setting_english">English</string>
+    <string name="revoke_success_message">Successfully Revoke User Account</string>
+    <string name="revoke_fail_message">Revoke Request Failed</string>
+    <string name="revoke_no_item_message">Can\'t Make Request.No Access Key</string>
 </resources>

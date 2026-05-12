@@ -18,12 +18,12 @@ import com.gyleedev.data.remote.RevokeService
 import com.gyleedev.data.remote.TypeAccess
 import com.gyleedev.data.remote.TypeApi
 import com.gyleedev.data.remote.TypeRevoke
-import com.gyleedev.data.remote.request.toRequest
+import com.gyleedev.data.remote.request.RevokeRequest
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
-import com.gyleedev.githubsearch.domain.model.RevokeRequestBody
+import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
@@ -202,13 +202,19 @@ class GitHubRepositoryImpl @Inject constructor(
         reposDao.resetRepos()
     }
 
-    override suspend fun revokeApplication() {
+    override suspend fun revokeApplication(): RevokeResult {
         val accessToken = tokenPreference.getString()
-        if (accessToken.isNotEmpty() || accessToken.isNotBlank()) {
-            revokeService.revoke(
-                clientId = BuildConfig.CLIENT_ID,
-                accessToken = RevokeRequestBody(accessToken).toRequest(),
-            )
+        if (accessToken.isBlank()) {
+            return RevokeResult.NO_KEY
+        }
+        val response = revokeService.revoke(
+            clientId = BuildConfig.CLIENT_ID,
+            request = RevokeRequest(accessToken),
+        )
+        return if (response.isSuccessful) {
+            RevokeResult.SUCCESS
+        } else {
+            RevokeResult.FAIL
         }
     }
 
