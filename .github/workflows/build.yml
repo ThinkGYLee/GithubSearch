@@ -44,4 +44,4 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: ./gradlew spotlessCheck assembleDebug --parallel --build-cache --configure-on-demand
+        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest --parallel --build-cache --configure-on-demand
