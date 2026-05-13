@@ -3,7 +3,7 @@ package com.gyleedev.githubsearch.domain.repository
 import androidx.paging.PagingData
 import com.gyleedev.githubsearch.domain.model.AccessTime
 import com.gyleedev.githubsearch.domain.model.FilterStatus
-import com.gyleedev.githubsearch.domain.model.GithubAccessModel
+import com.gyleedev.githubsearch.domain.model.GetAccessTokenRepositoryResult
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.model.UserFetchResult
@@ -38,7 +38,7 @@ interface GitHubRepository {
 
     fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>>
 
-    suspend fun getAccessToken(code: String): GithubAccessModel?
+    suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult
 
     suspend fun resetData()
 
