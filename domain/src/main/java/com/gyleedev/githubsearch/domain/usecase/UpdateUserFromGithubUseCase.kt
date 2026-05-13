@@ -1,5 +1,6 @@
 package com.gyleedev.githubsearch.domain.usecase
 
+import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.first
@@ -8,6 +9,7 @@ import javax.inject.Inject
 
 private const val ACCESS_TIMEOUT_MS = 3_600_000L
 
+//TODO fetch 상세가 바뀐거에 맞춰서 로직 수정할 것
 class UpdateUserFromGithubUseCase @Inject constructor(
     private val repository: GitHubRepository,
 ) {
@@ -20,10 +22,10 @@ class UpdateUserFromGithubUseCase @Inject constructor(
             when {
                 // 시간이 경과됐을 때
                 isTimeOut -> {
-                    val fetchedUser = repository.fetchUser(id)
+                    val userFetchResult = repository.fetchUser(id)
                     val localUser = repository.getUserWithFlow(id).first() as UserModel
-                    fetchedUser?.let {
-                        val insertUser = fetchedUser.copy(favorite = localUser.favorite)
+                    if (userFetchResult is UserFetchResult.Success) {
+                        val insertUser = userFetchResult.user.copy(favorite = localUser.favorite)
                         repository.upsertUser(insertUser)
                     }
                     val entityId = localUser.id
