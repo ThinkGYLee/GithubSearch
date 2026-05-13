@@ -24,6 +24,7 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
+import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
@@ -134,7 +135,45 @@ class GitHubRepositoryImpl @Inject constructor(
         accessTimeDao.upsertAccessTime(entity)
     }
 
-    override suspend fun fetchUser(id: String): UserModel? = githubApiService.getUser(id).toModel()
+    override suspend fun fetchUser(id: String): UserFetchResult {
+        val response = githubApiService.getUser(id)
+
+        // 성공 범위(200-299)인 경우 처리
+        if (response.isSuccessful) {
+            val userResponse = response.body()
+
+            if (userResponse != null) {
+                return UserFetchResult.Success(
+                    user = userResponse.toModel(),
+                )
+            }
+
+            return UserFetchResult.UnknownError
+        }
+
+        // 성공 범위가 아닌 경우(400-500대) 상태 코드별 처리
+        return when (response.code()) {
+            // 유저를 찾을 수 없음
+            404 -> {
+                UserFetchResult.NoSuchUser
+            }
+
+            // 기본 할당량 초과
+            403 -> {
+                UserFetchResult.ExceedQuota
+            }
+
+            // 보조 제한(Secondary Rate Limit) 초과
+            429 -> {
+                UserFetchResult.ExceedQuota
+            }
+
+            // 그 외 에러
+            else -> {
+                UserFetchResult.UnknownError
+            }
+        }
+    }
 
     override suspend fun fetchRepos(id: String): List<RepositoryModel> = githubApiService.getRepos(id)
         .map { response -> response.toModel(id = id) }

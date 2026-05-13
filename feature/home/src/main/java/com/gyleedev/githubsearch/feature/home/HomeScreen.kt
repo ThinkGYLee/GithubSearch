@@ -52,7 +52,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
-import com.gyleedev.githubsearch.domain.model.SearchStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
@@ -90,32 +89,6 @@ fun HomeScreen(
                     message = message,
                     duration = SnackbarDuration.Short,
                 )
-            }
-        }
-    }
-
-    LaunchedEffect(viewModel.errorAlert, lifecycleOwner) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.errorAlert.collectLatest { status ->
-                when (status) {
-                    SearchStatus.NO_SUCH_USER -> {
-                        snackBarHostState.showSnackbar(
-                            message = noSuchUserMessage,
-                            duration = SnackbarDuration.Short,
-                        )
-                    }
-
-                    SearchStatus.BAD_NETWORK -> {
-                        snackBarHostState.showSnackbar(
-                            message = httpException,
-                            duration = SnackbarDuration.Short,
-                        )
-                    }
-
-                    else -> {
-                        println("no information error $status")
-                    }
-                }
             }
         }
     }
