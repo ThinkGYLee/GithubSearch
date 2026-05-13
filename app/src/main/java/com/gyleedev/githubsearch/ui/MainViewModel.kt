@@ -3,6 +3,7 @@ package com.gyleedev.githubsearch.ui
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.BuildConfig
+import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.domain.usecase.GetAccessTokenUseCase
 import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,8 +20,8 @@ getAccessTokenUseCase -> repositoryGetAccessToken 있으면 repositorySaveToken
 class MainViewModel @Inject constructor(
     private val getAccessTokenUseCase: GetAccessTokenUseCase,
 ) : BaseViewModel() {
-    private val _alertLoginSuccess = MutableSharedFlow<Boolean>()
-    val alertLoginSuccess: SharedFlow<Boolean> = _alertLoginSuccess
+    private val _alertLoginSuccess = MutableSharedFlow<GetAccessTokenUseCaseResult>()
+    val alertLoginSuccess: SharedFlow<GetAccessTokenUseCaseResult> = _alertLoginSuccess
 
     private val _launchOAuthEvent = MutableSharedFlow<String>()
     val launchOAuthEvent: SharedFlow<String> = _launchOAuthEvent

@@ -45,6 +45,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
@@ -90,7 +91,10 @@ fun GithubSearchScreen(
     LaunchedEffect(viewModel.alertLoginSuccess, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.alertLoginSuccess.collectLatest { result ->
-                val message = if (result) loginSuccessMessage else loginFailMessage
+                val message = when (result) {
+                    GetAccessTokenUseCaseResult.Fail -> loginFailMessage
+                    GetAccessTokenUseCaseResult.Success -> loginSuccessMessage
+                }
                 snackBarHostState.showSnackbar(
                     message = message,
                     duration = SnackbarDuration.Short,
