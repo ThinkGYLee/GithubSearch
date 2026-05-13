@@ -13,9 +13,7 @@ import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -62,9 +60,6 @@ class HomeViewModel @Inject constructor(
 
     val users = getUsersUseCase().cachedIn(viewModelScope)
 
-    private val _errorAlert = MutableSharedFlow<SearchStatus>()
-    val errorAlert: SharedFlow<SearchStatus> = _errorAlert
-
     val uiState = combine(searchQuery, searchedUser, isLoading, isSearchActivated, showRequestAuthDialog) { query, user, isLoading, searchActivated, showAuth ->
         val searchResult = if (user == null) {
             SearchUiState.Empty
@@ -94,7 +89,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(exceptionHandler) {
             isLoading.emit(true)
             val status = fetchUserUseCase(id)
-            if (status != SearchStatus.SUCCESS) {
+            if (status == SearchStatus.NEED_AUTHENTICATION) {
                 changeDialogState(true)
             }
             isLoading.emit(false)
