@@ -6,6 +6,7 @@ import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GithubAccessModel
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
+import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import kotlinx.coroutines.flow.Flow
 
@@ -16,7 +17,7 @@ interface GitHubRepository {
 
     suspend fun getLastAccessById(id: String): AccessTime?
 
-    suspend fun fetchUser(id: String): UserModel?
+    suspend fun fetchUser(id: String): UserFetchResult
 
     suspend fun fetchRepos(id: String): List<RepositoryModel>
 
