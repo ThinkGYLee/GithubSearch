@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 private const val ACCESS_TIMEOUT_MS = 3_600_000L
 
-//TODO fetch 상세가 바뀐거에 맞춰서 로직 수정할 것
+// TODO fetch 상세가 바뀐거에 맞춰서 로직 수정할 것
 class UpdateUserFromGithubUseCase @Inject constructor(
     private val repository: GitHubRepository,
 ) {
