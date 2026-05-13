@@ -88,4 +88,3 @@ class GetAccessTokenTest {
         coVerify(exactly = 0) { repository.saveAccessToken(any()) }
     }
 }
-
