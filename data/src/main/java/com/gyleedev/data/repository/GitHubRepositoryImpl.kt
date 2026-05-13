@@ -21,7 +21,7 @@ import com.gyleedev.data.remote.TypeRevoke
 import com.gyleedev.data.remote.request.RevokeRequest
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
-import com.gyleedev.githubsearch.domain.model.GithubAccessModel
+import com.gyleedev.githubsearch.domain.model.GetAccessTokenRepositoryResult
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.model.UserFetchResult
@@ -205,28 +205,23 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     // Main
-    override suspend fun getAccessToken(code: String): GithubAccessModel? {
-        try {
-            val response =
-                accessService.getAccessToken(
-                    clientId = BuildConfig.CLIENT_ID,
-                    clientSecret = BuildConfig.CLIENT_SECRET,
-                    code = code,
-                )
-
-            if (response.isSuccessful && response.code() == 200) {
-                val body = response.body()
-
-                if (body != null) {
-                    val accessToken = body.accessToken
-
-                    return GithubAccessModel(accessToken = accessToken)
-                }
+    override suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult {
+        val response =
+            accessService.getAccessToken(
+                clientId = BuildConfig.CLIENT_ID,
+                clientSecret = BuildConfig.CLIENT_SECRET,
+                code = code,
+            )
+        return if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                val accessToken = body.accessToken
+                GetAccessTokenRepositoryResult.Success(token = accessToken)
+            } else {
+                GetAccessTokenRepositoryResult.Fail
             }
-
-            return null
-        } catch (e: Exception) {
-            return null
+        } else {
+            GetAccessTokenRepositoryResult.Fail
         }
     }
 
