@@ -29,7 +29,7 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE github_id = :githubId COLLATE NOCASE")
     fun getUserByGithubId(githubId: String): Flow<UserEntity?>
 
-    @Query("DELETE * FROM user WHERE gihub_id = :githubId")
+    @Query("DELETE FROM user WHERE github_id = :githubId")
     fun deleteUserById(githubId: String)
 
     @Insert
