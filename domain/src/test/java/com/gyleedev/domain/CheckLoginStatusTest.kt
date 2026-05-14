@@ -33,7 +33,7 @@ class CheckLoginStatusTest {
 
         // Then
         assertEquals(expectedValue, actualValue)
-        coVerify(exactly = 1) { repository.hasAccessToken() }
+        coVerify(exactly = 1) { repository.hasAccessToken().ignoreUnused() }
     }
 
     @Test
@@ -48,6 +48,6 @@ class CheckLoginStatusTest {
 
         // Then
         assertEquals(expectedValue, actualValue)
-        coVerify(exactly = 1) { repository.hasAccessToken() }
+        coVerify(exactly = 1) { repository.hasAccessToken().ignoreUnused() }
     }
 }
