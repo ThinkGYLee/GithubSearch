@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "07a92b5c94622352e1209ea933ee3866",
+    "identityHash": "c0d40a449410e6a8d7b254f42ee10e66",
     "entities": [
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` TEXT NOT NULL, `name` TEXT, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `avatar` TEXT NOT NULL, `company` TEXT, `email` TEXT, `bio` TEXT, `repos` INTEGER NOT NULL, `createdDate` TEXT, `updatedDate` TEXT, `reposAddress` TEXT NOT NULL, `blogUrl` TEXT, `favorite` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `github_id` TEXT NOT NULL, `name` TEXT, `followers` INTEGER NOT NULL, `following` INTEGER NOT NULL, `avatar` TEXT NOT NULL, `company` TEXT, `email` TEXT, `bio` TEXT, `repos` INTEGER NOT NULL, `createdDate` TEXT, `updatedDate` TEXT, `reposAddress` TEXT NOT NULL, `blogUrl` TEXT, `favorite` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,8 +15,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "userId",
-            "columnName": "user_id",
+            "fieldPath": "githubId",
+            "columnName": "github_id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -100,19 +100,19 @@
         },
         "indices": [
           {
-            "name": "index_user_user_id",
+            "name": "index_user_github_id",
             "unique": true,
             "columnNames": [
-              "user_id"
+              "github_id"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_user_id` ON `${TABLE_NAME}` (`user_id`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_github_id` ON `${TABLE_NAME}` (`github_id`)"
           }
         ]
       },
       {
         "tableName": "repos",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_entity_id` INTEGER NOT NULL, `user_github_id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `language` TEXT, `stargazer` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, FOREIGN KEY(`user_entity_id`) REFERENCES `user`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_entity_id` INTEGER NOT NULL, `user_github_id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `language` TEXT, `stargazer` INTEGER NOT NULL, FOREIGN KEY(`user_entity_id`) REFERENCES `user`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -152,12 +152,6 @@
             "columnName": "stargazer",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "favorite",
-            "columnName": "favorite",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -194,7 +188,7 @@
       },
       {
         "tableName": "access_time",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `github_id` TEXT NOT NULL, `access_time` TEXT NOT NULL, `is_repo_fetched` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `github_id` TEXT NOT NULL, `access_time` TEXT NOT NULL, `is_repo_fetched` INTEGER NOT NULL, FOREIGN KEY(`github_id`) REFERENCES `user`(`github_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -237,12 +231,25 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_access_time_github_id` ON `${TABLE_NAME}` (`github_id`)"
           }
+        ],
+        "foreignKeys": [
+          {
+            "table": "user",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "github_id"
+            ],
+            "referencedColumns": [
+              "github_id"
+            ]
+          }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '07a92b5c94622352e1209ea933ee3866')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c0d40a449410e6a8d7b254f42ee10e66')"
     ]
   }
 }

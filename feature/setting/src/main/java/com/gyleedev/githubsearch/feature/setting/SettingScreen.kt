@@ -31,6 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.feature.setting.component.RadioButtonDialog
 import com.gyleedev.githubsearch.feature.setting.component.SettingMainBlock
@@ -62,6 +63,8 @@ fun SettingScreen(
     val revokeSuccessMessage = stringResource(id = SettingR.string.revoke_success_message)
     val revokeFailMessage = stringResource(id = SettingR.string.revoke_fail_message)
     val revokeNoKeyMessage = stringResource(id = SettingR.string.revoke_no_item_message)
+    val resetSuccessMessage = stringResource(id = SettingR.string.reset_success_message)
+    val resetFailMessage = stringResource(id = SettingR.string.reset_fail_message)
 
     LaunchedEffect(viewModel.showRevokeResult, lifecycleOwner, context) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -70,6 +73,22 @@ fun SettingScreen(
                     RevokeResult.SUCCESS -> revokeSuccessMessage
                     RevokeResult.FAIL -> revokeFailMessage
                     RevokeResult.NO_KEY -> revokeNoKeyMessage
+                }
+
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short,
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(viewModel.showResetResult, lifecycleOwner, context) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.showResetResult.collectLatest { result ->
+                val message = when (result) {
+                    ResetDataResult.Success -> resetSuccessMessage
+                    ResetDataResult.Fail -> resetFailMessage
                 }
 
                 snackBarHostState.showSnackbar(
@@ -231,6 +250,10 @@ val themeList =
 
 val languageList =
     listOf(
+        LanguageItem(
+            type = LocaleListCompat.getEmptyLocaleList(),
+            content = SettingR.string.setting_language_default,
+        ),
         LanguageItem(
             LocaleListCompat.create(Locale.KOREA),
             SettingR.string.setting_korean,

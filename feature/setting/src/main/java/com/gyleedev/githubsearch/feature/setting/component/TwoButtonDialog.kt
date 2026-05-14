@@ -43,7 +43,6 @@ fun TwoButtonDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onDismissRequest()
                     onEventRequest()
                 },
             ) {

@@ -8,6 +8,7 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.model.UserSyncResult
 import kotlinx.coroutines.flow.Flow
 
 interface GitHubRepository {
@@ -28,9 +29,15 @@ interface GitHubRepository {
         list: List<RepositoryModel>,
     )
 
+    suspend fun syncUserData(githubId: String): UserSyncResult
+
+    suspend fun syncRepoDataList(entityId: Long, githubId: String)
+
+    suspend fun deleteUserById(githubId: String)
+
     suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean = true)
 
-    suspend fun upsertUser(user: UserModel)
+    suspend fun upsertUser(user: UserModel): Long
 
     suspend fun getUserId(id: String): Long?
 
@@ -40,7 +47,7 @@ interface GitHubRepository {
 
     suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult
 
-    suspend fun resetData()
+    suspend fun resetUser()
 
     suspend fun revokeApplication(): RevokeResult
 

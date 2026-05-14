@@ -19,9 +19,12 @@
     <string name="filter_dark_theme">Dark</string>
     <string name="filter_light_theme">Light</string>
     <string name="filter_default_theme">System Default</string>
+    <string name="setting_language_default">System Default</string>
     <string name="setting_korean">Korean</string>
     <string name="setting_english">English</string>
     <string name="revoke_success_message">Successfully Revoke User Account</string>
     <string name="revoke_fail_message">Revoke Request Failed</string>
     <string name="revoke_no_item_message">Can\'t Make Request.No Access Key</string>
+    <string name="reset_fail_message">Reset Failed. Please Try Again</string>
+    <string name="reset_success_message">Successfully Reset Data</string>
 </resources>

@@ -5,10 +5,10 @@ import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -22,39 +22,31 @@ class CheckLoginStatusTest {
     }
 
     @Test
-    fun `login 되어 있을 때`() = runTest {
+    fun `로그인 상태일 때 true를 Flow로 반환한다`() = runTest {
         // Given
         val expectedValue = true
-        val expectedFlow = flowOf(expectedValue)
-
-        // Repository 동작 정의
-        coEvery { repository.hasAccessToken() } returns expectedFlow
+        coEvery { repository.hasAccessToken() } returns flowOf(expectedValue)
 
         // When
         val actualFlow = useCase()
-
-        // Then
         val actualValue = actualFlow.first()
 
+        // Then
         assertEquals(expectedValue, actualValue)
         coVerify(exactly = 1) { repository.hasAccessToken().ignoreUnused() }
     }
 
     @Test
-    fun `login 되어있지 않을 때`() = runTest {
+    fun `로그아웃 상태일 때 false를 Flow로 반환한다`() = runTest {
         // Given
         val expectedValue = false
-        val expectedFlow = flowOf(expectedValue)
-
-        // Repository 동작 정의
-        coEvery { repository.hasAccessToken() } returns expectedFlow
+        coEvery { repository.hasAccessToken() } returns flowOf(expectedValue)
 
         // When
         val actualFlow = useCase()
-
-        // Then
         val actualValue = actualFlow.first()
 
+        // Then
         assertEquals(expectedValue, actualValue)
         coVerify(exactly = 1) { repository.hasAccessToken().ignoreUnused() }
     }

@@ -8,14 +8,14 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 
 @Entity(
     tableName = "user",
-    indices = [Index(value = ["user_id"], unique = true)],
+    indices = [Index(value = ["github_id"], unique = true)],
 )
 data class UserEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long,
-    @ColumnInfo(name = "user_id")
-    val userId: String,
+    @ColumnInfo(name = "github_id")
+    val githubId: String,
     @ColumnInfo(name = "name")
     val name: String?,
     @ColumnInfo(name = "followers")
@@ -46,7 +46,7 @@ data class UserEntity(
 
 fun UserModel.toEntity(): UserEntity = UserEntity(
     id = id,
-    userId = login,
+    githubId = login,
     name = name,
     followers = followers,
     following = following,
@@ -64,7 +64,7 @@ fun UserModel.toEntity(): UserEntity = UserEntity(
 
 fun UserEntity.toModel(): UserModel = UserModel(
     id = id,
-    login = userId,
+    login = githubId,
     name = name,
     followers = followers,
     following = following,

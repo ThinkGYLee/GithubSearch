@@ -26,8 +26,10 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.model.UserSyncResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.time.Clock
@@ -175,8 +177,17 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchRepos(id: String): List<RepositoryModel> = githubApiService.getRepos(id)
-        .map { response -> response.toModel(id = id) }
+    override suspend fun fetchRepos(id: String): List<RepositoryModel> {
+        val response = githubApiService.getRepos(id)
+        val body = response.body()
+        return if (response.isSuccessful && body != null) {
+            body.map { response ->
+                response.toModel(id = id)
+            }
+        } else {
+            emptyList()
+        }
+    }
 
     // 마지막 액세스 시간 가져오기
     override suspend fun getLastAccessById(id: String): AccessTimeModel? = accessTimeDao.getTimeByGithubId(id)?.let {
@@ -188,7 +199,28 @@ class GitHubRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun upsertUser(user: UserModel) = userDao.upsertUser(user.toEntity())
+    override suspend fun syncUserData(githubId: String): UserSyncResult {
+        val userFetchResult = fetchUser(githubId)
+        val localUser = getUserWithFlow(githubId).first() as UserModel
+        return if (userFetchResult is UserFetchResult.Success) {
+            val insertUser = userFetchResult.user.copy(favorite = localUser.favorite)
+            val entityId = upsertUser(insertUser)
+            UserSyncResult.Success(entityId = entityId)
+        } else {
+            UserSyncResult.Fail
+        }
+    }
+
+    override suspend fun syncRepoDataList(entityId: Long, githubId: String) {
+        val fetchedRepos = fetchRepos(githubId)
+        if (fetchedRepos.isNotEmpty()) {
+            insertRepositoryList(entityId, fetchedRepos)
+        }
+    }
+
+    override suspend fun deleteUserById(githubId: String) = userDao.deleteUserById(githubId)
+
+    override suspend fun upsertUser(user: UserModel): Long = userDao.upsertUser(user.toEntity())
 
     override suspend fun getUserId(id: String): Long? = userDao.getUser(id)?.id
 
@@ -230,10 +262,8 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     // Setting
-    override suspend fun resetData() {
-        accessTimeDao.resetAccessTime()
+    override suspend fun resetUser() {
         userDao.resetUser()
-        reposDao.resetRepos()
     }
 
     override suspend fun revokeApplication(): RevokeResult {

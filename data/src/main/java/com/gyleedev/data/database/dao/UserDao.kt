@@ -23,17 +23,20 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE favorite = true AND repos =0")
     fun getUsersNonRepo(): PagingSource<Int, UserEntity>
 
-    @Query("SELECT * FROM user WHERE user_id = :id  COLLATE NOCASE")
-    suspend fun getUser(id: String): UserEntity?
+    @Query("SELECT * FROM user WHERE github_id = :githubId  COLLATE NOCASE")
+    suspend fun getUser(githubId: String): UserEntity?
 
-    @Query("SELECT * FROM user WHERE user_id = :userId COLLATE NOCASE")
-    fun getUserByGithubId(userId: String): Flow<UserEntity?>
+    @Query("SELECT * FROM user WHERE github_id = :githubId COLLATE NOCASE")
+    fun getUserByGithubId(githubId: String): Flow<UserEntity?>
+
+    @Query("DELETE FROM user WHERE github_id = :githubId")
+    fun deleteUserById(githubId: String)
 
     @Insert
     suspend fun insertUser(user: UserEntity): Long
 
     @Upsert
-    suspend fun upsertUser(user: UserEntity)
+    suspend fun upsertUser(user: UserEntity): Long
 
     fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
         FilterStatus.ALL -> getUsersAll()

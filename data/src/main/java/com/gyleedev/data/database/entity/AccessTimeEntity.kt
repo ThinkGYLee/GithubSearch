@@ -2,12 +2,21 @@ package com.gyleedev.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
 
 @Entity(
     tableName = "access_time",
+    foreignKeys = [
+        ForeignKey(
+            entity = UserEntity::class,
+            parentColumns = arrayOf("github_id"),
+            childColumns = arrayOf("github_id"),
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
     indices = [Index(value = ["github_id"], unique = true)],
 )
 data class AccessTimeEntity(

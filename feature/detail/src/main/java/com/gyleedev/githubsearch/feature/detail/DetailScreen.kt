@@ -120,7 +120,6 @@ private fun DetailScreen(
                 description = repoList[index].description,
                 language = repoList[index].language,
                 stargazer = repoList[index].stargazer,
-
             )
         }
     }

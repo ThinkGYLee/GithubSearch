@@ -1,6 +1,7 @@
 package com.gyleedev.githubsearch.feature.setting
 
 import androidx.lifecycle.viewModelScope
+import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import com.gyleedev.githubsearch.domain.usecase.ResetDataUseCase
@@ -37,6 +38,8 @@ class SettingViewModel @Inject constructor(
     private val showLogoutDialog = MutableStateFlow(false)
     private val _showRevokeResult = MutableSharedFlow<RevokeResult>()
     val showRevokeResult: SharedFlow<RevokeResult> = _showRevokeResult
+    private val _showResetResult = MutableSharedFlow<ResetDataResult>()
+    val showResetResult: SharedFlow<ResetDataResult> = _showResetResult
 
     val uiState = combine(showThemeDialog, showLanguageDialog, showLoginDialog, showLogoutDialog, showResetDialog) { theme, lang, login, logout, reset ->
         SettingUiState.Success(
@@ -54,7 +57,7 @@ class SettingViewModel @Inject constructor(
 
     fun resetData() {
         viewModelScope.launch {
-            resetDataUseCase()
+            _showResetResult.emit(resetDataUseCase())
         }
     }
 

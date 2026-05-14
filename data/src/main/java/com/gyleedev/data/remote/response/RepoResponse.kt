@@ -16,5 +16,4 @@ fun RepoResponse.toModel(id: String): RepositoryModel = RepositoryModel(
     description = description,
     language = language,
     stargazer = stargazer,
-    favorite = false,
 )
