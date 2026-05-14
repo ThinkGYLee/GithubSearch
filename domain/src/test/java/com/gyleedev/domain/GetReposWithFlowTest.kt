@@ -51,7 +51,7 @@ class GetReposWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getReposWithFlow(userId) }
+        coVerify(exactly = 1) { repository.getReposWithFlow(userId).ignoreUnused() }
     }
 
     @Test
@@ -67,7 +67,7 @@ class GetReposWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getReposWithFlow(userId) }
+        coVerify(exactly = 1) { repository.getReposWithFlow(userId).ignoreUnused() }
     }
 
     @Test
@@ -83,6 +83,6 @@ class GetReposWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getReposWithFlow(userId) }
+        coVerify(exactly = 1) { repository.getReposWithFlow(userId).ignoreUnused() }
     }
 }
