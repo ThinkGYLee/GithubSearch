@@ -34,6 +34,7 @@ class GetFavoritesTest {
         val filter = FilterStatus.ALL
         val expectedData = mockUsers
         val expectedPaging = PagingData.from(expectedData)
+
         coEvery { repository.getFavorites(filter) } returns flowOf(expectedPaging)
 
         // When
@@ -42,7 +43,7 @@ class GetFavoritesTest {
 
         // Then
         assertEquals(expectedData, actualResult)
-        coVerify(exactly = 1) { repository.getFavorites(filter) }
+        coVerify(exactly = 1) { repository.getFavorites(filter).ignoreUnused() }
     }
 
     @Test
@@ -51,6 +52,7 @@ class GetFavoritesTest {
         val filter = FilterStatus.REPO
         val expectedData = mockUsers.filter { it.repoCount > 0 }
         val expectedPaging = PagingData.from(expectedData)
+
         coEvery { repository.getFavorites(filter) } returns flowOf(expectedPaging)
 
         // When
@@ -59,14 +61,16 @@ class GetFavoritesTest {
 
         // Then
         assertEquals(expectedData, actualResult)
+        coVerify(exactly = 1) { repository.getFavorites(filter).ignoreUnused() }
     }
 
     @Test
     fun `즐겨찾기 목록이 없을 때 빈 목록을 반환한다`() = runTest {
         // Given
         val filter = FilterStatus.ALL
-        val expectedResult = emptyList<UserModel>()
-        val expectedPaging = PagingData.from(expectedResult)
+        val expectedData = emptyList<UserModel>()
+        val expectedPaging = PagingData.from(expectedData)
+
         coEvery { repository.getFavorites(filter) } returns flowOf(expectedPaging)
 
         // When
@@ -74,7 +78,8 @@ class GetFavoritesTest {
         val actualResult = resultFlow.asSnapshot()
 
         // Then
-        assertEquals(expectedResult, actualResult)
+        assertEquals(expectedData, actualResult)
+        coVerify(exactly = 1) { repository.getFavorites(filter).ignoreUnused() }
     }
 
     private fun createDummyUser(id: Long, repoCount: Int): UserModel = UserModel(
