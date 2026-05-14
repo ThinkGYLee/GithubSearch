@@ -51,31 +51,34 @@ class GetUsersTest {
     @Test
     fun `유저 목록이 존재할 때 페이징 데이터를 정상적으로 반환한다`() = runTest {
         // Given
-        val expectedValue = PagingData.from(mockUsers)
-        coEvery { repository.getUsers() } returns flowOf(expectedValue)
+        val expectedData = mockUsers
+        val expectedPaging = PagingData.from(expectedData)
+
+        coEvery { repository.getUsers() } returns flowOf(expectedPaging)
 
         // When
         val resultFlow = useCase()
         val actualResult = resultFlow.asSnapshot()
 
         // Then
-        assertEquals(mockUsers, actualResult)
-        coVerify(exactly = 1) { repository.getUsers() }
+        assertEquals(expectedData, actualResult)
+        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
     }
 
     @Test
     fun `유저 목록이 없을 때 빈 페이징 데이터를 반환한다`() = runTest {
         // Given
-        val expectedValue = PagingData.from(emptyList<UserModel>())
-        val expectedResult = emptyList<UserModel>()
-        coEvery { repository.getUsers() } returns flowOf(expectedValue)
+        val expectedData = emptyList<UserModel>()
+        val expectedPaging = PagingData.from(expectedData)
+
+        coEvery { repository.getUsers() } returns flowOf(expectedPaging)
 
         // When
         val resultFlow = useCase()
         val actualResult = resultFlow.asSnapshot()
 
         // Then
-        assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getUsers() }
+        assertEquals(expectedData, actualResult)
+        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
     }
 }
