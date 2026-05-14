@@ -95,7 +95,6 @@ fun RadioButtonDialog(
             TextButton(
                 onClick = {
                     onEventRequest(selectedIndex.intValue)
-                    onDismissRequest()
                 },
             ) {
                 Text(text = stringResource(id = DesignSystemR.string.text_filter_confirm))
