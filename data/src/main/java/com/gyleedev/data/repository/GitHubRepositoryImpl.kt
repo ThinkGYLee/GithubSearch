@@ -230,9 +230,15 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     // Setting
-    override suspend fun resetData() {
+    override suspend fun resetAccessTime() {
         accessTimeDao.resetAccessTime()
+    }
+
+    override suspend fun resetUser() {
         userDao.resetUser()
+    }
+
+    override suspend fun resetRepos() {
         reposDao.resetRepos()
     }
 
