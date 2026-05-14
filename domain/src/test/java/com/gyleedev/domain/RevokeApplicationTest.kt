@@ -25,69 +25,86 @@ class RevokeApplicationTest {
     @Test
     fun `앱 권한 철회 성공 시 토큰을 삭제하고 성공 결과를 반환한다`() = runTest {
         // Given
-        val expected = RevokeResult.SUCCESS
-        coEvery { repository.revokeApplication() } returns expected
+        val expectedResult = RevokeResult.SUCCESS
+
+        coEvery { repository.revokeApplication() } returns expectedResult
         coEvery { repository.deleteAccessToken() } just runs
 
         // When
-        val actual = useCase()
+        val actualResult = useCase()
 
         // Then
-        assertEquals(expected, actual)
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.revokeApplication() }
         coVerify(exactly = 1) { repository.deleteAccessToken() }
     }
 
     @Test
     fun `앱 권한 철회 실패 시 실패 결과를 반환한다`() = runTest {
         // Given
-        val expected = RevokeResult.FAIL
-        coEvery { repository.revokeApplication() } returns expected
+        val expectedResult = RevokeResult.FAIL
+
+        coEvery { repository.revokeApplication() } returns expectedResult
+        coEvery { repository.deleteAccessToken() } just runs
 
         // When
-        val actual = useCase()
+        val actualResult = useCase()
 
         // Then
-        assertEquals(expected, actual)
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.revokeApplication() }
         coVerify(exactly = 0) { repository.deleteAccessToken() }
     }
 
     @Test
     fun `액세스 토큰이 없어 철회할 수 없을 때 토큰 없음 결과를 반환한다`() = runTest {
         // Given
-        val expected = RevokeResult.NO_KEY
-        coEvery { repository.revokeApplication() } returns expected
+        val expectedResult = RevokeResult.NO_KEY
+
+        coEvery { repository.revokeApplication() } returns expectedResult
+        coEvery { repository.deleteAccessToken() } just runs
 
         // When
-        val actual = useCase()
+        val actualResult = useCase()
 
         // Then
-        assertEquals(expected, actual)
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.revokeApplication() }
+        coVerify(exactly = 0) { repository.deleteAccessToken() }
     }
 
     @Test
     fun `앱 권한 철회 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
         // Given
-        val expected = RevokeResult.FAIL
+        val expectedResult = RevokeResult.FAIL
+
         coEvery { repository.revokeApplication() } throws Exception("Network Error")
+        coEvery { repository.deleteAccessToken() } just runs
 
         // When
-        val actual = useCase()
+        val actualResult = useCase()
 
         // Then
-        assertEquals(expected, actual)
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.revokeApplication() }
+        coVerify(exactly = 0) { repository.deleteAccessToken() }
     }
 
     @Test
     fun `토큰 삭제 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
         // Given
-        val expected = RevokeResult.FAIL
-        coEvery { repository.revokeApplication() } returns RevokeResult.SUCCESS
+        val expectedResult = RevokeResult.FAIL
+        val expectedRevokeResult = RevokeResult.SUCCESS
+
+        coEvery { repository.revokeApplication() } returns expectedRevokeResult
         coEvery { repository.deleteAccessToken() } throws Exception("Preference Error")
 
         // When
-        val actual = useCase()
+        val actualResult = useCase()
 
         // Then
-        assertEquals(expected, actual)
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.revokeApplication() }
+        coVerify(exactly = 1) { repository.deleteAccessToken() }
     }
 }
