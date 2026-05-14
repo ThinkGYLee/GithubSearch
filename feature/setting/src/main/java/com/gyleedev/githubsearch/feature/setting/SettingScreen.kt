@@ -251,6 +251,10 @@ val themeList =
 val languageList =
     listOf(
         LanguageItem(
+            type = LocaleListCompat.getEmptyLocaleList(),
+            content = SettingR.string.setting_language_default,
+        ),
+        LanguageItem(
             LocaleListCompat.create(Locale.KOREA),
             SettingR.string.setting_korean,
         ),
