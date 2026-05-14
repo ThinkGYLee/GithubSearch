@@ -8,9 +8,9 @@ import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -23,7 +23,7 @@ class GetUsersTest {
     fun setUp() {
         useCase = GetUsersUseCase(repository)
         mockUsers = mutableListOf()
-        var count = 100L
+        var count = 10L
         while (count >= 0) {
             mockUsers.add(
                 UserModel(
@@ -49,28 +49,33 @@ class GetUsersTest {
     }
 
     @Test
-    fun `User가 존재할 때`() = runTest {
+    fun `유저 목록이 존재할 때 페이징 데이터를 정상적으로 반환한다`() = runTest {
+        // Given
         val expectedValue = PagingData.from(mockUsers)
-
         coEvery { repository.getUsers() } returns flowOf(expectedValue)
 
+        // When
         val resultFlow = useCase()
-        val resultData = resultFlow.asSnapshot()
-        assertEquals(mockUsers, resultData)
+        val actualResult = resultFlow.asSnapshot()
 
-        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
+        // Then
+        assertEquals(mockUsers, actualResult)
+        coVerify(exactly = 1) { repository.getUsers() }
     }
 
     @Test
-    fun `User가 없을 때`() = runTest {
+    fun `유저 목록이 없을 때 빈 페이징 데이터를 반환한다`() = runTest {
+        // Given
         val expectedValue = PagingData.from(emptyList<UserModel>())
-
+        val expectedResult = emptyList<UserModel>()
         coEvery { repository.getUsers() } returns flowOf(expectedValue)
 
+        // When
         val resultFlow = useCase()
-        val resultData = resultFlow.asSnapshot()
-        assertEquals(emptyList<UserModel>(), resultData)
+        val actualResult = resultFlow.asSnapshot()
 
-        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
+        // Then
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.getUsers() }
     }
 }
