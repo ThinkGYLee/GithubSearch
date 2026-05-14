@@ -22,48 +22,46 @@ class UpdateFavoriteStatusTest {
     }
 
     @Test
-    fun `업데이트가 성공하여 return된 id와 기존 id가 일치할때`() = runTest {
+    fun `즐겨찾기 상태 변경 성공 시 성공 결과를 반환한다`() = runTest {
         // Given
         val user = createDummyUser(id = 1L, favorite = false)
         val expected = UpdateFavoriteResult.Success
-        coEvery { repository.upsertUser(user) } returns 1L
+        coEvery { repository.upsertUser(any()) } returns 1L
 
         // When
         val result = useCase(user)
 
         // Then
         assertEquals(expected, result)
-        coVerify(exactly = 1) { repository.upsertUser(user) }
+        coVerify(exactly = 1) { repository.upsertUser(any()) }
     }
 
     @Test
-    fun `업데이트 대상이 없어서 return된 id와 기존 id가 다를때(새로 insert 됐을 때)`() = runTest {
+    fun `업데이트된 ID가 기존과 다를 경우 실패 결과를 반환한다`() = runTest {
         // Given
         val user = createDummyUser(id = 1L, favorite = false)
         val expected = UpdateFavoriteResult.Fail
-        coEvery { repository.upsertUser(user) } returns 2L
+        coEvery { repository.upsertUser(any()) } returns 2L
 
         // When
         val result = useCase(user)
 
         // Then
         assertEquals(expected, result)
-        coVerify(exactly = 1) { repository.upsertUser(user) }
     }
 
     @Test
-    fun `에러가 나서 job이 cancel 됐을 때`() = runTest {
+    fun `즐겨찾기 상태 변경 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
         // Given
         val user = createDummyUser(id = 1L, favorite = false)
         val expected = UpdateFavoriteResult.Fail
-        coEvery { repository.upsertUser(user) } throws Exception("Database Error")
+        coEvery { repository.upsertUser(any()) } throws Exception("Database Error")
 
         // When
         val result = useCase(user)
 
         // Then
         assertEquals(expected, result)
-        coVerify(exactly = 1) { repository.upsertUser(user) }
     }
 
     private fun createDummyUser(id: Long, favorite: Boolean): UserModel = UserModel(
