@@ -31,7 +31,6 @@ class GetReposWithFlowTest {
                     description = "description_$count",
                     language = "language_$count",
                     stargazer = count.toInt(),
-                    favorite = false,
                 ),
             )
             count--

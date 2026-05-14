@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d4704aa730b2be5d770853a544355aa2",
+    "identityHash": "c0d40a449410e6a8d7b254f42ee10e66",
     "entities": [
       {
         "tableName": "user",
@@ -112,7 +112,7 @@
       },
       {
         "tableName": "repos",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_entity_id` INTEGER NOT NULL, `user_github_id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `language` TEXT, `stargazer` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, FOREIGN KEY(`user_entity_id`) REFERENCES `user`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_entity_id` INTEGER NOT NULL, `user_github_id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `language` TEXT, `stargazer` INTEGER NOT NULL, FOREIGN KEY(`user_entity_id`) REFERENCES `user`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -150,12 +150,6 @@
           {
             "fieldPath": "stargazer",
             "columnName": "stargazer",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "favorite",
-            "columnName": "favorite",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -255,7 +249,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd4704aa730b2be5d770853a544355aa2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c0d40a449410e6a8d7b254f42ee10e66')"
     ]
   }
 }

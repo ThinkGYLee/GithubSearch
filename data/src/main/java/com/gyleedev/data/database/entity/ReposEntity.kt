@@ -36,8 +36,6 @@ data class ReposEntity(
     val language: String?,
     @ColumnInfo(name = "stargazer")
     val stargazer: Int,
-    @ColumnInfo(name = "favorite")
-    val favorite: Boolean,
 )
 
 fun ReposEntity.toModel(): RepositoryModel = RepositoryModel(
@@ -46,7 +44,6 @@ fun ReposEntity.toModel(): RepositoryModel = RepositoryModel(
     description = description,
     language = language,
     stargazer = stargazer,
-    favorite = favorite,
 )
 
 fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity = ReposEntity(
@@ -57,5 +54,4 @@ fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity = ReposEntity(
     name = name,
     stargazer = stargazer,
     language = language,
-    favorite = favorite,
 )
