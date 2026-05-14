@@ -43,6 +43,7 @@ class GetUserWithFlowTest {
             blogUrl = "blogUrl",
             favorite = false,
         )
+
         coEvery { repository.getUserWithFlow(userId) } returns flowOf(expectedResult)
 
         // When
@@ -51,7 +52,7 @@ class GetUserWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getUserWithFlow(userId) }
+        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
     }
 
     @Test
@@ -59,6 +60,7 @@ class GetUserWithFlowTest {
         // Given
         val userId = "googleAndroid"
         val expectedResult = null
+
         coEvery { repository.getUserWithFlow(userId) } returns flowOf(expectedResult)
 
         // When
@@ -67,7 +69,7 @@ class GetUserWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getUserWithFlow(userId) }
+        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
     }
 
     @Test
@@ -75,6 +77,7 @@ class GetUserWithFlowTest {
         // Given
         val userId = "googleAndroid"
         val expectedResult = null
+
         coEvery { repository.getUserWithFlow(userId) } throws Exception("Database Error")
 
         // When
@@ -83,5 +86,6 @@ class GetUserWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
     }
 }
