@@ -83,5 +83,6 @@ class GetReposWithFlowTest {
 
         // Then
         assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.getReposWithFlow(userId) }
     }
 }
