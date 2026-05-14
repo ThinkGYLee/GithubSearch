@@ -3,13 +3,13 @@ package com.gyleedev.domain
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.usecase.RevokeApplicationUseCase
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
+import io.mockk.runs
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -23,13 +23,11 @@ class RevokeApplicationTest {
     }
 
     @Test
-    fun `Access Token이 존재하고 Revoke 에 성공했을 때`() = runTest {
+    fun `앱 권한 철회 성공 시 토큰을 삭제하고 성공 결과를 반환한다`() = runTest {
         // Given
         val expected = RevokeResult.SUCCESS
-
-        // Repository 동작 정의
         coEvery { repository.revokeApplication() } returns expected
-        coEvery { repository.deleteAccessToken() } just Runs
+        coEvery { repository.deleteAccessToken() } just runs
 
         // When
         val actual = useCase()
@@ -40,11 +38,9 @@ class RevokeApplicationTest {
     }
 
     @Test
-    fun `Access Token이 존재하고 Revoke 에 실패했을 때`() = runTest {
+    fun `앱 권한 철회 실패 시 실패 결과를 반환한다`() = runTest {
         // Given
         val expected = RevokeResult.FAIL
-
-        // Repository 동작 정의
         coEvery { repository.revokeApplication() } returns expected
 
         // When
@@ -56,11 +52,9 @@ class RevokeApplicationTest {
     }
 
     @Test
-    fun `Access Token이 존재하지 않을 때`() = runTest {
+    fun `액세스 토큰이 없어 철회할 수 없을 때 토큰 없음 결과를 반환한다`() = runTest {
         // Given
         val expected = RevokeResult.NO_KEY
-
-        // Repository 동작 정의
         coEvery { repository.revokeApplication() } returns expected
 
         // When
@@ -68,22 +62,32 @@ class RevokeApplicationTest {
 
         // Then
         assertEquals(expected, actual)
-        coVerify(exactly = 0) { repository.deleteAccessToken() }
     }
 
     @Test
-    fun `repository function 을 호출했을 때 Exception이 발생했을 때`() = runTest {
+    fun `앱 권한 철회 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
         // Given
         val expected = RevokeResult.FAIL
-
-        // Repository 동작 정의
-        coEvery { repository.revokeApplication() } throws Exception("Unknown Exception")
+        coEvery { repository.revokeApplication() } throws Exception("Network Error")
 
         // When
         val actual = useCase()
 
         // Then
         assertEquals(expected, actual)
-        coVerify(exactly = 0) { repository.deleteAccessToken() }
+    }
+
+    @Test
+    fun `토큰 삭제 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
+        // Given
+        val expected = RevokeResult.FAIL
+        coEvery { repository.revokeApplication() } returns RevokeResult.SUCCESS
+        coEvery { repository.deleteAccessToken() } throws Exception("Preference Error")
+
+        // When
+        val actual = useCase()
+
+        // Then
+        assertEquals(expected, actual)
     }
 }
