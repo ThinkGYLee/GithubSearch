@@ -15,5 +15,5 @@ interface GithubApiService {
     @GET("users/{user}/repos")
     suspend fun getRepos(
         @Path("user") user: String,
-    ): List<RepoResponse>
+    ): Response<List<RepoResponse>>
 }
