@@ -30,7 +30,7 @@ interface GitHubRepository {
 
     suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean = true)
 
-    suspend fun upsertUser(user: UserModel)
+    suspend fun upsertUser(user: UserModel): Long
 
     suspend fun getUserId(id: String): Long?
 

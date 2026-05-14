@@ -188,7 +188,7 @@ class GitHubRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun upsertUser(user: UserModel) = userDao.upsertUser(user.toEntity())
+    override suspend fun upsertUser(user: UserModel): Long = userDao.upsertUser(user.toEntity())
 
     override suspend fun getUserId(id: String): Long? = userDao.getUser(id)?.id
 
