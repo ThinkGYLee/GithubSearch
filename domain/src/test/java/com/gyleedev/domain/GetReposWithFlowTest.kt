@@ -30,7 +30,7 @@ class GetReposWithFlowTest {
             description = "desc_2",
             language = "Java",
             stargazer = 20,
-        )
+        ),
     )
 
     @Before

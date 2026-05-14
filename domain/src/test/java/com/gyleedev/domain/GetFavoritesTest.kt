@@ -20,7 +20,7 @@ class GetFavoritesTest {
     private lateinit var useCase: GetFavoritesUseCase
     private val mockUsers = listOf(
         createDummyUser(id = 1, repoCount = 5),
-        createDummyUser(id = 2, repoCount = 0)
+        createDummyUser(id = 2, repoCount = 0),
     )
 
     @Before
