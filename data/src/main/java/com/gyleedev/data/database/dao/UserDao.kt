@@ -33,7 +33,7 @@ interface UserDao {
     suspend fun insertUser(user: UserEntity): Long
 
     @Upsert
-    suspend fun upsertUser(user: UserEntity)
+    suspend fun upsertUser(user: UserEntity): Long
 
     fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
         FilterStatus.ALL -> getUsersAll()
