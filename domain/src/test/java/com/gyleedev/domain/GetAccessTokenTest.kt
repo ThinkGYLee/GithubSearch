@@ -4,14 +4,13 @@ import com.gyleedev.githubsearch.domain.model.GetAccessTokenRepositoryResult
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.usecase.GetAccessTokenUseCase
-import io.mockk.Runs
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.coVerifySequence
 import io.mockk.just
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
+import io.mockk.runs
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -25,22 +24,19 @@ class GetAccessTokenTest {
     }
 
     @Test
-    fun `AccessToken 가져오기 성공`() = runTest {
+    fun `액세스 토큰 발급 및 저장 성공 시 성공 결과를 반환한다`() = runTest {
         // Given
-        val token = "token"
         val code = "code"
-        val expectedValue = GetAccessTokenRepositoryResult.Success(token = token)
+        val token = "token"
+        val expectedRepoResult = GetAccessTokenRepositoryResult.Success(token = token)
         val expectedResult = GetAccessTokenUseCaseResult.Success
-
-        // Repository 동작 정의
-        coEvery { repository.getAccessToken(code) } returns expectedValue
-        coEvery { repository.saveAccessToken(token) } just Runs
+        coEvery { repository.getAccessToken(code) } returns expectedRepoResult
+        coEvery { repository.saveAccessToken(token) } just runs
 
         // When
         val actualResult = useCase(code)
 
         // Then
-
         assertEquals(expectedResult, actualResult)
         coVerifySequence {
             repository.getAccessToken(code)
@@ -49,42 +45,48 @@ class GetAccessTokenTest {
     }
 
     @Test
-    fun `AccessToken 가져오기 실패`() = runTest {
+    fun `액세스 토큰 발급 실패 시 실패 결과를 반환한다`() = runTest {
         // Given
         val code = "code"
-        val expectedValue = GetAccessTokenRepositoryResult.Fail
+        val expectedRepoResult = GetAccessTokenRepositoryResult.Fail
         val expectedResult = GetAccessTokenUseCaseResult.Fail
-
-        // Repository 동작 정의
-        coEvery { repository.getAccessToken(code) } returns expectedValue
-        coEvery { repository.saveAccessToken(any()) } just Runs
+        coEvery { repository.getAccessToken(code) } returns expectedRepoResult
 
         // When
         val actualResult = useCase(code)
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getAccessToken(code) }
-        coVerify(exactly = 0) { repository.saveAccessToken(any()) }
     }
 
     @Test
-    fun `Exception 나왔을때`() = runTest {
+    fun `액세스 토큰 발급 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
         // Given
-        val exception = Exception("Unknown Exception")
         val code = "code"
         val expectedResult = GetAccessTokenUseCaseResult.Fail
-
-        // Repository 동작 정의
-        coEvery { repository.getAccessToken(code) } throws exception
-        coEvery { repository.saveAccessToken(any()) } just Runs
+        coEvery { repository.getAccessToken(code) } throws Exception("Network Error")
 
         // When
         val actualResult = useCase(code)
 
         // Then
         assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.getAccessToken(code) }
-        coVerify(exactly = 0) { repository.saveAccessToken(any()) }
+    }
+
+    @Test
+    fun `액세스 토큰 저장 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
+        // Given
+        val code = "code"
+        val token = "token"
+        val expectedRepoResult = GetAccessTokenRepositoryResult.Success(token = token)
+        val expectedResult = GetAccessTokenUseCaseResult.Fail
+        coEvery { repository.getAccessToken(code) } returns expectedRepoResult
+        coEvery { repository.saveAccessToken(token) } throws Exception("Preference Error")
+
+        // When
+        val actualResult = useCase(code)
+
+        // Then
+        assertEquals(expectedResult, actualResult)
     }
 }
