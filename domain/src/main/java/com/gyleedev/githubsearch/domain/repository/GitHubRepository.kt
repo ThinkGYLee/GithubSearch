@@ -40,7 +40,11 @@ interface GitHubRepository {
 
     suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult
 
-    suspend fun resetData()
+    suspend fun resetAccessTime()
+
+    suspend fun resetUser()
+
+    suspend fun resetRepos()
 
     suspend fun revokeApplication(): RevokeResult
 
