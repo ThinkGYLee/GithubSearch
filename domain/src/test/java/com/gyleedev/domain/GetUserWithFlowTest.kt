@@ -6,10 +6,10 @@ import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -23,7 +23,8 @@ class GetUserWithFlowTest {
     }
 
     @Test
-    fun `User가 존재할 때`() = runTest {
+    fun `유저 정보가 존재할 때 유저 데이터를 Flow로 반환한다`() = runTest {
+        // Given
         val userId = "googleAndroid"
         val expectedResult = UserModel(
             id = 0L,
@@ -42,39 +43,45 @@ class GetUserWithFlowTest {
             blogUrl = "blogUrl",
             favorite = false,
         )
-
         coEvery { repository.getUserWithFlow(userId) } returns flowOf(expectedResult)
 
-        val actual = useCase(userId)
-        assertEquals(expectedResult, actual.first())
+        // When
+        val actualFlow = useCase(userId)
+        val actualResult = actualFlow.first()
 
-        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
+        // Then
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.getUserWithFlow(userId) }
     }
 
     @Test
-    fun `User가 없을 때`() = runTest {
+    fun `유저 정보가 없을 때 null을 Flow로 반환한다`() = runTest {
+        // Given
         val userId = "googleAndroid"
         val expectedResult = null
-
         coEvery { repository.getUserWithFlow(userId) } returns flowOf(expectedResult)
 
-        val actual = useCase(userId)
-        assertEquals(expectedResult, actual.first())
+        // When
+        val actualFlow = useCase(userId)
+        val actualResult = actualFlow.first()
 
-        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
+        // Then
+        assertEquals(expectedResult, actualResult)
+        coVerify(exactly = 1) { repository.getUserWithFlow(userId) }
     }
 
     @Test
-    fun `Exception 이 날 때`() = runTest {
+    fun `유저 정보 조회 중 예외가 발생하면 null을 Flow로 반환한다`() = runTest {
+        // Given
         val userId = "googleAndroid"
-        val exception = Exception("Unknown Exception")
         val expectedResult = null
+        coEvery { repository.getUserWithFlow(userId) } throws Exception("Database Error")
 
-        coEvery { repository.getUserWithFlow(userId) } throws exception
+        // When
+        val actualFlow = useCase(userId)
+        val actualResult = actualFlow.first()
 
-        val actual = useCase(userId)
-        assertEquals(expectedResult, actual.first())
-
-        coVerify(exactly = 1) { repository.getUserWithFlow(userId).ignoreUnused() }
+        // Then
+        assertEquals(expectedResult, actualResult)
     }
 }
