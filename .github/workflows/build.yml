@@ -97,25 +97,28 @@ jobs:
           touch build/dist/.nojekyll
           
           # HTML 리포트 복사
-          cp -r build/reports/jacoco/jacocoFullReport/html/* build/dist/
+          if [ -d "build/reports/jacoco/jacocoFullReport/html" ]; then
+            cp -r build/reports/jacoco/jacocoFullReport/html/* build/dist/
+          fi
           
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
           
-          # Python을 사용한 안정적인 XML 파싱 및 배지 생성
+          # Python을 사용한 안정적인 XML 파싱 및 배지 생성 (에러 핸들링 강화)
           python3 - <<EOF
           import xml.etree.ElementTree as ET
           import json
           import os
 
           def analyze_coverage(xml_path):
+              print(f"--- Analyzing {xml_path} ---")
+              if not os.path.exists(xml_path):
+                  print(f"Error: {xml_path} does not exist")
+                  return None
+              
               try:
-                  if not os.path.exists(xml_path):
-                      return {}
-                  
                   tree = ET.parse(xml_path)
                   root = tree.getroot()
                   
-                  # 결과 저장용 사전
                   stats = {
                       "vm": {"m": 0, "c": 0},
                       "uc": {"m": 0, "c": 0},
@@ -128,20 +131,21 @@ jobs:
                       # 1. ViewModel (feature 패키지 내 ViewModel 키워드 포함 클래스)
                       if "feature" in pkg_name:
                           for cls in pkg.findall('class'):
-                              if "ViewModel" in cls.get('name', ''):
+                              cls_name = cls.get('name', '')
+                              if "ViewModel" in cls_name and not "Test" in cls_name:
                                   for cnt in cls.findall('counter'):
                                       if cnt.get('type') == 'INSTRUCTION':
                                           stats["vm"]["m"] += int(cnt.get('missed', 0))
                                           stats["vm"]["c"] += int(cnt.get('covered', 0))
                       
-                      # 2. UseCase (domain/usecase 패키지)
+                      # 2. UseCase (domain/usecase)
                       elif "domain/usecase" in pkg_name or "domain/model" in pkg_name:
                           for cnt in pkg.findall('counter'):
                               if cnt.get('type') == 'INSTRUCTION':
                                   stats["uc"]["m"] += int(cnt.get('missed', 0))
                                   stats["uc"]["c"] += int(cnt.get('covered', 0))
                       
-                      # 3. Repository (data/repository 패키지)
+                      # 3. Repository (data/repository)
                       elif "data/repository" in pkg_name or "data/remote" in pkg_name or "data/database" in pkg_name:
                           for cnt in pkg.findall('counter'):
                               if cnt.get('type') == 'INSTRUCTION':
@@ -150,44 +154,48 @@ jobs:
                   
                   return stats
               except Exception as e:
-                  print(f"Error analyzing coverage: {e}")
-                  return {}
-
-          def calculate_percent(m, c):
-              total = m + c
-              return int(c * 100 / total) if total > 0 else 0
+                  print(f"Critical Parsing Error: {e}")
+                  return None
 
           def create_badge(label, value, filename):
               color = "brightgreen" if value >= 80 else "green" if value >= 60 else "orange" if value >= 40 else "red"
-              data = {"schemaVersion": 1, "label": label, "message": f"{value}%", "color": color}
-              with open(f"build/dist/badges/{filename}-coverage.json", "w") as f:
+              data = {
+                  "schemaVersion": 1,
+                  "label": label,
+                  "message": f"{value}%",
+                  "color": color
+              }
+              output_path = f"build/dist/badges/{filename}-coverage.json"
+              with open(output_path, "w") as f:
                   json.dump(data, f)
+              print(f"Created Badge: {output_path} ({label}: {value}%)")
 
           stats = analyze_coverage("$REPORT_PATH")
-          
-          vm_val = calculate_percent(stats["vm"]["m"], stats["vm"]["c"])
-          uc_val = calculate_percent(stats["uc"]["m"], stats["uc"]["c"])
-          repo_val = calculate_percent(stats["repo"]["m"], stats["repo"]["c"])
-          
-          # Total Unit Test = (VM + UC + Repo 합산)
-          total_m = stats["vm"]["m"] + stats["uc"]["m"] + stats["repo"]["m"]
-          total_c = stats["vm"]["c"] + stats["uc"]["c"] + stats["repo"]["c"]
-          total_val = calculate_percent(total_m, total_c)
+          if stats:
+              def calc(key):
+                  total = stats[key]["m"] + stats[key]["c"]
+                  return int(stats[key]["c"] * 100 / total) if total > 0 else 0
 
-          print(f"VM: {vm_val}%, UC: {uc_val}%, Repo: {repo_val}%, Total Unit Test: {total_val}%")
+              vm_v = calc("vm")
+              uc_v = calc("uc")
+              repo_v = calc("repo")
+              
+              total_m = stats["vm"]["m"] + stats["uc"]["m"] + stats["repo"]["m"]
+              total_c = stats["vm"]["c"] + stats["uc"]["c"] + stats["repo"]["c"]
+              tot_v = int(total_c * 100 / (total_m + total_c)) if (total_m + total_c) > 0 else 0
 
-          create_badge("ViewModel", vm_val, "viewmodel")
-          create_badge("UseCase", uc_val, "usecase")
-          create_badge("Repository", repo_val, "repository")
-          create_badge("Unit Test", total_val, "unit-test")
+              create_badge("ViewModel", vm_v, "viewmodel")
+              create_badge("UseCase", uc_v, "usecase")
+              create_badge("Repository", repo_v, "repository")
+              create_badge("Unit Test", tot_v, "unit-test")
           EOF
 
-      - name: Verify Deployment Directory
+      - name: Verify Artifacts
         if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         run: |
-          echo "--- Deployment Directory Structure ---"
-          find build/dist -maxdepth 2
-          echo "-------------------------------------"
+          echo "--- Checking Generated Badges ---"
+          ls -R build/dist/badges/
+          echo "--------------------------------"
 
       - name: Upload Pages Artifact
         if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
