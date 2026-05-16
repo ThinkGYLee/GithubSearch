@@ -239,11 +239,7 @@ class GitHubRepositoryImpl @Inject constructor(
     // Main
     override suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult {
         val response =
-            accessService.getAccessToken(
-                clientId = BuildConfig.CLIENT_ID,
-                clientSecret = BuildConfig.CLIENT_SECRET,
-                code = code,
-            )
+            accessService.getAccessToken(code = code)
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
