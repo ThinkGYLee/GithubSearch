@@ -14,7 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetAccessTokenTest {
+class GetAccessTokenUseCaseTest {
     private val repository: GitHubRepository = mockk()
     private lateinit var useCase: GetAccessTokenUseCase
 

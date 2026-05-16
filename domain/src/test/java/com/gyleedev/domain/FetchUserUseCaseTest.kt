@@ -15,7 +15,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class FetchUserTest {
+class FetchUserUseCaseTest {
     private val repository: GitHubRepository = mockk()
     private lateinit var useCase: FetchUserUseCase
 

@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetReposWithFlowTest {
+class GetReposWithFlowUseCaseTest {
     private val repository: GitHubRepository = mockk()
     private lateinit var useCase: GetReposWithFlowUseCase
     private val mockRepos = listOf(

@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class ResetDataTest {
+class ResetDataUseCaseTest {
     private val repository: GitHubRepository = mockk()
     private lateinit var useCase: ResetDataUseCase
 
