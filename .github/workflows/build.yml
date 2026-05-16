@@ -7,7 +7,7 @@ on:
       - 'docs/**'
       - '.github/workflows/**'
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 concurrency:
   group: build-${{ github.ref }}
@@ -27,6 +27,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 변경 사항 확인을 위해 전체 히스토리 가져오기
+
+      - name: Check for Test Changes
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            DIFF_BASE="origin/${{ github.base_ref }}"
+          else
+            DIFF_BASE="${{ github.event.before }}"
+            # 첫 푸시거나 이전 커밋 정보를 알 수 없는 경우 대비
+            if [ "$DIFF_BASE" == "0000000000000000000000000000000000000000" ]; then
+              DIFF_BASE="HEAD^"
+            fi
+          fi
+          
+          # 테스트 관련 파일 변경 여부 확인
+          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/test/|src/androidTest/" > /dev/null; then
+            echo "tests_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "tests_changed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v4
@@ -46,10 +68,16 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
+        # 테스트 코드가 변경되었을 때만 jacocoFullReport 실행, 아니면 일반 테스트만 실행
+        run: |
+          if [ "${{ steps.filter.outputs.tests_changed }}" == "true" ]; then
+            ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
+          else
+            ./gradlew spotlessCheck assembleDebug testDebugUnitTest --parallel --build-cache --configure-on-demand
+          fi
 
       - name: Post JaCoCo Report Comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.filter.outputs.tests_changed == 'true'
         uses: Madrapps/jacoco-report@v1.7.1
         with:
           paths: |
@@ -60,11 +88,14 @@ jobs:
           title: "📈 테스트 커버리지 리포트"
           update-comment: true
 
-      - name: Generate Coverage Badges Data
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Prepare Deployment Directory
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.tests_changed == 'true'
         run: |
+          mkdir -p build/dist/badges
+          cp -r build/reports/jacoco/jacocoFullReport/html/* build/dist/
+          
+          # JSON 배지 데이터 생성 로직
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
-          mkdir -p build/badges
           
           extract_coverage() {
             local package=$1
@@ -88,7 +119,7 @@ jobs:
             local label=$1
             local value=$2
             local color=$(get_color $value)
-            echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/badges/$3-coverage.json"
+            echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/dist/badges/$3-coverage.json"
           }
 
           DOMAIN_COV=$(extract_coverage "com/gyleedev/domain")
@@ -99,19 +130,10 @@ jobs:
           create_badge_json "Data" $DATA_COV "data"
           create_badge_json "Total" $TOTAL_COV "total"
 
-      - name: Deploy Coverage and Badges to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Deploy to GitHub Pages
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.tests_changed == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/reports/jacoco/jacocoFullReport/html
-          destination_dir: .
-          
-      - name: Deploy Badges Data to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/badges
-          destination_dir: badges
-          keep_files: true
+          publish_dir: ./build/dist
+          force_orphan: true # gh-pages 브랜치가 없으면 자동으로 생성함
