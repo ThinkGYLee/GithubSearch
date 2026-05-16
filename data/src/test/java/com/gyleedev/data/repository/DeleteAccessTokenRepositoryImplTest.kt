@@ -45,7 +45,7 @@ class DeleteAccessTokenRepositoryImplTest {
     }
 
     @Test
-    fun `DeleteAccessToken 결과 확인`() = runTest {
+    fun `DeleteAccessToken 기능 확인`() = runTest {
         // Given
         every { tokenPreference.deleteKey() } just runs
         // When
