@@ -43,7 +43,7 @@ class DeleteUserByIdRepositoryImplTest {
     }
 
     @Test
-    fun `DeleteUserById 함수 확인`() = runTest {
+    fun `DeleteUserById 테스트`() = runTest {
         // Given
         val givenId = "user1"
         coEvery { userDao.deleteUserById(githubId = givenId) } just runs
