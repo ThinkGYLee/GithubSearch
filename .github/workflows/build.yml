@@ -154,15 +154,16 @@ jobs:
                       
                       # 2. UseCase & Domain Model (domain 패키지)
                       elif "domain" in pkg_name:
-                          if "usecase" in pkg_name or "model" in pkg_name:
+                          if any(k in pkg_name for k in ["usecase", "model"]):
                               for cnt in pkg.findall('counter'):
                                   if cnt.get('type') == 'INSTRUCTION':
                                       stats["uc"]["m"] += int(cnt.get('missed', 0))
                                       stats["uc"]["c"] += int(cnt.get('covered', 0))
                       
-                      # 3. Repository & Data Source (data 패키지)
+                      # 3. Repository & Meaningful Data Logic (data 패키지)
                       elif "data" in pkg_name:
-                          if any(k in pkg_name for k in ["repository", "remote", "database", "api"]):
+                          # 인터셉터, 프리퍼런스, 레포지토리 등 '로직'이 포함된 패키지만 집계
+                          if any(k in pkg_name for k in ["repository", "interceptor", "preference", "datasource"]):
                               for cnt in pkg.findall('counter'):
                                   if cnt.get('type') == 'INSTRUCTION':
                                       stats["repo"]["m"] += int(cnt.get('missed', 0))

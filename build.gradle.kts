@@ -28,7 +28,17 @@ val fileFilter = listOf(
     "**/*_Factory.*",
     "**/*_MembersInjector.*",
     "**/*_Impl*.*",
-    "**/*Binding.*"
+    "**/*Binding.*",
+    // UI & Navigation (Boilerplate)
+    "**/*Args*.*",
+    "**/*Directions*.*",
+    // Network & DI (Configuration)
+    "**/*Module*.*",
+    "**/*Qualifiers*.*",
+    "**/*Service*.*",
+    "**/*Database*.*",
+    "**/*Dao*.*",
+    "**/*Mapper*.*"
 )
 
 tasks.register<JacocoReport>("jacocoFullReport") {
