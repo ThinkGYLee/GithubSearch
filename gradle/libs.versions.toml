@@ -33,7 +33,7 @@ jetbrainsKotlinJvm = "2.3.21"
 app-versionCode = "1"
 app-versionName = "1.0.0"
 project-targetSdk = "36"
-
+jacoco = "0.8.12"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

@@ -46,5 +46,9 @@ gradlePlugin {
             id = "gyleedev.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
+        register("androidJacoco") {
+            id = "gyleedev.android.jacoco"
+            implementationClass = "AndroidJacocoConventionPlugin"
+        }
     }
 }
