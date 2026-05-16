@@ -7,6 +7,7 @@ group = "com.gyleedev.build_logic"
 dependencies {
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.jacoco.gradle.plugin)
     compileOnly(libs.hilt.gradle.plugin)
     compileOnly(libs.ksp.gradle.plugin)
     compileOnly(libs.compose.compiler.gradle.plugin)
