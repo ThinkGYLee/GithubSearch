@@ -58,8 +58,9 @@ class SyncRepoDataListRepositoryImplTest {
         )
         // RepoResponse -> RepositoryModel -> ReposEntity 변환 과정 검증
         val expectedEntities = mockRepoResponses.map { it.toModel(githubId).toEntity(entityId) }
+        val expectedResponse = Response.success(mockRepoResponses)
 
-        coEvery { githubApiService.getRepos(githubId) } returns Response.success(mockRepoResponses)
+        coEvery { githubApiService.getRepos(githubId) } returns expectedResponse
         coEvery { reposDao.insertRepos(expectedEntities) } just runs
 
         // When
@@ -78,8 +79,9 @@ class SyncRepoDataListRepositoryImplTest {
         val entityId = 1L
         val githubId = "test_user"
         val mockRepoResponses = emptyList<RepoResponse>()
+        val expectedResponse = Response.success(mockRepoResponses)
 
-        coEvery { githubApiService.getRepos(githubId) } returns Response.success(mockRepoResponses)
+        coEvery { githubApiService.getRepos(githubId) } returns expectedResponse
 
         // When
         repository.syncRepoDataList(entityId, githubId)
