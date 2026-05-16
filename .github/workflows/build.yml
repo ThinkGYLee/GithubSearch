@@ -47,10 +47,25 @@ jobs:
           fi
           
           # 소스, 테스트, 빌드 설정, CI 설정 파일 변경 여부 확인
-          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/main/|src/test/|src/androidTest/|build-logic/|build.gradle.kts|gradle/|.github/workflows/build.yml" > /dev/null; then
+          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/main/|src/test/|src/androidTest/|build-logic/|build.gradle.kts|gradle/|gradle.properties|.github/workflows/build.yml" > /dev/null; then
             echo "code_changed=true" >> $GITHUB_OUTPUT
           else
             echo "code_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate Secrets
+        if: steps.filter.outputs.code_changed == 'true'
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: |
+          if [ -z "$CLIENT_ID" ]; then
+            echo "::error::CLIENT_ID secret is missing!"
+            exit 1
+          fi
+          if [ -z "$CLIENT_SECRET" ]; then
+            echo "::error::CLIENT_SECRET secret is missing!"
+            exit 1
           fi
 
       - name: Validate Gradle Wrapper
@@ -75,7 +90,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
+        run: ./gradlew spotlessCheck lintDebug assembleDebug assembleDebugAndroidTest testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
 
       - name: Post JaCoCo Report Comment
         if: github.event_name == 'pull_request' && steps.filter.outputs.code_changed == 'true'
@@ -125,31 +140,33 @@ jobs:
                   }
 
                   for pkg in root.findall('package'):
-                      pkg_name = pkg.get('name', '')
+                      pkg_name = pkg.get('name', '').replace('.', '/')
                       
                       # 1. ViewModel (feature 패키지 내 ViewModel 키워드 포함 클래스)
                       if "feature" in pkg_name:
                           for cls in pkg.findall('class'):
                               cls_name = cls.get('name', '')
-                              if "ViewModel" in cls_name and not "Test" in cls_name:
+                              if "ViewModel" in cls_name and "Test" not in cls_name:
                                   for cnt in cls.findall('counter'):
                                       if cnt.get('type') == 'INSTRUCTION':
                                           stats["vm"]["m"] += int(cnt.get('missed', 0))
                                           stats["vm"]["c"] += int(cnt.get('covered', 0))
                       
-                      # 2. UseCase (domain/usecase)
-                      elif "domain/usecase" in pkg_name or "domain/model" in pkg_name:
-                          for cnt in pkg.findall('counter'):
-                              if cnt.get('type') == 'INSTRUCTION':
-                                  stats["uc"]["m"] += int(cnt.get('missed', 0))
-                                  stats["uc"]["c"] += int(cnt.get('covered', 0))
+                      # 2. UseCase & Domain Model (domain 패키지)
+                      elif "domain" in pkg_name:
+                          if "usecase" in pkg_name or "model" in pkg_name:
+                              for cnt in pkg.findall('counter'):
+                                  if cnt.get('type') == 'INSTRUCTION':
+                                      stats["uc"]["m"] += int(cnt.get('missed', 0))
+                                      stats["uc"]["c"] += int(cnt.get('covered', 0))
                       
-                      # 3. Repository (data/repository)
-                      elif "data/repository" in pkg_name or "data/remote" in pkg_name or "data/database" in pkg_name:
-                          for cnt in pkg.findall('counter'):
-                              if cnt.get('type') == 'INSTRUCTION':
-                                  stats["repo"]["m"] += int(cnt.get('missed', 0))
-                                  stats["repo"]["c"] += int(cnt.get('covered', 0))
+                      # 3. Repository & Data Source (data 패키지)
+                      elif "data" in pkg_name:
+                          if any(k in pkg_name for k in ["repository", "remote", "database", "api"]):
+                              for cnt in pkg.findall('counter'):
+                                  if cnt.get('type') == 'INSTRUCTION':
+                                      stats["repo"]["m"] += int(cnt.get('missed', 0))
+                                      stats["repo"]["c"] += int(cnt.get('covered', 0))
                   
                   return stats
               except Exception as e:

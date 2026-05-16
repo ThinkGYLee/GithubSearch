@@ -15,7 +15,6 @@ dependencies {
     implementation(libs.landscapist.glide)
     implementation(libs.landscapist.placeholder)
     implementation(libs.androidx.material.icons)
-    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
 }
