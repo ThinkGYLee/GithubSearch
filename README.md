@@ -9,15 +9,11 @@
 - 페이징
 
 ## 📈 테스트 커버리지 리포트
-<!-- START_COVERAGE_REPORT -->
 | Layer | Instruction Coverage | Details |
 | :--- | :---: | :---: |
-| **Domain** | ![Domain Coverage](https://img.shields.io/badge/Coverage-0%25-red) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
-| **Data** | ![Data Coverage](https://img.shields.io/badge/Coverage-0%25-red) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
-| **Total** | ![Total Coverage](https://img.shields.io/badge/Coverage-0%25-red) | [전체 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |
-
-최근 업데이트: 2026-05-17
-<!-- END_COVERAGE_REPORT -->
+| **Domain** | ![Domain](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/domain-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Data** | ![Data](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/data-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Total** | ![Total](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/total-coverage.json) | [전체 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |
 
 ## 기술 스택
  구분 | 내용
@@ -259,4 +255,3 @@ fun getAccessToken(code: String) {
         }
     }
 ```
-

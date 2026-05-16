@@ -60,70 +60,58 @@ jobs:
           title: "📈 테스트 커버리지 리포트"
           update-comment: true
 
-      - name: Upload Report Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: build/reports/jacoco/jacocoFullReport/html
-
-      - name: Deploy Coverage to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/reports/jacoco/jacocoFullReport/html
-
-      - name: Update README Coverage
+      - name: Generate Coverage Badges Data
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+          mkdir -p build/badges
           
-          # XML에서 지표 추출 (Instruction 기준)
           extract_coverage() {
             local package=$1
             if [ -z "$package" ]; then
-              # Total Coverage
               missed=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed=")[0-9]+' "$REPORT_PATH" || echo 0)
               covered=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed="'$missed'" covered=")[0-9]+' "$REPORT_PATH" || echo 0)
             else
-              # Package Specific Coverage
               line=$(grep "package name=\"$package\"" "$REPORT_PATH" -A 10 | grep "counter type=\"INSTRUCTION\"" | head -n 1)
               missed=$(echo "$line" | grep -oP '(?<=missed=")[0-9]+' || echo 0)
               covered=$(echo "$line" | grep -oP '(?<=covered=")[0-9]+' || echo 0)
             fi
-            
             total=$((missed + covered))
-            if [ "$total" -eq 0 ]; then
-              echo 0
-            else
-              echo $((covered * 100 / total))
-            fi
+            if [ "$total" -eq 0 ]; then echo 0; else echo $((covered * 100 / total)); fi
+          }
+
+          get_color() {
+            if [ "$1" -ge 80 ]; then echo "brightgreen"; elif [ "$1" -ge 60 ]; then echo "green"; elif [ "$1" -ge 40 ]; then echo "orange"; else echo "red"; fi
+          }
+
+          create_badge_json() {
+            local label=$1
+            local value=$2
+            local color=$(get_color $value)
+            echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/badges/$3-coverage.json"
           }
 
           DOMAIN_COV=$(extract_coverage "com/gyleedev/domain")
           DATA_COV=$(extract_coverage "com/gyleedev/data")
           TOTAL_COV=$(extract_coverage "")
 
-          # 배지 색상 결정 함수
-          get_color() {
-            if [ "$1" -ge 80 ]; then echo "brightgreen"; elif [ "$1" -ge 60 ]; then echo "green"; elif [ "$1" -ge 40 ]; then echo "orange"; else echo "red"; fi
-          }
+          create_badge_json "Domain" $DOMAIN_COV "domain"
+          create_badge_json "Data" $DATA_COV "data"
+          create_badge_json "Total" $TOTAL_COV "total"
 
-          DOMAIN_COLOR=$(get_color $DOMAIN_COV)
-          DATA_COLOR=$(get_color $DATA_COV)
-          TOTAL_COLOR=$(get_color $TOTAL_COV)
-          UPDATE_DATE=$(date +'%Y-%m-%d')
-
-          # README.md 내용 업데이트
-          NEW_REPORT="| Layer | Instruction Coverage | Details |\n| :--- | :---: | :---: |\n| **Domain** | ![Domain Coverage](https://img.shields.io/badge/Coverage-$DOMAIN_COV%25-$DOMAIN_COLOR) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |\n| **Data** | ![Data Coverage](https://img.shields.io/badge/Coverage-$DATA_COV%25-$DATA_COLOR) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |\n| **Total** | ![Total Coverage](https://img.shields.io/badge/Coverage-$TOTAL_COV%25-$TOTAL_COLOR) | [전체 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |\n\n최근 업데이트: $UPDATE_DATE"
-          
-          sed -i "/<!-- START_COVERAGE_REPORT -->/,/<!-- END_COVERAGE_REPORT -->/c\<!-- START_COVERAGE_REPORT -->\n$NEW_REPORT\n<!-- END_COVERAGE_REPORT -->" README.md
-
-      - name: Commit and Push README changes
+      - name: Deploy Coverage and Badges to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "docs: README 테스트 커버리지 대시보드 업데이트"
-          git push
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/reports/jacoco/jacocoFullReport/html
+          destination_dir: .
+          
+      - name: Deploy Badges Data to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/badges
+          destination_dir: badges
+          keep_files: true
