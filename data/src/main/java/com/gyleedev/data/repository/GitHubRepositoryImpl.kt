@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.gyleedev.data.BuildConfig
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
 import com.gyleedev.data.database.dao.UserDao
@@ -201,8 +200,8 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun syncUserData(githubId: String): UserSyncResult {
         val userFetchResult = fetchUser(githubId)
-        val localUser = getUserWithFlow(githubId).first() as UserModel
-        return if (userFetchResult is UserFetchResult.Success) {
+        val localUser = getUserWithFlow(githubId).first()
+        return if (userFetchResult is UserFetchResult.Success && localUser != null) {
             val insertUser = userFetchResult.user.copy(favorite = localUser.favorite)
             val entityId = upsertUser(insertUser)
             UserSyncResult.Success(entityId = entityId)
@@ -239,11 +238,7 @@ class GitHubRepositoryImpl @Inject constructor(
     // Main
     override suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult {
         val response =
-            accessService.getAccessToken(
-                clientId = BuildConfig.CLIENT_ID,
-                clientSecret = BuildConfig.CLIENT_SECRET,
-                code = code,
-            )
+            accessService.getAccessToken(code = code)
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
@@ -271,10 +266,7 @@ class GitHubRepositoryImpl @Inject constructor(
         if (accessToken.isBlank()) {
             return RevokeResult.NO_KEY
         }
-        val response = revokeService.revoke(
-            clientId = BuildConfig.CLIENT_ID,
-            request = RevokeRequest(accessToken),
-        )
+        val response = revokeService.revoke(request = RevokeRequest(accessToken))
         return if (response.isSuccessful) {
             RevokeResult.SUCCESS
         } else {
