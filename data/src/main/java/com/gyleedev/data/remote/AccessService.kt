@@ -1,5 +1,6 @@
 package com.gyleedev.data.remote
 
+import com.gyleedev.data.BuildConfig
 import com.gyleedev.data.remote.response.GithubAccessResponse
 import retrofit2.Response
 import retrofit2.http.Field
@@ -12,8 +13,8 @@ interface AccessService {
     @POST("login/oauth/access_token")
     @Headers("Accept: application/json")
     suspend fun getAccessToken(
-        @Field("client_id") clientId: String,
-        @Field("client_secret") clientSecret: String,
+        @Field("client_id") clientId: String = BuildConfig.CLIENT_ID,
+        @Field("client_secret") clientSecret: String = BuildConfig.CLIENT_SECRET,
         @Field("code") code: String,
     ): Response<GithubAccessResponse>
 }
