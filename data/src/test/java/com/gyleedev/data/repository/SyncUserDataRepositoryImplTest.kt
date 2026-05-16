@@ -79,9 +79,10 @@ class SyncUserDataRepositoryImplTest {
         // UserModel을 거쳐 favorite 상태 유지 후 Entity로 변환
         val expectedMergedEntity: UserEntity = remoteUserResponse.toModel().copy(favorite = true).toEntity()
         val expectedGeneratedId = 100L
+        val expectedResponse = Response.success(remoteUserResponse)
         val expectedResult = UserSyncResult.Success(expectedGeneratedId)
 
-        coEvery { githubApiService.getUser(githubId) } returns Response.success(remoteUserResponse)
+        coEvery { githubApiService.getUser(githubId) } returns expectedResponse
         every { userDao.getUserByGithubId(githubId) } returns flowOf(localUserEntity)
         coEvery { userDao.upsertUser(expectedMergedEntity) } returns expectedGeneratedId
 
