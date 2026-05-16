@@ -15,6 +15,7 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("org.jetbrains.kotlin.jvm")
+                apply("gyleedev.android.jacoco")
             }
 
             configure<JavaPluginExtension> {

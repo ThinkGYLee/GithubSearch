@@ -13,6 +13,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.library")
+                apply("gyleedev.android.jacoco")
             }
 
             configure<LibraryExtension> {
@@ -24,6 +25,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     defaultConfig.buildConfigField("String", "VERSION_NAME", "\"$versionName\"")
                 }
                 buildTypes {
+                    getByName("debug") {
+                        enableUnitTestCoverage = true
+                    }
                     getByName("release") {
                         isMinifyEnabled = false
                     }

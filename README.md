@@ -8,6 +8,13 @@
 - 네트워크 콜 최적화
 - 페이징
 
+## 📈 테스트 커버리지 리포트
+| Layer | Instruction Coverage | Details |
+| :--- | :---: | :---: |
+| **Domain** | ![Domain](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/domain-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Data** | ![Data](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/data-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Total** | ![Total](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/total-coverage.json) | [전체 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |
+
 ## 기술 스택
  구분 | 내용
 -- | --
@@ -248,4 +255,3 @@ fun getAccessToken(code: String) {
         }
     }
 ```
-

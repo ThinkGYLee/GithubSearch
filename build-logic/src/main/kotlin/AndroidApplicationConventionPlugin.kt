@@ -13,6 +13,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
+                apply("gyleedev.android.jacoco")
             }
 
             configure<ApplicationExtension> {
@@ -22,6 +23,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 defaultConfig.versionName = libs.findVersion("app-versionName").get().requiredVersion
 
                 buildTypes {
+                    getByName("debug") {
+                        enableUnitTestCoverage = true
+                    }
                     getByName("release") {
                         isMinifyEnabled = true
                         isShrinkResources = true

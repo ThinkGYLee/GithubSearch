@@ -6,6 +6,8 @@ on:
       - '**.md'
       - 'docs/**'
       - '.github/workflows/**'
+  push:
+    branches: [ main ]
 
 concurrency:
   group: build-${{ github.ref }}
@@ -13,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: "Build"
+    name: "Build & Coverage"
     runs-on: ubuntu-latest
 
     permissions:
@@ -40,8 +42,76 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
 
-      - name: Check and Build and Test
+      - name: Check and Build and Test with Coverage
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest --parallel --build-cache --configure-on-demand
+        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
+
+      - name: Post JaCoCo Report Comment
+        if: github.event_name == 'pull_request'
+        uses: Madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: "📈 테스트 커버리지 리포트"
+          update-comment: true
+
+      - name: Generate Coverage Badges Data
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+          mkdir -p build/badges
+          
+          extract_coverage() {
+            local package=$1
+            if [ -z "$package" ]; then
+              missed=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed=")[0-9]+' "$REPORT_PATH" || echo 0)
+              covered=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed="'$missed'" covered=")[0-9]+' "$REPORT_PATH" || echo 0)
+            else
+              line=$(grep "package name=\"$package\"" "$REPORT_PATH" -A 10 | grep "counter type=\"INSTRUCTION\"" | head -n 1)
+              missed=$(echo "$line" | grep -oP '(?<=missed=")[0-9]+' || echo 0)
+              covered=$(echo "$line" | grep -oP '(?<=covered=")[0-9]+' || echo 0)
+            fi
+            total=$((missed + covered))
+            if [ "$total" -eq 0 ]; then echo 0; else echo $((covered * 100 / total)); fi
+          }
+
+          get_color() {
+            if [ "$1" -ge 80 ]; then echo "brightgreen"; elif [ "$1" -ge 60 ]; then echo "green"; elif [ "$1" -ge 40 ]; then echo "orange"; else echo "red"; fi
+          }
+
+          create_badge_json() {
+            local label=$1
+            local value=$2
+            local color=$(get_color $value)
+            echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/badges/$3-coverage.json"
+          }
+
+          DOMAIN_COV=$(extract_coverage "com/gyleedev/domain")
+          DATA_COV=$(extract_coverage "com/gyleedev/data")
+          TOTAL_COV=$(extract_coverage "")
+
+          create_badge_json "Domain" $DOMAIN_COV "domain"
+          create_badge_json "Data" $DATA_COV "data"
+          create_badge_json "Total" $TOTAL_COV "total"
+
+      - name: Deploy Coverage and Badges to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/reports/jacoco/jacocoFullReport/html
+          destination_dir: .
+          
+      - name: Deploy Badges Data to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/badges
+          destination_dir: badges
+          keep_files: true
