@@ -15,6 +15,7 @@ import com.gyleedev.data.utils.createDummyUserEntity
 import com.gyleedev.data.utils.ignoreUnused
 import com.gyleedev.githubsearch.domain.model.UserSyncResult
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.coVerifySequence
 import io.mockk.every
 import io.mockk.mockk
@@ -53,7 +54,7 @@ class SyncUserDataRepositoryImplTest {
     }
 
     @Test
-    fun `유저 데이터 동기화 시 API 호출이 성공하면 로컬 즐겨찾기 상태를 유지하며 DB를 업데이트한다`() = runTest {
+    fun `유저 데이터 동기화 시 API 호출이 성공하고 로컬 유저가 존재하면 즐겨찾기 상태를 유지하며 DB를 업데이트한다`() = runTest {
         // Given
         val githubId = "test_user"
         val remoteUserResponse = UserResponse(
@@ -73,16 +74,14 @@ class SyncUserDataRepositoryImplTest {
         )
         val localUserEntity: UserEntity = createDummyUserEntity(id = 1L, repoCount = 5).copy(
             githubId = githubId,
-            favorite = true, // 로컬에서는 즐겨찾기 상태임
+            favorite = true,
         )
 
-        // UserModel을 거쳐 favorite 상태 유지 후 Entity로 변환
         val expectedMergedEntity: UserEntity = remoteUserResponse.toModel().copy(favorite = true).toEntity()
         val expectedGeneratedId = 100L
-        val expectedResponse = Response.success(remoteUserResponse)
         val expectedResult = UserSyncResult.Success(expectedGeneratedId)
 
-        coEvery { githubApiService.getUser(githubId) } returns expectedResponse
+        coEvery { githubApiService.getUser(githubId) } returns Response.success(remoteUserResponse)
         every { userDao.getUserByGithubId(githubId) } returns flowOf(localUserEntity)
         coEvery { userDao.upsertUser(expectedMergedEntity) } returns expectedGeneratedId
 
@@ -99,16 +98,28 @@ class SyncUserDataRepositoryImplTest {
     }
 
     @Test
-    fun `유저 데이터 동기화 시 API 호출이 실패하면 Fail을 반환한다`() = runTest {
+    fun `유저 데이터 동기화 시 API 호출은 성공했으나 로컬 유저가 존재하지 않으면 실패를 반환한다`() = runTest {
         // Given
         val githubId = "test_user"
+        val remoteUserResponse = UserResponse(
+            name = "remote_name",
+            login = githubId,
+            followers = 100,
+            following = 50,
+            avatar = "remote_avatar",
+            company = "remote_company",
+            email = "remote_email",
+            bio = "remote_bio",
+            repoCount = 10,
+            createdDate = "2023-01-01",
+            updatedDate = "2023-01-02",
+            reposAddress = "remote_repos",
+            blogUrl = "remote_blog",
+        )
         val expectedResult = UserSyncResult.Fail
-        val mockErrorResponse = Response.error<UserResponse>(404, "".toResponseBody(null))
 
-        coEvery { githubApiService.getUser(githubId) } returns mockErrorResponse
-
-        val localUserEntity = createDummyUserEntity(id = 1L, repoCount = 5).copy(githubId = githubId)
-        every { userDao.getUserByGithubId(githubId) } returns flowOf(localUserEntity)
+        coEvery { githubApiService.getUser(githubId) } returns Response.success(remoteUserResponse)
+        every { userDao.getUserByGithubId(githubId) } returns flowOf(null)
 
         // When
         val result = repository.syncUserData(githubId)
@@ -119,5 +130,30 @@ class SyncUserDataRepositoryImplTest {
             githubApiService.getUser(githubId)
             userDao.getUserByGithubId(githubId).ignoreUnused()
         }
+
+        coVerify(exactly = 0) { userDao.upsertUser(any()) }
+    }
+
+    @Test
+    fun `유저 데이터 동기화 시 API 호출이 실패하면 로컬 유저 조회 후 Fail을 반환하고 저장은 수행하지 않는다`() = runTest {
+        // Given
+        val githubId = "test_user"
+        val expectedResult = UserSyncResult.Fail
+        val mockErrorResponse = Response.error<UserResponse>(404, "".toResponseBody(null))
+
+        coEvery { githubApiService.getUser(githubId) } returns mockErrorResponse
+        every { userDao.getUserByGithubId(githubId) } returns flowOf(null)
+
+        // When
+        val result = repository.syncUserData(githubId)
+
+        // Then
+        assertEquals(expectedResult, result)
+        coVerifySequence {
+            githubApiService.getUser(githubId)
+            userDao.getUserByGithubId(githubId).ignoreUnused()
+        }
+
+        coVerify(exactly = 0) { userDao.upsertUser(any()) }
     }
 }
