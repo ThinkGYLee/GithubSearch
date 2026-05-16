@@ -8,12 +8,15 @@
 - 네트워크 콜 최적화
 - 페이징
 
-## 📈 테스트 커버리지 리포트
-| Layer | Instruction Coverage | Details |
+## 📈 유닛 테스트 커버리지 대시보드
+| Category | Instruction Coverage | Details |
 | :--- | :---: | :---: |
-| **Domain** | ![Domain](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/domain-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
-| **Data** | ![Data](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/data-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
-| **Total** | ![Total](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/total-coverage.json) | [전체 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Total Unit Test** | ![Total](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/unit-test-coverage.json) | [상세 리포트 📄](https://ThinkGYLee.github.io/GithubSearch/) |
+| **ViewModel** | ![ViewModel](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/viewmodel-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **UseCase** | ![UseCase](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/usecase-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+| **Repository** | ![Repository](https://img.shields.io/endpoint?url=https://ThinkGYLee.github.io/GithubSearch/badges/repository-coverage.json) | [상세보기 🔍](https://ThinkGYLee.github.io/GithubSearch/) |
+
+> *본 지표는 UI 및 설정을 제외한 핵심 비즈니스 로직에 대한 유닛 테스트 결과입니다.*
 
 ## 기술 스택
  구분 | 내용

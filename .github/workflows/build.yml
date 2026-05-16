@@ -107,58 +107,79 @@ jobs:
           import json
           import os
 
-          def get_coverage(xml_path, package_prefix=None):
+          def analyze_coverage(xml_path):
               try:
                   if not os.path.exists(xml_path):
-                      print(f"Warning: {xml_path} not found")
-                      return 0
+                      return {}
                   
                   tree = ET.parse(xml_path)
                   root = tree.getroot()
-                  missed, covered = 0, 0
                   
-                  if package_prefix:
-                      found_any = False
-                      for pkg in root.findall('package'):
-                          pkg_name = pkg.get('name', '')
-                          if pkg_name.startswith(package_prefix):
-                              found_any = True
-                              for cnt in pkg.findall('counter'):
-                                  if cnt.get('type') == 'INSTRUCTION':
-                                      missed += int(cnt.get('missed', 0))
-                                      covered += int(cnt.get('covered', 0))
-                      if not found_any:
-                          print(f"Warning: No packages found with prefix {package_prefix}")
-                  else:
-                      for cnt in root.findall('counter'):
-                          if cnt.get('type') == 'INSTRUCTION':
-                              missed += int(cnt.get('missed', 0))
-                              covered += int(cnt.get('covered', 0))
+                  # 결과 저장용 사전
+                  stats = {
+                      "vm": {"m": 0, "c": 0},
+                      "uc": {"m": 0, "c": 0},
+                      "repo": {"m": 0, "c": 0}
+                  }
+
+                  for pkg in root.findall('package'):
+                      pkg_name = pkg.get('name', '')
+                      
+                      # 1. ViewModel (feature 패키지 내 ViewModel 키워드 포함 클래스)
+                      if "feature" in pkg_name:
+                          for cls in pkg.findall('class'):
+                              if "ViewModel" in cls.get('name', ''):
+                                  for cnt in cls.findall('counter'):
+                                      if cnt.get('type') == 'INSTRUCTION':
+                                          stats["vm"]["m"] += int(cnt.get('missed', 0))
+                                          stats["vm"]["c"] += int(cnt.get('covered', 0))
+                      
+                      # 2. UseCase (domain/usecase 패키지)
+                      elif "domain/usecase" in pkg_name or "domain/model" in pkg_name:
+                          for cnt in pkg.findall('counter'):
+                              if cnt.get('type') == 'INSTRUCTION':
+                                  stats["uc"]["m"] += int(cnt.get('missed', 0))
+                                  stats["uc"]["c"] += int(cnt.get('covered', 0))
+                      
+                      # 3. Repository (data/repository 패키지)
+                      elif "data/repository" in pkg_name or "data/remote" in pkg_name or "data/database" in pkg_name:
+                          for cnt in pkg.findall('counter'):
+                              if cnt.get('type') == 'INSTRUCTION':
+                                  stats["repo"]["m"] += int(cnt.get('missed', 0))
+                                  stats["repo"]["c"] += int(cnt.get('covered', 0))
                   
-                  total = missed + covered
-                  percentage = int(covered * 100 / total) if total > 0 else 0
-                  print(f"Coverage for {package_prefix or 'Total'}: {percentage}% ({covered}/{total})")
-                  return percentage
+                  return stats
               except Exception as e:
-                  print(f"Error parsing coverage: {e}")
-                  return 0
+                  print(f"Error analyzing coverage: {e}")
+                  return {}
+
+          def calculate_percent(m, c):
+              total = m + c
+              return int(c * 100 / total) if total > 0 else 0
 
           def create_badge(label, value, filename):
               color = "brightgreen" if value >= 80 else "green" if value >= 60 else "orange" if value >= 40 else "red"
               data = {"schemaVersion": 1, "label": label, "message": f"{value}%", "color": color}
-              file_path = f"build/dist/badges/{filename}-coverage.json"
-              with open(file_path, "w") as f:
+              with open(f"build/dist/badges/{filename}-coverage.json", "w") as f:
                   json.dump(data, f)
-              print(f"Created badge: {file_path}")
 
-          # 수치 계산 및 배지 생성
-          dom_cov = get_coverage("$REPORT_PATH", "com/gyleedev/githubsearch/domain")
-          dat_cov = get_coverage("$REPORT_PATH", "com/gyleedev/data")
-          tot_cov = get_coverage("$REPORT_PATH")
+          stats = analyze_coverage("$REPORT_PATH")
+          
+          vm_val = calculate_percent(stats["vm"]["m"], stats["vm"]["c"])
+          uc_val = calculate_percent(stats["uc"]["m"], stats["uc"]["c"])
+          repo_val = calculate_percent(stats["repo"]["m"], stats["repo"]["c"])
+          
+          # Total Unit Test = (VM + UC + Repo 합산)
+          total_m = stats["vm"]["m"] + stats["uc"]["m"] + stats["repo"]["m"]
+          total_c = stats["vm"]["c"] + stats["uc"]["c"] + stats["repo"]["c"]
+          total_val = calculate_percent(total_m, total_c)
 
-          create_badge("Domain", dom_cov, "domain")
-          create_badge("Data", dat_cov, "data")
-          create_badge("Total", tot_cov, "total")
+          print(f"VM: {vm_val}%, UC: {uc_val}%, Repo: {repo_val}%, Total Unit Test: {total_val}%")
+
+          create_badge("ViewModel", vm_val, "viewmodel")
+          create_badge("UseCase", uc_val, "usecase")
+          create_badge("Repository", repo_val, "repository")
+          create_badge("Unit Test", total_val, "unit-test")
           EOF
 
       - name: Verify Deployment Directory

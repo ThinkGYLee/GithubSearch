@@ -7,11 +7,13 @@ import com.gyleedev.data.preference.TokenPreference
 import com.gyleedev.data.remote.AccessService
 import com.gyleedev.data.remote.GithubApiService
 import com.gyleedev.data.remote.RevokeService
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +45,7 @@ class DeleteAccessTokenRepositoryImplTest {
     }
 
     @Test
-    fun `DeleteAccessToken 실행을 확인한다`() = runTest {
+    fun `DeleteAccessToken 결과 확인`() = runTest {
         // Given
         every { tokenPreference.deleteKey() } just runs
         // When
