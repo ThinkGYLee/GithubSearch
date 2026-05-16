@@ -5,13 +5,11 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
-      - '.github/workflows/**'
   push:
     branches: [ main, develop ]
     paths-ignore:
       - '**.md'
       - 'docs/**'
-      - '.github/workflows/**'
 
 concurrency:
   group: build-${{ github.ref }}
