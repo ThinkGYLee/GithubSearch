@@ -6,6 +6,8 @@ on:
       - '**.md'
       - 'docs/**'
       - '.github/workflows/**'
+  push:
+    branches: [ main ]
 
 concurrency:
   group: build-${{ github.ref }}
@@ -13,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: "Build"
+    name: "Build & Coverage"
     runs-on: ubuntu-latest
 
     permissions:
@@ -40,8 +42,33 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
 
-      - name: Check and Build and Test
+      - name: Check and Build and Test with Coverage
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest --parallel --build-cache --configure-on-demand
+        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
+
+      - name: Post JaCoCo Report Comment
+        if: github.event_name == 'pull_request'
+        uses: Madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: "📈 테스트 커버리지 리포트"
+          update-comment: true
+
+      - name: Upload Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/jacocoFullReport/html
+
+      - name: Deploy Coverage to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/reports/jacoco/jacocoFullReport/html
