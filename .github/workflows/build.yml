@@ -8,6 +8,10 @@ on:
       - '.github/workflows/**'
   push:
     branches: [ main, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/**'
 
 concurrency:
   group: build-${{ github.ref }}
@@ -21,8 +25,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      pages: write      # Pages 배포 권한
-      id-token: write   # OIDC 배포 권한
+      pages: write      # Pages 배포를 위한 필수 권한
+      id-token: write   # OIDC 배포를 위한 필수 권한
 
     timeout-minutes: 60
 
@@ -32,7 +36,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for Test Changes
+      - name: Check for Code Changes
         id: filter
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -43,40 +47,39 @@ jobs:
               DIFF_BASE="HEAD^"
             fi
           fi
-          # 테스트 관련 파일 또는 비즈니스 로직 변경 여부 확인
-          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/main/|src/test/|src/androidTest/" > /dev/null; then
-            echo "tests_changed=true" >> $GITHUB_OUTPUT
+          
+          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/main/|src/test/|src/androidTest/|build-logic/|build.gradle.kts|gradle/" > /dev/null; then
+            echo "code_changed=true" >> $GITHUB_OUTPUT
           else
-            echo "tests_changed=false" >> $GITHUB_OUTPUT
+            echo "code_changed=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Validate Gradle Wrapper
+        if: steps.filter.outputs.code_changed == 'true'
         uses: gradle/actions/wrapper-validation@v4
 
       - name: Set up JDK 17
+        if: steps.filter.outputs.code_changed == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: 17
 
       - name: Setup Gradle
+        if: steps.filter.outputs.code_changed == 'true'
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
 
-      - name: Check and Build and Test with JaCoCo
+      - name: Build and Test with JaCoCo
+        if: steps.filter.outputs.code_changed == 'true'
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: |
-          if [ "${{ steps.filter.outputs.tests_changed }}" == "true" ]; then
-            ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
-          else
-            ./gradlew spotlessCheck assembleDebug testDebugUnitTest --parallel --build-cache --configure-on-demand
-          fi
+        run: ./gradlew spotlessCheck assembleDebug testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
 
       - name: Post JaCoCo Report Comment
-        if: github.event_name == 'pull_request' && steps.filter.outputs.tests_changed == 'true'
+        if: github.event_name == 'pull_request' && steps.filter.outputs.code_changed == 'true'
         uses: Madrapps/jacoco-report@v1.7.1
         with:
           paths: |
@@ -88,26 +91,32 @@ jobs:
           update-comment: true
 
       - name: Prepare Deployment Directory
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.tests_changed == 'true'
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         run: |
           mkdir -p build/dist/badges
           cp -r build/reports/jacoco/jacocoFullReport/html/* build/dist/
           
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
           
+          # 정교해진 수치 추출 함수 (정규표현식 기반)
           extract_coverage() {
-            local package=$1
-            if [ -z "$package" ]; then
-              missed=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed=")[0-9]+' "$REPORT_PATH" || echo 0)
-              covered=$(grep -oPm1 '(?<=</package><counter type="INSTRUCTION" missed="'$missed'" covered=")[0-9]+' "$REPORT_PATH" || echo 0)
+            local search_pattern=$1
+            local line=$(grep -Pzo "$search_pattern.*?(?=<counter type=\"LINE\")" "$REPORT_PATH" | tr -d '\0' | grep "counter type=\"INSTRUCTION\"" | tail -n 1)
+            
+            if [ -z "$line" ]; then
+              echo 0
             else
-              line=$(grep "package name=\"$package\"" "$REPORT_PATH" -A 10 | grep "counter type=\"INSTRUCTION\"" | head -n 1)
-              missed=$(echo "$line" | grep -oP '(?<=missed=")[0-9]+' || echo 0)
-              covered=$(echo "$line" | grep -oP '(?<=covered=")[0-9]+' || echo 0)
+              missed=$(echo "$line" | grep -oP 'missed="\K[0-9]+')
+              covered=$(echo "$line" | grep -oP 'covered="\K[0-9]+')
+              total=$((missed + covered))
+              if [ "$total" -eq 0 ]; then echo 0; else echo $((covered * 100 / total)); fi
             fi
-            total=$((missed + covered))
-            if [ "$total" -eq 0 ]; then echo 0; else echo $((covered * 100 / total)); fi
           }
+
+          # 레이어별 패키지 경로에 맞춰 추출
+          DOMAIN_COV=$(extract_coverage "package name=\"com/gyleedev/githubsearch/domain")
+          DATA_COV=$(extract_coverage "package name=\"com/gyleedev/data")
+          TOTAL_COV=$(tail -n 10 "$REPORT_PATH" | grep "counter type=\"INSTRUCTION\"" | head -n 1 | grep -oP 'covered="\K[0-9]+' | xargs -I {} sh -c "c={}; m=\$(tail -n 10 \"$REPORT_PATH\" | grep \"counter type=\\\"INSTRUCTION\\\"\" | head -n 1 | grep -oP 'missed=\"\K[0-9]+'); echo \$((\$c * 100 / (\$m + \$c)))")
 
           get_color() {
             if [ "$1" -ge 80 ]; then echo "brightgreen"; elif [ "$1" -ge 60 ]; then echo "green"; elif [ "$1" -ge 40 ]; then echo "orange"; else echo "red"; fi
@@ -120,21 +129,17 @@ jobs:
             echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/dist/badges/$3-coverage.json"
           }
 
-          DOMAIN_COV=$(extract_coverage "com/gyleedev/domain")
-          DATA_COV=$(extract_coverage "com/gyleedev/data")
-          TOTAL_COV=$(extract_coverage "")
-
           create_badge_json "Domain" $DOMAIN_COV "domain"
           create_badge_json "Data" $DATA_COV "data"
           create_badge_json "Total" $TOTAL_COV "total"
 
       - name: Upload Pages Artifact
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.tests_changed == 'true'
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/dist
 
       - name: Deploy to GitHub Pages
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.tests_changed == 'true'
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
