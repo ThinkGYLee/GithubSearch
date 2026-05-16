@@ -53,13 +53,13 @@ class GetLastAccessByIdRepositoryImplTest {
             id = 1L,
             githubId = requestGithubId,
             accessTime = expectedInstant,
-            isRepoFetched = true
+            isRepoFetched = true,
         )
         val expectedResult = AccessTime(
             id = 1L,
             githubId = requestGithubId,
             accessTime = expectedInstant,
-            isRepoFetched = true
+            isRepoFetched = true,
         )
 
         coEvery { accessTimeDao.getTimeByGithubId(requestGithubId) } returns expectedEntity
