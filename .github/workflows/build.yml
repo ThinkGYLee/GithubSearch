@@ -98,40 +98,56 @@ jobs:
           
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
           
-          # 정교해진 수치 추출 함수 (정규표현식 기반)
-          extract_coverage() {
-            local search_pattern=$1
-            local line=$(grep -Pzo "$search_pattern.*?(?=<counter type=\"LINE\")" "$REPORT_PATH" | tr -d '\0' | grep "counter type=\"INSTRUCTION\"" | tail -n 1)
-            
-            if [ -z "$line" ]; then
-              echo 0
-            else
-              missed=$(echo "$line" | grep -oP 'missed="\K[0-9]+')
-              covered=$(echo "$line" | grep -oP 'covered="\K[0-9]+')
-              total=$((missed + covered))
-              if [ "$total" -eq 0 ]; then echo 0; else echo $((covered * 100 / total)); fi
-            fi
-          }
+          # Python을 사용한 안정적인 XML 파싱 및 수치 추출
+          python3 - <<EOF
+          import xml.etree.ElementTree as ET
+          import json
+          import os
 
-          # 레이어별 패키지 경로에 맞춰 추출
-          DOMAIN_COV=$(extract_coverage "package name=\"com/gyleedev/githubsearch/domain")
-          DATA_COV=$(extract_coverage "package name=\"com/gyleedev/data")
-          TOTAL_COV=$(tail -n 10 "$REPORT_PATH" | grep "counter type=\"INSTRUCTION\"" | head -n 1 | grep -oP 'covered="\K[0-9]+' | xargs -I {} sh -c "c={}; m=\$(tail -n 10 \"$REPORT_PATH\" | grep \"counter type=\\\"INSTRUCTION\\\"\" | head -n 1 | grep -oP 'missed=\"\K[0-9]+'); echo \$((\$c * 100 / (\$m + \$c)))")
+          def get_coverage(xml_path, package_prefix=None):
+              try:
+                  tree = ET.parse(xml_path)
+                  root = tree.getroot()
+                  missed, covered = 0, 0
+                  
+                  if package_prefix:
+                      # 레이어 하위의 모든 패키지 수치 합산
+                      for pkg in root.findall('package'):
+                          if pkg.get('name').startswith(package_prefix):
+                              for cnt in pkg.findall('counter'):
+                                  if cnt.get('type') == 'INSTRUCTION':
+                                      missed += int(cnt.get('missed'))
+                                      covered += int(cnt.get('covered'))
+                  else:
+                      # 전체 합계 (Report 직속 counter)
+                      for cnt in root.findall('counter'):
+                          if cnt.get('type') == 'INSTRUCTION':
+                              missed += int(cnt.get('missed'))
+                              covered += int(cnt.get('covered'))
+                  
+                  total = missed + covered
+                  return int(covered * 100 / total) if total > 0 else 0
+              except Exception as e:
+                  print(f"Error parsing {xml_path}: {e}")
+                  return 0
 
-          get_color() {
-            if [ "$1" -ge 80 ]; then echo "brightgreen"; elif [ "$1" -ge 60 ]; then echo "green"; elif [ "$1" -ge 40 ]; then echo "orange"; else echo "red"; fi
-          }
+          def create_badge(label, value, filename):
+              color = "brightgreen" if value >= 80 else "green" if value >= 60 else "orange" if value >= 40 else "red"
+              data = {"schemaVersion": 1, "label": label, "message": f"{value}%", "color": color}
+              os.makedirs("build/dist/badges", exist_ok=True)
+              with open(f"build/dist/badges/{filename}-coverage.json", "w") as f:
+                  json.dump(data, f)
 
-          create_badge_json() {
-            local label=$1
-            local value=$2
-            local color=$(get_color $value)
-            echo "{\"schemaVersion\": 1, \"label\": \"$label\", \"message\": \"$value%\", \"color\": \"$color\"}" > "build/dist/badges/$3-coverage.json"
-          }
+          # 수치 계산
+          dom_cov = get_coverage("$REPORT_PATH", "com/gyleedev/githubsearch/domain")
+          dat_cov = get_coverage("$REPORT_PATH", "com/gyleedev/data")
+          tot_cov = get_coverage("$REPORT_PATH")
 
-          create_badge_json "Domain" $DOMAIN_COV "domain"
-          create_badge_json "Data" $DATA_COV "data"
-          create_badge_json "Total" $TOTAL_COV "total"
+          # 배지 생성
+          create_badge("Domain", dom_cov, "domain")
+          create_badge("Data", dat_cov, "data")
+          create_badge("Total", tot_cov, "total")
+          EOF
 
       - name: Upload Pages Artifact
         if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
