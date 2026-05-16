@@ -13,9 +13,9 @@ import com.gyleedev.githubsearch.domain.model.UserModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -31,6 +31,7 @@ class FetchUserRepositoryImplTest {
     private val revokeService: RevokeService = mockk()
     private val tokenPreference: TokenPreference = mockk()
     private val clock: Clock = mockk()
+
     private val mockModel = UserModel(
         id = 0L,
         name = "test_name",
@@ -48,6 +49,7 @@ class FetchUserRepositoryImplTest {
         blogUrl = "test_blog_url",
         favorite = false,
     )
+
     private val mockResponse = UserResponse(
         name = "test_name",
         login = "test_user",
@@ -63,12 +65,13 @@ class FetchUserRepositoryImplTest {
         reposAddress = "test_repos_address",
         blogUrl = "test_blog_url",
     )
+
     private val mockSuccess = Response.success(mockResponse)
     private val mockSuccessNoBody = Response.success<UserResponse>(null)
     private val mockNoUser = Response.error<UserResponse>(404, "".toResponseBody(null))
     private val mockExceedQuota = Response.error<UserResponse>(403, "".toResponseBody(null))
     private val mockExceedLimit = Response.error<UserResponse>(429, "".toResponseBody(null))
-    private val mockUnknowError = Response.error<UserResponse>(503, "".toResponseBody(null))
+    private val mockUnknownError = Response.error<UserResponse>(503, "".toResponseBody(null))
 
     @Before
     fun setUp() {
@@ -88,11 +91,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 결과가 성공이고 body가 존재할 때`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockSuccess
         val expectedResult = UserFetchResult.Success(mockModel)
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockSuccess
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }
@@ -102,11 +106,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 결과가 성공이고 body가 null 일 때`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockSuccessNoBody
         val expectedResult = UserFetchResult.UnknownError
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockSuccessNoBody
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }
@@ -116,11 +121,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 검색 결과가 없을 때`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockNoUser
         val expectedResult = UserFetchResult.NoSuchUser
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockNoUser
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }
@@ -130,11 +136,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 리밋 초과 코드 403`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockExceedQuota
         val expectedResult = UserFetchResult.ExceedQuota
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockExceedQuota
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }
@@ -144,11 +151,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 리밋 초과 코드 429`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockExceedLimit
         val expectedResult = UserFetchResult.ExceedQuota
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockExceedLimit
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }
@@ -158,11 +166,12 @@ class FetchUserRepositoryImplTest {
     fun `Api 검색 결과 그 외의 실패`() = runTest {
         // Given
         val givenId = "test_user"
-        val expectedResponse = mockUnknowError
         val expectedResult = UserFetchResult.UnknownError
-        coEvery { githubApiService.getUser(givenId) } returns expectedResponse
+        coEvery { githubApiService.getUser(givenId) } returns mockUnknownError
+
         // When
         val actualResult = repository.fetchUser(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getUser(givenId) }

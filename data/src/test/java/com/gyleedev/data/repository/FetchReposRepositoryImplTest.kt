@@ -12,9 +12,9 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -30,6 +30,7 @@ class FetchReposRepositoryImplTest {
     private val revokeService: RevokeService = mockk()
     private val tokenPreference: TokenPreference = mockk()
     private val clock: Clock = mockk()
+
     private val mockModel = listOf(
         RepositoryModel(
             name = "name_1",
@@ -46,7 +47,8 @@ class FetchReposRepositoryImplTest {
             stargazer = 20,
         ),
     )
-    val mockResponse = listOf(
+
+    private val mockResponse = listOf(
         RepoResponse(
             name = "name_1",
             description = "desc_1",
@@ -60,6 +62,7 @@ class FetchReposRepositoryImplTest {
             stargazer = 20,
         ),
     )
+
     private val mockSuccess = Response.success(mockResponse)
     private val mockFail = Response.error<List<RepoResponse>>(404, "".toResponseBody(null))
 
@@ -81,11 +84,12 @@ class FetchReposRepositoryImplTest {
     fun `Api Response 가 Success 일 때`() = runTest {
         // Given
         val givenId = "testUser"
-        val expectedResponse = mockSuccess
         val expectedResult = mockModel
-        coEvery { githubApiService.getRepos(givenId) } returns expectedResponse
+        coEvery { githubApiService.getRepos(givenId) } returns mockSuccess
+
         // When
         val actualResult = repository.fetchRepos(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
@@ -95,11 +99,12 @@ class FetchReposRepositoryImplTest {
     fun `Api Response 가 Error 일 때`() = runTest {
         // Given
         val givenId = "testUser"
-        val expectedResponse = mockFail
         val expectedResult = emptyList<RepositoryModel>()
-        coEvery { githubApiService.getRepos(givenId) } returns expectedResponse
+        coEvery { githubApiService.getRepos(givenId) } returns mockFail
+
         // When
         val actualResult = repository.fetchRepos(givenId)
+
         // Then
         assertEquals(expectedResult, actualResult)
         coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
