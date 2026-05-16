@@ -25,8 +25,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      pages: write      # Pages 배포를 위한 필수 권한
-      id-token: write   # OIDC 배포를 위한 필수 권한
+      pages: write
+      id-token: write
 
     timeout-minutes: 60
 
@@ -94,11 +94,14 @@ jobs:
         if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         run: |
           mkdir -p build/dist/badges
+          touch build/dist/.nojekyll
+          
+          # HTML 리포트 복사
           cp -r build/reports/jacoco/jacocoFullReport/html/* build/dist/
           
           REPORT_PATH="build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
           
-          # Python을 사용한 안정적인 XML 파싱 및 수치 추출
+          # Python을 사용한 안정적인 XML 파싱 및 배지 생성
           python3 - <<EOF
           import xml.etree.ElementTree as ET
           import json
@@ -106,48 +109,64 @@ jobs:
 
           def get_coverage(xml_path, package_prefix=None):
               try:
+                  if not os.path.exists(xml_path):
+                      print(f"Warning: {xml_path} not found")
+                      return 0
+                  
                   tree = ET.parse(xml_path)
                   root = tree.getroot()
                   missed, covered = 0, 0
                   
                   if package_prefix:
-                      # 레이어 하위의 모든 패키지 수치 합산
+                      found_any = False
                       for pkg in root.findall('package'):
-                          if pkg.get('name').startswith(package_prefix):
+                          pkg_name = pkg.get('name', '')
+                          if pkg_name.startswith(package_prefix):
+                              found_any = True
                               for cnt in pkg.findall('counter'):
                                   if cnt.get('type') == 'INSTRUCTION':
-                                      missed += int(cnt.get('missed'))
-                                      covered += int(cnt.get('covered'))
+                                      missed += int(cnt.get('missed', 0))
+                                      covered += int(cnt.get('covered', 0))
+                      if not found_any:
+                          print(f"Warning: No packages found with prefix {package_prefix}")
                   else:
-                      # 전체 합계 (Report 직속 counter)
                       for cnt in root.findall('counter'):
                           if cnt.get('type') == 'INSTRUCTION':
-                              missed += int(cnt.get('missed'))
-                              covered += int(cnt.get('covered'))
+                              missed += int(cnt.get('missed', 0))
+                              covered += int(cnt.get('covered', 0))
                   
                   total = missed + covered
-                  return int(covered * 100 / total) if total > 0 else 0
+                  percentage = int(covered * 100 / total) if total > 0 else 0
+                  print(f"Coverage for {package_prefix or 'Total'}: {percentage}% ({covered}/{total})")
+                  return percentage
               except Exception as e:
-                  print(f"Error parsing {xml_path}: {e}")
+                  print(f"Error parsing coverage: {e}")
                   return 0
 
           def create_badge(label, value, filename):
               color = "brightgreen" if value >= 80 else "green" if value >= 60 else "orange" if value >= 40 else "red"
               data = {"schemaVersion": 1, "label": label, "message": f"{value}%", "color": color}
-              os.makedirs("build/dist/badges", exist_ok=True)
-              with open(f"build/dist/badges/{filename}-coverage.json", "w") as f:
+              file_path = f"build/dist/badges/{filename}-coverage.json"
+              with open(file_path, "w") as f:
                   json.dump(data, f)
+              print(f"Created badge: {file_path}")
 
-          # 수치 계산
+          # 수치 계산 및 배지 생성
           dom_cov = get_coverage("$REPORT_PATH", "com/gyleedev/githubsearch/domain")
           dat_cov = get_coverage("$REPORT_PATH", "com/gyleedev/data")
           tot_cov = get_coverage("$REPORT_PATH")
 
-          # 배지 생성
           create_badge("Domain", dom_cov, "domain")
           create_badge("Data", dat_cov, "data")
           create_badge("Total", tot_cov, "total")
           EOF
+
+      - name: Verify Deployment Directory
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        run: |
+          echo "--- Deployment Directory Structure ---"
+          find build/dist -maxdepth 2
+          echo "-------------------------------------"
 
       - name: Upload Pages Artifact
         if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
