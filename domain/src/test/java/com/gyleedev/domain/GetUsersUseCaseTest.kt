@@ -14,7 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetUsersTest {
+class GetUsersUseCaseTest {
     private val repository: GitHubRepository = mockk()
     private lateinit var useCase: GetUsersUseCase
     private lateinit var mockUsers: MutableList<UserModel>

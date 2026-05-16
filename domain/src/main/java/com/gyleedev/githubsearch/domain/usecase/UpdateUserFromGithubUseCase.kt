@@ -57,6 +57,7 @@ class UpdateUserFromGithubUseCase @Inject constructor(
             UserUpdateResult.Fail
         } else {
             val durationSinceLastAccess = Instant.now(clock).toEpochMilli() - lastAccess.accessTime.toEpochMilli()
+
             val isTimeOut = durationSinceLastAccess >= ACCESS_TIMEOUT_MS
             val isRepoNeedSync = !lastAccess.isRepoFetched
 

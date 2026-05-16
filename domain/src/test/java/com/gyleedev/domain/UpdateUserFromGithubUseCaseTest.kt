@@ -7,27 +7,33 @@ import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.usecase.UpdateUserFromGithubUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit4.MockKRule
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-class UpdateUserFromGithubTest {
+class UpdateUserFromGithubUseCaseTest {
 
-    private lateinit var repository: GitHubRepository
+    @get:Rule
+    val rule = MockKRule(this)
+
+    @MockK(relaxed = true)
+    lateinit var repository: GitHubRepository
     private lateinit var useCase: UpdateUserFromGithubUseCase
     private val clock = Clock.fixed(Instant.parse("2026-05-14T10:00:00Z"), ZoneId.of("UTC"))
     private val userId = "testUser"
 
     @Before
     fun setUp() {
-        repository = mockk()
         useCase = UpdateUserFromGithubUseCase(repository, clock)
     }
 
