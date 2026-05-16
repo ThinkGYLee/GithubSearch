@@ -200,8 +200,8 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun syncUserData(githubId: String): UserSyncResult {
         val userFetchResult = fetchUser(githubId)
-        val localUser = getUserWithFlow(githubId).first() as UserModel
-        return if (userFetchResult is UserFetchResult.Success) {
+        val localUser = getUserWithFlow(githubId).first()
+        return if (userFetchResult is UserFetchResult.Success && localUser != null) {
             val insertUser = userFetchResult.user.copy(favorite = localUser.favorite)
             val entityId = upsertUser(insertUser)
             UserSyncResult.Success(entityId = entityId)
