@@ -14,7 +14,6 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.androidx.material.icons)
-    testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
 }

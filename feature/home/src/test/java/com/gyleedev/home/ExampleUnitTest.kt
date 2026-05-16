@@ -1,6 +1,6 @@
 package com.gyleedev.home
 
-import junit.framework.TestCase.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**

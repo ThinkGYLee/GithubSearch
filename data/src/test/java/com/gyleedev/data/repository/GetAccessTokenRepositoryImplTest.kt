@@ -12,7 +12,7 @@ import com.gyleedev.githubsearch.domain.model.GetAccessTokenRepositoryResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
+import org.junit.Assert.assertEquals
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
