@@ -43,8 +43,8 @@ jobs:
               DIFF_BASE="HEAD^"
             fi
           fi
-          
-          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/test/|src/androidTest/" > /dev/null; then
+          # 테스트 관련 파일 또는 비즈니스 로직 변경 여부 확인
+          if git diff --name-only $DIFF_BASE HEAD | grep -E "src/main/|src/test/|src/androidTest/" > /dev/null; then
             echo "tests_changed=true" >> $GITHUB_OUTPUT
           else
             echo "tests_changed=false" >> $GITHUB_OUTPUT
