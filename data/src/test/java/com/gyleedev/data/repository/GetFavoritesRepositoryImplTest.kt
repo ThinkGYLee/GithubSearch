@@ -1,7 +1,5 @@
 package com.gyleedev.data.repository
 
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.paging.testing.asSnapshot
 import com.gyleedev.data.database.dao.AccessTimeDao
 import com.gyleedev.data.database.dao.ReposDao
@@ -12,6 +10,8 @@ import com.gyleedev.data.preference.TokenPreference
 import com.gyleedev.data.remote.AccessService
 import com.gyleedev.data.remote.GithubApiService
 import com.gyleedev.data.remote.RevokeService
+import com.gyleedev.data.utils.createDummyUserEntity
+import com.gyleedev.data.utils.createMockPagingSource
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import io.mockk.coVerify
 import io.mockk.every
@@ -135,33 +135,5 @@ class GetFavoritesRepositoryImplTest {
         // Then
         assertEquals(expectedModels, actualResult)
         coVerify(exactly = 1) { userDao.getUsers(expectedStatus) }
-    }
-
-    private fun createDummyUserEntity(id: Long, repoCount: Int): UserEntity = UserEntity(
-        id = id,
-        name = "name_$id",
-        githubId = "login_$id",
-        followers = 0,
-        following = 0,
-        avatar = "",
-        company = null,
-        email = null,
-        bio = null,
-        repoCount = repoCount,
-        createdDate = null,
-        updatedDate = null,
-        reposAddress = "",
-        blogUrl = null,
-        favorite = true,
-    )
-
-    private fun <K : Any, V : Any> createMockPagingSource(data: List<V>): PagingSource<K, V> = object : PagingSource<K, V>() {
-        override suspend fun load(params: LoadParams<K>): LoadResult<K, V> = LoadResult.Page(
-            data = data,
-            prevKey = null,
-            nextKey = null,
-        )
-
-        override fun getRefreshKey(state: PagingState<K, V>): K? = null
     }
 }
