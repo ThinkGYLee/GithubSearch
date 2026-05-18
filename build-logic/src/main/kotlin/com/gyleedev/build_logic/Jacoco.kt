@@ -9,7 +9,7 @@ import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
-private val fileFilter = listOf(
+private val baseFileFilter = listOf(
     "**/R.class",
     "**/R$*.class",
     "**/BuildConfig.*",
@@ -25,6 +25,13 @@ private val fileFilter = listOf(
     "**/*_MembersInjector.*",
     "**/*_Impl*.*",
     "**/*Binding.*"
+)
+
+private val fileFilter = baseFileFilter + listOf(
+    // Compose UI
+    "**/*Screen*.*",
+    "**/component/**/*.*",
+    "**/*Dialog*.*"
 )
 
 internal fun Project.configureJacoco(
@@ -62,6 +69,41 @@ internal fun Project.configureJacoco(
                 fileTree(layout.buildDirectory) {
                     include("jacoco/testDebugUnitTest.exec")
                     include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+                }
+            )
+        }
+    }
+
+    if (tasks.findByName("jacocoAndroidTestReport") == null) {
+        tasks.register<JacocoReport>("jacocoAndroidTestReport") {
+            group = "Reporting"
+            description = "Generate Jacoco coverage reports for the Android UI (Instrumentation) tests."
+
+            reports {
+                xml.required.set(true)
+                html.required.set(true)
+            }
+
+            val javaClasses = fileTree(layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
+                exclude(baseFileFilter) // UI 테스트이므로 Compose UI 관련 필터링 제거
+            }
+            val kotlinClasses = fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
+                exclude(baseFileFilter)
+            }
+
+            classDirectories.setFrom(files(javaClasses, kotlinClasses))
+
+            sourceDirectories.setFrom(
+                files(
+                    "$projectDir/src/main/java",
+                    "$projectDir/src/main/kotlin"
+                )
+            )
+
+            executionData.setFrom(
+                fileTree(layout.buildDirectory) {
+                    // Android UI 테스트 실행 후 생성되는 ec 파일 경로
+                    include("outputs/code_coverage/debugAndroidTest/connected/**/*.ec")
                 }
             )
         }
