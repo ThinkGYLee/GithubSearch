@@ -18,6 +18,7 @@
 ### 공통 과제 (Common)
 - **Turbine 라이브러리 도입**
   - **목적**: `isLoading: false -> true -> false` 등과 같이 빠르게 변하는 중간 상태(Transient State)를 `awaitItem()`으로 순차적 검증하기 위함.
+  - **Todo**: 도입 완료 후 `SettingViewModelTest`에서 `SharedFlow` 검증용으로 임시 사용 중인 `mutableListOf` 기반의 수집 코드를 `.test { awaitItem() }`으로 리팩터링.
 - **Paging Flow 상태 검증 고도화**
   - **목적**: `users`, `items` 플로우에 대해 컬렉터만 연결해두는 것을 넘어, 필터 변경 시 새로운 PagingData가 정상 발행되는지 확인 (`paging-testing` 라이브러리의 `asSnapshot()` 등 활용 검토).
 
@@ -41,16 +42,16 @@
 - **Enum 확장 대응 (Parameterized Test)**
   - `FilterStatus`의 모든 상태값 변이에 대해 상태가 업데이트되는지 파라미터화 테스트 작성 권장.
 
-### 3. SettingViewModelTest
-- **이벤트 누락 보완 (RESET & Else 분기)**
+### 3. SettingViewModelTest (✅ 완료)
+- [x] **이벤트 누락 보완 (RESET & Else 분기)**
   - `SettingEvent.RESET` 호출 시 `showResetDialog` 토글 동작 검증.
-  - 정의되지 않은 나머지 이벤트(`else -> {}`) 발생 시 기존 상태가 유지되는지(Negative Test) 검증.
-- **명시적 상태 변경 (LOGIN/LOGOUT)**
-  - 초기값 `false`에서 다시 `false`로 가는 무의미한 검증이 아닌, 상태를 먼저 `true`로 바꾼 후 이벤트 호출로 `false`로 닫히는 동작을 검증.
-- **양방향 토글 정밀 검증 (THEME/LANGUAGE)**
+  - 정의되지 않은 나머지 이벤트(`POLICY`, `NONE`) 발생 시 기존 상태가 유지되는지(Negative Test) 검증.
+- [x] **명시적 상태 변경 (LOGIN/LOGOUT)**
+  - `INFORMATION` 이벤트로 다이얼로그를 먼저 `true`로 바꾼 후 이벤트 호출로 `false`로 닫히는 동작을 검증.
+- [x] **양방향 토글 정밀 검증 (THEME/LANGUAGE/RESET)**
   - `false -> true` 전환 이후 `true -> false` 전환 시나리오 추가 검증.
-- **SharedFlow 지연 구독 이슈 문서화**
-  - 단발성 이벤트 방출 시 구독 시점에 따른 유실 가능성 명시 및 검증.
+- [x] **SharedFlow 지연 구독 이슈 문서화**
+  - 단발성 이벤트 방출 시 구독 시점에 따른 유실 가능성 명시 및 검증. (현재 테스트에서는 `runCurrent()` 이전에 미리 백그라운드 코루틴으로 구독(`collect`)하여 데이터 유실을 방지하는 정석적인 패턴 적용 완료)
 
 ### 4. DetailViewModelTest
 - **Flow 다중 방출 시나리오**
