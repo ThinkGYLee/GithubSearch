@@ -3,7 +3,7 @@ package com.gyleedev.githubsearch.feature.setting.model
 enum class SettingEvent {
     THEME,
     LANGUAGE,
-    INFORMATION,
+    AUTH,
     RESET,
     POLICY,
     LOGIN,

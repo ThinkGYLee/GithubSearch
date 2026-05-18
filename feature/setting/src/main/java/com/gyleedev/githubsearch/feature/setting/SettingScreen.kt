@@ -206,7 +206,7 @@ val settingList = listOf(
             SettingRowItem.ClickableItem(
                 icon = Icons.Outlined.AccountCircle,
                 content = SettingR.string.setting_login,
-                event = SettingEvent.INFORMATION,
+                event = SettingEvent.AUTH,
             ),
             SettingRowItem.ClickableItem(
                 icon = Icons.Outlined.Storage,

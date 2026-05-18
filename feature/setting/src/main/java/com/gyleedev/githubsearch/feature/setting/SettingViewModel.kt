@@ -87,7 +87,7 @@ class SettingViewModel @Inject constructor(
                     )
                 }
 
-                SettingEvent.INFORMATION -> {
+                SettingEvent.AUTH -> {
                     val result = checkLoginStatusUseCase().first()
                     if (result) {
                         showLogoutDialog.emit(true)
