@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.feature.detail
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
@@ -40,9 +42,9 @@ class DetailViewModel @Inject constructor(
     init {
         val id = savedStateHandle.get<String>("id")
         viewModelScope.launch {
-            if (id != null) {
+            if (!id.isNullOrBlank()) {
                 userId.emit(id)
-                updateUserAndRepositoryData()
+                updateUserFromGithubUseCase(id)
             }
         }
     }
@@ -75,14 +77,11 @@ class DetailViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    private suspend fun updateUserAndRepositoryData() {
-        updateUserFromGithubUseCase(userId.value)
-    }
-
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateFavoriteStatus() {
-        viewModelScope.launch {
-            user.value?.let {
-                updateFavoriteStatusUseCase(it)
+        viewModelScope.launch(exceptionHandler) {
+            if (user.value != null) {
+                updateFavoriteStatusUseCase(user.value as UserModel)
             }
         }
     }
