@@ -1,5 +1,6 @@
 package com.gyleedev.domain
 
+import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
 import com.gyleedev.githubsearch.domain.usecase.CheckLoginStatusUseCase
 import io.mockk.coEvery

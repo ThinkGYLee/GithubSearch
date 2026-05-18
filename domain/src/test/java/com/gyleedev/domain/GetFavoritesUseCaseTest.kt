@@ -2,6 +2,7 @@ package com.gyleedev.domain
 
 import androidx.paging.PagingData
 import androidx.paging.testing.asSnapshot
+import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository

@@ -31,7 +31,6 @@ dependencies {
     implementation(libs.paging.runtime.ktx)
     implementation(libs.kotlin.coroutines)
     implementation(libs.androidx.core.ktx)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":core:testing"))
     testImplementation(libs.androidx.paging.testing)
 }

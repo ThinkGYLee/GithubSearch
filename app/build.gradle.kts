@@ -27,6 +27,7 @@ extensions.configure<ApplicationExtension>("android") {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":core:testing"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
