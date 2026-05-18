@@ -12,7 +12,7 @@ import com.gyleedev.data.remote.RevokeService
 import com.gyleedev.data.remote.response.UserResponse
 import com.gyleedev.data.remote.response.toModel
 import com.gyleedev.data.utils.createDummyUserEntity
-import com.gyleedev.data.utils.ignoreUnused
+import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import com.gyleedev.githubsearch.domain.model.UserSyncResult
 import io.mockk.coEvery
 import io.mockk.coVerify

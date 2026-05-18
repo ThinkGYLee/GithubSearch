@@ -9,7 +9,7 @@ import com.gyleedev.data.remote.AccessService
 import com.gyleedev.data.remote.GithubApiService
 import com.gyleedev.data.remote.RevokeService
 import com.gyleedev.data.utils.createDummyUserEntity
-import com.gyleedev.data.utils.ignoreUnused
+import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
