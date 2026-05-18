@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.feature.setting
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
@@ -55,20 +57,23 @@ class SettingViewModel @Inject constructor(
         initialValue = SettingUiState.Loading,
     )
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun resetData() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             _showResetResult.emit(resetDataUseCase())
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun revokeApplication() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             _showRevokeResult.emit(revokeApplicationUseCase())
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun changDialogState(settingEvent: SettingEvent) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             when (settingEvent) {
                 SettingEvent.THEME -> {
                     showThemeDialog.emit(

@@ -1,6 +1,8 @@
 package com.gyleedev.githubsearch.ui
 
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import com.gyleedev.githubsearch.BuildConfig
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
@@ -26,13 +28,15 @@ class MainViewModel @Inject constructor(
     private val _launchOAuthEvent = MutableSharedFlow<String>()
     val launchOAuthEvent: SharedFlow<String> = _launchOAuthEvent
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun getAccessToken(code: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             val result = getAccessTokenUseCase(code)
             _alertLoginSuccess.emit(result)
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun requestGithubLogin() {
         val clientId = BuildConfig.CLIENT_ID
         val loginUrl =
@@ -46,7 +50,7 @@ class MainViewModel @Inject constructor(
                 .build()
                 .toString()
 
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             _launchOAuthEvent.emit(loginUrl)
         }
     }
