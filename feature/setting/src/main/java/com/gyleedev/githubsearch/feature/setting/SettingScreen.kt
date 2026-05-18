@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.feature.setting
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,6 +48,7 @@ import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 import com.gyleedev.githubsearch.feature.setting.R as SettingR
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
@@ -203,7 +206,7 @@ val settingList = listOf(
             SettingRowItem.ClickableItem(
                 icon = Icons.Outlined.AccountCircle,
                 content = SettingR.string.setting_login,
-                event = SettingEvent.INFORMATION,
+                event = SettingEvent.AUTH,
             ),
             SettingRowItem.ClickableItem(
                 icon = Icons.Outlined.Storage,

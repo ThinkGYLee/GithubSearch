@@ -96,20 +96,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateSearchId(id: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             searchQuery.emit(id)
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun changeSearchBarState(state: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             isSearchActivated.emit(state)
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun changeDialogState(state: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             showRequestAuthDialog.emit(state)
         }
     }

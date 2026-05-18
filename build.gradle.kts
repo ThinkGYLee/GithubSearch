@@ -32,6 +32,10 @@ val fileFilter = listOf(
     // UI & Navigation (Boilerplate)
     "**/*Args*.*",
     "**/*Directions*.*",
+    // Compose UI
+    "**/*Screen*.*",
+    "**/component/**/*.*",
+    "**/*Dialog*.*",
     // Network & DI (Configuration)
     "**/*Module*.*",
     "**/*Qualifiers*.*",
@@ -85,6 +89,77 @@ tasks.register<JacocoReport>("jacocoFullReport") {
                 include("jacoco/testDebugUnitTest.exec")
                 include("jacoco/test.exec")
                 include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+            }
+        )
+    }
+
+    classDirectories.setFrom(files(classDirectoriesList))
+    sourceDirectories.setFrom(files(sourceDirectoriesList))
+    executionData.setFrom(files(executionDataList))
+}
+
+tasks.register<JacocoReport>("jacocoFullAndroidTestReport") {
+    group = "Reporting"
+    description = "전체 모듈의 Android UI (Instrumentation) 테스트 커버리지 리포트를 통합하여 생성합니다."
+
+    // 명시적으로 실행할 때만 동작하도록 설정 (CI 등에서 필요한 경우 dependsOn 추가)
+    // dependsOn(subprojects.mapNotNull { it.tasks.findByName("connectedDebugAndroidTest") })
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val classDirectoriesList = mutableListOf<FileTree>()
+    val sourceDirectoriesList = mutableListOf<FileCollection>()
+    val executionDataList = mutableListOf<FileCollection>()
+    val localBaseFileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*\$Lambda$*.*",
+        "**/*\$ExternalSynthetic$*.*",
+        "**/*\$TypeAdapter$*.*",
+        "**/*Hilt*.*",
+        "**/Dagger*.*",
+        "**/*_Factory.*",
+        "**/*_MembersInjector.*",
+        "**/*_Impl*.*",
+        "**/*Binding.*",
+        "**/*Args*.*",
+        "**/*Directions*.*",
+        "**/*Module*.*",
+        "**/*Qualifiers*.*",
+        "**/*Service*.*",
+        "**/*Database*.*",
+        "**/*Dao*.*",
+        "**/*Mapper*.*"
+    )
+
+    subprojects {
+        val project = this
+        val buildDir = project.layout.buildDirectory
+
+        classDirectoriesList.add(
+            project.fileTree(buildDir.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes")) {
+                exclude(localBaseFileFilter)
+            }
+        )
+        classDirectoriesList.add(
+            project.fileTree(buildDir.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")) {
+                exclude(localBaseFileFilter)
+            }
+        )
+
+        sourceDirectoriesList.add(project.files("${project.projectDir}/src/main/java"))
+        sourceDirectoriesList.add(project.files("${project.projectDir}/src/main/kotlin"))
+
+        executionDataList.add(
+            project.fileTree(buildDir) {
+                include("outputs/code_coverage/debugAndroidTest/connected/**/*.ec")
             }
         )
     }

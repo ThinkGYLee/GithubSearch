@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.feature.favorite
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.domain.model.FilterStatus
@@ -53,21 +55,24 @@ class FavoriteViewModel @Inject constructor(
                 getFavoritesUseCase(it)
             }.cachedIn(viewModelScope)
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateFilter(status: FilterStatus) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             filterState.emit(status)
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun showFavoriteDialog(user: UserModel) {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             focusedUser.emit(user)
             updateShowFavoriteDialog()
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateFavoriteStatus() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             focusedUser.value?.let {
                 updateFavoriteUseCase(it)
             }
@@ -76,14 +81,16 @@ class FavoriteViewModel @Inject constructor(
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateShowFavoriteDialog() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             showFavoriteDialog.emit(!showFavoriteDialog.value)
         }
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateShowFilterDialog() {
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             showFilterDialog.emit(!showFilterDialog.value)
         }
     }
