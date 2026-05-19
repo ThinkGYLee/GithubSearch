@@ -25,10 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.feature.detail.component.DetailRepoInfo
 import com.gyleedev.githubsearch.feature.detail.component.DetailUserInfo
+import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,4 +175,28 @@ private fun DetailRepoTitle() {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
     )
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+private fun DetailScreenPreview(
+    user: UserModel = DetailPreviewData.skydovesUser,
+    repoList: List<RepositoryModel> = DetailPreviewData.skydovesRepos,
+) {
+    GithubSearchTheme {
+        DetailScreen(
+            avatar = user.avatar,
+            repoCount = user.repoCount,
+            followers = user.followers,
+            following = user.following,
+            name = user.name,
+            login = user.login,
+            bio = user.bio,
+            company = user.company,
+            email = user.email,
+            blogUrl = user.blogUrl,
+            repoList = repoList,
+            paddingValues = PaddingValues(0.dp),
+        )
+    }
 }
