@@ -16,6 +16,7 @@ internal fun Project.configureComposeAndroid(commonExtension: CommonExtension) {
         add("implementation", libs.findLibrary("androidx-ui").get())
         add("implementation", libs.findLibrary("androidx-ui-graphics").get())
         add("implementation", libs.findLibrary("androidx-ui-tooling-preview").get())
+        add("debugImplementation", libs.findLibrary("androidx-ui-tooling").get())
         add("implementation", libs.findLibrary("androidx-material3").get())
     }
 }
