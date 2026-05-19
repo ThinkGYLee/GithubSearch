@@ -21,8 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
+import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.feature.detail.R
+import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
 @Composable
 fun DetailUserInfo(
@@ -164,5 +167,26 @@ fun DetailUserInfo(
                 Text(text = blogUrl)
             }
         }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+private fun DetailUserInfoPreview(
+    user: UserModel = DetailPreviewData.skydovesUser,
+) {
+    GithubSearchTheme {
+        DetailUserInfo(
+            avatar = user.avatar,
+            repos = user.repoCount,
+            followers = user.followers,
+            following = user.following,
+            name = user.name,
+            login = user.login,
+            bio = user.bio,
+            company = user.company,
+            email = user.email,
+            blogUrl = user.blogUrl,
+        )
     }
 }
