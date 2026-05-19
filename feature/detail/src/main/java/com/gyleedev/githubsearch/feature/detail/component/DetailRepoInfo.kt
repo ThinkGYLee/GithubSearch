@@ -14,7 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
+import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
+import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
 @Composable
 fun DetailRepoInfo(
@@ -38,7 +42,7 @@ fun DetailRepoInfo(
 
         if (description != null) {
             Text(
-                text = description,
+                text = description.parseEmojis() ?: "",
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
@@ -68,5 +72,20 @@ fun DetailRepoInfo(
                 )
             }
         }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+private fun DetailRepoInfoPreview(
+    repo: RepositoryModel = DetailPreviewData.skydovesRepos.first(),
+) {
+    GithubSearchTheme {
+        DetailRepoInfo(
+            name = repo.name,
+            description = repo.description,
+            language = repo.language,
+            stargazer = repo.stargazer,
+        )
     }
 }
