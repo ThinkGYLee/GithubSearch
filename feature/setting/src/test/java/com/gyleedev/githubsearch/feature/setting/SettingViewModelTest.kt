@@ -1,6 +1,7 @@
 package com.gyleedev.githubsearch.feature.setting
 
 import com.gyleedev.githubsearch.core.testing.CoroutineRule
+import com.gyleedev.githubsearch.core.testing.collectIn
 import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
@@ -15,6 +16,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -50,9 +52,6 @@ class SettingViewModelTest {
         coEvery { resetDataUseCase() } returns ResetDataResult.Success
         coEvery { revokeApplicationUseCase() } returns RevokeResult.SUCCESS
         coEvery { checkLoginStatusUseCase() } returns flowOf(false)
-    }
-
-    private fun createViewModel() {
         viewModel = SettingViewModel(
             resetDataUseCase = resetDataUseCase,
             revokeApplicationUseCase = revokeApplicationUseCase,
@@ -70,7 +69,6 @@ class SettingViewModelTest {
         val expectedThemeDialogTrue = true
         val expectedThemeDialogFalse = false
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -79,7 +77,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 1
-        var currentState = viewModel.uiState.value as Success
+        var currentState = viewModel.uiState.first() as Success
         assertEquals(expectedThemeDialogTrue, currentState.showThemeDialog)
 
         // When 2
@@ -87,7 +85,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 2
-        currentState = viewModel.uiState.value as Success
+        currentState = viewModel.uiState.first() as Success
         assertEquals(expectedThemeDialogFalse, currentState.showThemeDialog)
 
         coVerify(exactly = 0) { checkLoginStatusUseCase().ignoreUnused() }
@@ -101,7 +99,6 @@ class SettingViewModelTest {
         val expectedLanguageDialogTrue = true
         val expectedLanguageDialogFalse = false
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -110,7 +107,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 1
-        var currentState = viewModel.uiState.value as Success
+        var currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLanguageDialogTrue, currentState.showLanguageDialog)
 
         // When 2
@@ -118,7 +115,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 2
-        currentState = viewModel.uiState.value as Success
+        currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLanguageDialogFalse, currentState.showLanguageDialog)
 
         coVerify(exactly = 0) { checkLoginStatusUseCase().ignoreUnused() }
@@ -132,7 +129,6 @@ class SettingViewModelTest {
         val expectedResetDialogTrue = true
         val expectedResetDialogFalse = false
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -141,7 +137,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 1
-        var currentState = viewModel.uiState.value as Success
+        var currentState = viewModel.uiState.first() as Success
         assertEquals(expectedResetDialogTrue, currentState.showResetDialog)
 
         // When 2
@@ -149,7 +145,7 @@ class SettingViewModelTest {
         runCurrent()
 
         // Then 2
-        currentState = viewModel.uiState.value as Success
+        currentState = viewModel.uiState.first() as Success
         assertEquals(expectedResetDialogFalse, currentState.showResetDialog)
 
         coVerify(exactly = 0) { checkLoginStatusUseCase().ignoreUnused() }
@@ -160,11 +156,10 @@ class SettingViewModelTest {
     @Test
     fun `정의되지 않은 이벤트를 받으면 상태가 변경되지 않는다`() = runTest {
         // Given
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
-        val initialState = viewModel.uiState.value as Success
+        val initialState = viewModel.uiState.first() as Success
 
         // When
         viewModel.changDialogState(SettingEvent.POLICY)
@@ -176,7 +171,7 @@ class SettingViewModelTest {
         coVerify(exactly = 0) { resetDataUseCase() }
         coVerify(exactly = 0) { revokeApplicationUseCase() }
 
-        val currentState = viewModel.uiState.value as Success
+        val currentState = viewModel.uiState.first() as Success
         assertEquals(initialState, currentState)
     }
 
@@ -186,7 +181,6 @@ class SettingViewModelTest {
         val expectedLogoutDialogState = true
         coEvery { checkLoginStatusUseCase() } returns flowOf(true)
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -199,7 +193,7 @@ class SettingViewModelTest {
         coVerify(exactly = 0) { resetDataUseCase() }
         coVerify(exactly = 0) { revokeApplicationUseCase() }
 
-        val currentState = viewModel.uiState.value as Success
+        val currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLogoutDialogState, currentState.showLogoutDialog)
     }
 
@@ -209,7 +203,6 @@ class SettingViewModelTest {
         val expectedLoginDialogState = true
         coEvery { checkLoginStatusUseCase() } returns flowOf(false)
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -222,7 +215,7 @@ class SettingViewModelTest {
         coVerify(exactly = 0) { resetDataUseCase() }
         coVerify(exactly = 0) { revokeApplicationUseCase() }
 
-        val currentState = viewModel.uiState.value as Success
+        val currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLoginDialogState, currentState.showLoginDialog)
     }
 
@@ -234,38 +227,36 @@ class SettingViewModelTest {
 
         // 시나리오 1: 로그아웃 다이얼로그 닫기
         coEvery { checkLoginStatusUseCase() } returns flowOf(true)
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
         viewModel.changDialogState(SettingEvent.AUTH) // 로그아웃 다이얼로그 오픈
         runCurrent()
-        assertEquals(true, (viewModel.uiState.value as Success).showLogoutDialog)
+        assertEquals(true, (viewModel.uiState.first() as Success).showLogoutDialog)
 
         // When 1
         viewModel.changDialogState(SettingEvent.LOGOUT)
         runCurrent()
 
         // Then 1
-        var currentState = viewModel.uiState.value as Success
+        var currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLogoutDialogState, currentState.showLogoutDialog)
 
         // 시나리오 2: 로그인 다이얼로그 닫기
         coEvery { checkLoginStatusUseCase() } returns flowOf(false)
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
         viewModel.changDialogState(SettingEvent.AUTH) // 로그인 다이얼로그 오픈
         runCurrent()
-        assertEquals(true, (viewModel.uiState.value as Success).showLoginDialog)
+        assertEquals(true, (viewModel.uiState.first() as Success).showLoginDialog)
 
         // When 2
         viewModel.changDialogState(SettingEvent.LOGIN)
         runCurrent()
 
         // Then 2
-        currentState = viewModel.uiState.value as Success
+        currentState = viewModel.uiState.first() as Success
         assertEquals(expectedLoginDialogState, currentState.showLoginDialog)
     }
 
@@ -278,9 +269,8 @@ class SettingViewModelTest {
         val resultList = mutableListOf<ResetDataResult>()
         coEvery { resetDataUseCase() } returns expectedResult
 
-        createViewModel()
         collectViewModelFlows()
-        backgroundScope.launch { viewModel.showResetResult.collect { resultList.add(it) } }
+        viewModel.showResetResult.collectIn(backgroundScope, resultList)
         runCurrent()
 
         // When
@@ -303,9 +293,9 @@ class SettingViewModelTest {
         // TODO: Turbine 라이브러리가 도입되면, 명시적인 List 수집 코드를 삭제하고 .test { awaitItem() } 블록으로 대체할 것.
         // 현재는 Turbine 없이 SharedFlow(replay=0)의 "정확히 1회 방출" 여부와 유실 방지를 검증하기 위해 미리 List에 수집하는 정석 패턴 사용.
         val resultList = mutableListOf<RevokeResult>()
+
         coEvery { revokeApplicationUseCase() } returns expectedResult
 
-        createViewModel()
         collectViewModelFlows()
         backgroundScope.launch { viewModel.showRevokeResult.collect { resultList.add(it) } }
         runCurrent()

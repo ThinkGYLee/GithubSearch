@@ -58,6 +58,7 @@ class DetailViewModelTest {
         coEvery { updateFavoriteStatusUseCase(any()) } returns UpdateFavoriteResult.Success
     }
 
+    // id를 받아오는가 못받아오는가에 따라서도 수행해야할 동작이 있어서 따로 뺌
     private fun createViewModel(id: String? = null) {
         val savedStateHandle = SavedStateHandle().apply {
             id?.let { set("id", it) }
