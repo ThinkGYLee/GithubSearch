@@ -14,6 +14,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -45,9 +46,6 @@ class FavoriteViewModelTest {
     fun setUp() {
         coEvery { updateFavoriteUseCase(any()) } returns UpdateFavoriteResult.Success
         coEvery { getFavoritesUseCase(any()) } returns flowOf(PagingData.empty())
-    }
-
-    private fun createViewModel() {
         viewModel = FavoriteViewModel(
             updateFavoriteUseCase = updateFavoriteUseCase,
             getFavoritesUseCase = getFavoritesUseCase,
@@ -69,7 +67,6 @@ class FavoriteViewModelTest {
         )
 
         // When
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -89,7 +86,6 @@ class FavoriteViewModelTest {
             filterState = targetFilter,
         )
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -110,7 +106,6 @@ class FavoriteViewModelTest {
         val targetUser = createDummyUser("test")
         val expectedDialogState = true
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -121,7 +116,7 @@ class FavoriteViewModelTest {
         // Then
         coVerify(exactly = 1) { getFavoritesUseCase(FilterStatus.ALL).ignoreUnused() }
         coVerify(exactly = 0) { updateFavoriteUseCase(any()) }
-        val currentState = viewModel.uiState.value as FavoriteUiState.Success
+        val currentState = viewModel.uiState.first() as FavoriteUiState.Success
         assertEquals(expectedDialogState, currentState.favoriteDialogState)
     }
 
@@ -131,7 +126,6 @@ class FavoriteViewModelTest {
         val targetUser = createDummyUser("test")
         val expectedDialogState = false
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
         viewModel.showFavoriteDialog(targetUser) // 다이얼로그 열기
@@ -145,7 +139,7 @@ class FavoriteViewModelTest {
         coVerify(exactly = 1) { getFavoritesUseCase(FilterStatus.ALL).ignoreUnused() }
         coVerify(exactly = 1) { updateFavoriteUseCase(targetUser) }
 
-        val currentState = viewModel.uiState.value as FavoriteUiState.Success
+        val currentState = viewModel.uiState.first() as FavoriteUiState.Success
         assertEquals(expectedDialogState, currentState.favoriteDialogState)
     }
 
@@ -154,7 +148,6 @@ class FavoriteViewModelTest {
         // Given
         val expectedDialogState = true
 
-        createViewModel()
         collectViewModelFlows()
         runCurrent()
 
@@ -166,7 +159,7 @@ class FavoriteViewModelTest {
         coVerify(exactly = 1) { getFavoritesUseCase(FilterStatus.ALL).ignoreUnused() }
         coVerify(exactly = 0) { updateFavoriteUseCase(any()) }
 
-        val currentState = viewModel.uiState.value as FavoriteUiState.Success
+        val currentState = viewModel.uiState.first() as FavoriteUiState.Success
         assertEquals(expectedDialogState, currentState.filterDialogState)
     }
 }
