@@ -177,26 +177,36 @@ private fun DetailRepoTitle() {
     )
 }
 
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@androidx.compose.ui.tooling.preview.Preview(
+    showBackground = true,
+    name = "Light Mode",
+)
+@androidx.compose.ui.tooling.preview.Preview(
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode",
+)
 @Composable
 private fun DetailScreenPreview(
     user: UserModel = DetailPreviewData.skydovesUser,
     repoList: List<RepositoryModel> = DetailPreviewData.skydovesRepos,
 ) {
     GithubSearchTheme {
-        DetailScreen(
-            avatar = user.avatar,
-            repoCount = user.repoCount,
-            followers = user.followers,
-            following = user.following,
-            name = user.name,
-            login = user.login,
-            bio = user.bio,
-            company = user.company,
-            email = user.email,
-            blogUrl = user.blogUrl,
-            repoList = repoList,
-            paddingValues = PaddingValues(0.dp),
-        )
+        androidx.compose.material3.Surface {
+            DetailScreen(
+                avatar = user.avatar,
+                repoCount = user.repoCount,
+                followers = user.followers,
+                following = user.following,
+                name = user.name,
+                login = user.login,
+                bio = user.bio,
+                company = user.company,
+                email = user.email,
+                blogUrl = user.blogUrl,
+                repoList = repoList,
+                paddingValues = PaddingValues(0.dp),
+            )
+        }
     }
 }

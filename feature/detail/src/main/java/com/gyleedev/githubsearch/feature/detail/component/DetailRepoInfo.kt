@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -75,17 +76,27 @@ fun DetailRepoInfo(
     }
 }
 
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@androidx.compose.ui.tooling.preview.Preview(
+    showBackground = true,
+    name = "Light Mode",
+)
+@androidx.compose.ui.tooling.preview.Preview(
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode",
+)
 @Composable
 private fun DetailRepoInfoPreview(
     repo: RepositoryModel = DetailPreviewData.skydovesRepos.first(),
 ) {
     GithubSearchTheme {
-        DetailRepoInfo(
-            name = repo.name,
-            description = repo.description,
-            language = repo.language,
-            stargazer = repo.stargazer,
-        )
+        Surface {
+            DetailRepoInfo(
+                name = repo.name,
+                description = repo.description,
+                language = repo.language,
+                stargazer = repo.stargazer,
+            )
+        }
     }
 }
