@@ -12,4 +12,5 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.landscapist.glide)
     implementation(libs.landscapist.placeholder)
+    implementation(libs.emoji.java)
 }

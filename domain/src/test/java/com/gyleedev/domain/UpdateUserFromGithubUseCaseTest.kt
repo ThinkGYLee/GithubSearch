@@ -10,7 +10,6 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
 import io.mockk.just
-import io.mockk.mockk
 import io.mockk.runs
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -71,7 +70,8 @@ class UpdateUserFromGithubUseCaseTest {
         val lastAccess = AccessTime(
             id = expectedEntityId,
             githubId = userId,
-            accessTime = Instant.parse("2026-05-14T08:00:00Z"), // 2시간 전 (Timeout)
+            // 2시간 전 (Timeout)
+            accessTime = Instant.parse("2026-05-14T08:00:00Z"),
             isRepoFetched = true,
         )
 
@@ -102,7 +102,8 @@ class UpdateUserFromGithubUseCaseTest {
         val lastAccess = AccessTime(
             id = 1L,
             githubId = userId,
-            accessTime = Instant.parse("2026-05-14T08:00:00Z"), // 2시간 전 (Timeout)
+            // 2시간 전 (Timeout)
+            accessTime = Instant.parse("2026-05-14T08:00:00Z"),
             isRepoFetched = true,
         )
 
@@ -134,7 +135,8 @@ class UpdateUserFromGithubUseCaseTest {
         val lastAccess = AccessTime(
             id = expectedEntityId,
             githubId = userId,
-            accessTime = Instant.parse("2026-05-14T09:30:00Z"), // 30분 전 (No Timeout)
+            // 30분 전 (No Timeout)
+            accessTime = Instant.parse("2026-05-14T09:30:00Z"),
             isRepoFetched = false,
         )
 
@@ -165,7 +167,8 @@ class UpdateUserFromGithubUseCaseTest {
         val lastAccess = AccessTime(
             id = 1L,
             githubId = userId,
-            accessTime = Instant.parse("2026-05-14T09:30:00Z"), // 30분 전 (No Timeout)
+            // 30분 전 (No Timeout)
+            accessTime = Instant.parse("2026-05-14T09:30:00Z"),
             isRepoFetched = true,
         )
 
