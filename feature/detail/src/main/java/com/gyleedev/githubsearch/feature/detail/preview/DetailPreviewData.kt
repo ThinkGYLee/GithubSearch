@@ -10,7 +10,7 @@ object DetailPreviewData {
         following = 19,
         avatar = "https://avatars.githubusercontent.com/u/24237865?v=4",
         company = "@RevenueCat",
-        email = null,
+        email = "dove@dove.net",
         bio = "Senior Developer Relations & Engineer @RevenueCat 🥑 • GDE for Android & Kotlin & Firebase • Open Source Software ❤️  • Coffee Lover • Found @doveletter",
         repoCount = 82,
         reposAddress = "https://api.github.com/users/skydoves/repos",
