@@ -213,7 +213,7 @@ private fun DetailUserInfoPreview(
                 company = user.company,
                 email = user.email,
                 blogUrl = user.blogUrl,
-                onBlogClick = {}
+                onBlogClick = {},
             )
         }
     }

@@ -25,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
-import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
 import com.gyleedev.githubsearch.core.designsystem.util.getColor
+import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 

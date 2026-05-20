@@ -70,7 +70,7 @@ fun DetailScreen(
                     blogUrl = blogUrl,
                     repoList = repoList,
                     paddingValues = paddingValues,
-                    onBlogClick = { uriHandler.openUri(it) }
+                    onBlogClick = { uriHandler.openUri(it) },
                 )
             }
         }
@@ -96,9 +96,9 @@ private fun DetailScreen(
 ) {
     LazyColumn(
         modifier =
-            modifier
-                .fillMaxSize()
-                .padding(vertical = 4.dp),
+        modifier
+            .fillMaxSize()
+            .padding(vertical = 4.dp),
         contentPadding = paddingValues,
     ) {
         item {
@@ -113,7 +113,7 @@ private fun DetailScreen(
                 company = company,
                 email = email,
                 blogUrl = blogUrl,
-                onBlogClick = onBlogClick
+                onBlogClick = onBlogClick,
             )
         }
 
@@ -211,7 +211,7 @@ private fun DetailScreenPreview(
                 blogUrl = user.blogUrl,
                 repoList = repoList,
                 paddingValues = PaddingValues(0.dp),
-                onBlogClick = {}
+                onBlogClick = {},
             )
         }
     }

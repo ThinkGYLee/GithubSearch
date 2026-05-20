@@ -8,7 +8,7 @@ internal fun extractDomain(
 ): String {
     try {
         val isMissingProtocol = !url.startsWith(prefix = "http://") &&
-                !url.startsWith(prefix = "https://")
+            !url.startsWith(prefix = "https://")
 
         val validUrl = if (isMissingProtocol) {
             "http://$url"
