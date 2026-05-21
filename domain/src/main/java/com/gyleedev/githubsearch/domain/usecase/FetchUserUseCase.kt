@@ -11,8 +11,12 @@ class FetchUserUseCase @Inject constructor(
     suspend operator fun invoke(query: String): SearchStatus = try {
         val result = repository.fetchUser(query)
         if (result is UserFetchResult.Success) {
-            repository.insertUser(result.user)
-            repository.upsertAccessTime(id = 0L, githubId = query, isRepoFetched = false)
+            repository.upsertUser(result.user)
+            repository.upsertAccessTime(
+                id = 0L,
+                githubId = result.user.login,
+                isRepoFetched = false,
+            )
         }
         return when (result) {
             is UserFetchResult.Success -> {
