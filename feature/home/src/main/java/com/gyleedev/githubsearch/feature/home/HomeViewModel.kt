@@ -39,7 +39,8 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val isLoading = MutableStateFlow(false)
-    private val isSearchActivated = MutableStateFlow(false)
+    private val mode = MutableStateFlow(HomeMode.DEFAULT)
+    private val selectedUsers = MutableStateFlow<Set<String>>(emptySet())
     private val showRequestAuthDialog = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -60,7 +61,21 @@ class HomeViewModel @Inject constructor(
 
     val users = getUsersUseCase().cachedIn(viewModelScope)
 
-    val uiState = combine(searchQuery, searchedUser, isLoading, isSearchActivated, showRequestAuthDialog) { query, user, isLoading, searchActivated, showAuth ->
+    val uiState = combine(
+        searchQuery,
+        searchedUser,
+        isLoading,
+        mode,
+        selectedUsers,
+        showRequestAuthDialog,
+    ) { args ->
+        val query = args[0] as String
+        val user = args[1] as UserModel?
+        val loading = args[2] as Boolean
+        val mode = args[3] as HomeMode
+        val selected = args[4] as Set<String>
+        val showAuth = args[5] as Boolean
+
         val searchResult = if (user == null) {
             SearchUiState.Empty
         } else {
@@ -71,11 +86,13 @@ class HomeViewModel @Inject constructor(
                 bio = user.bio,
             )
         }
+
         HomeUiState.Success(
             searchQuery = query,
-            isLoading = isLoading,
+            isLoading = loading,
             searchState = searchResult,
-            isSearchActive = searchActivated,
+            mode = mode,
+            selectedUsers = selected,
             showRequestAuthDialog = showAuth,
         )
     }.stateIn(
@@ -104,9 +121,49 @@ class HomeViewModel @Inject constructor(
     }
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun changeSearchBarState(state: Boolean) {
+    fun changeSearchBarState(isActive: Boolean) {
         viewModelScope.launch(exceptionHandler) {
-            isSearchActivated.emit(state)
+            val emitState = if (isActive) {
+                HomeMode.SEARCH
+            } else {
+                HomeMode.DEFAULT
+            }
+            mode.emit(emitState)
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun changeSelectionState(login: String) {
+        viewModelScope.launch(exceptionHandler) {
+            val current = selectedUsers.value
+            if (current.contains(login)) {
+                selectedUsers.emit(current - login)
+            } else {
+                selectedUsers.emit(current + login)
+                if (mode.value != HomeMode.SELECT) {
+                    mode.emit(HomeMode.SELECT)
+                }
+            }
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun clearSelection() {
+        viewModelScope.launch(exceptionHandler) {
+            selectedUsers.emit(emptySet())
+            mode.emit(HomeMode.DEFAULT)
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun selectCheckBox(logins: List<String>) {
+        viewModelScope.launch(exceptionHandler) {
+            val currentSelected = selectedUsers.value
+            if (logins.all { currentSelected.contains(it) }) {
+                selectedUsers.emit(currentSelected - logins.toSet())
+            } else {
+                selectedUsers.emit(currentSelected + logins.toSet())
+            }
         }
     }
 
