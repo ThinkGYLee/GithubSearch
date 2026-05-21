@@ -20,6 +20,7 @@ fun UserInfoItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
     Row(
         modifier =
@@ -34,7 +35,7 @@ fun UserInfoItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        UserAvatar(avatar = avatar)
+        FlippableUserAvatar(avatar = avatar, isSelected = isSelected)
         Text(
             text = login,
             fontWeight = FontWeight.Bold,
