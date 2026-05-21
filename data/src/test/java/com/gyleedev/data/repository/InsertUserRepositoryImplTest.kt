@@ -44,7 +44,7 @@ class InsertUserRepositoryImplTest {
     }
 
     @Test
-    fun `유저 정보를 저장할 때 도메인 모델을 엔티티로 변환하여 UserDao의 insertUser를 호출한다`() = runTest {
+    fun `유저 정보를 저장할 때 도메인 모델을 엔티티로 변환하여 UserDao의 upsertUser를 호출한다`() = runTest {
         // Given
         val userModel = UserModel(
             id = 1L,
@@ -66,13 +66,13 @@ class InsertUserRepositoryImplTest {
         val expectedEntity = userModel.toEntity()
         val expectedInsertId = 100L
 
-        coEvery { userDao.insertUser(expectedEntity) } returns expectedInsertId
+        coEvery { userDao.upsertUser(expectedEntity) } returns expectedInsertId
 
         // When
-        repository.insertUser(userModel)
+        repository.upsertUser(userModel)
 
         // Then
-        coVerify(exactly = 1) { userDao.insertUser(expectedEntity) }
+        coVerify(exactly = 1) { userDao.upsertUser(expectedEntity) }
     }
 
     @Test
@@ -98,12 +98,12 @@ class InsertUserRepositoryImplTest {
         val expectedEntity = userModel.toEntity()
         val exception = RuntimeException("UNIQUE constraint failed: user.github_id")
 
-        coEvery { userDao.insertUser(expectedEntity) } throws exception
+        coEvery { userDao.upsertUser(expectedEntity) } throws exception
 
         // When
         var actualException: Exception? = null
         try {
-            repository.insertUser(userModel)
+            repository.upsertUser(userModel)
             org.junit.Assert.fail("예외가 발생해야 합니다.")
         } catch (e: Exception) {
             actualException = e
@@ -111,6 +111,6 @@ class InsertUserRepositoryImplTest {
 
         // Then
         assertEquals(exception.message, actualException?.message)
-        coVerify(exactly = 1) { userDao.insertUser(expectedEntity) }
+        coVerify(exactly = 1) { userDao.upsertUser(expectedEntity) }
     }
 }

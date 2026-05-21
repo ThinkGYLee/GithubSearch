@@ -22,8 +22,6 @@ interface GitHubRepository {
 
     suspend fun fetchRepos(id: String): List<RepositoryModel>
 
-    suspend fun insertUser(userModel: UserModel)
-
     suspend fun insertRepositoryList(
         userEntityId: Long,
         list: List<RepositoryModel>,
