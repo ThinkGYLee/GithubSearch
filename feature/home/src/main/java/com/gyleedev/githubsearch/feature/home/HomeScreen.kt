@@ -2,7 +2,12 @@ package com.gyleedev.githubsearch.feature.home
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +26,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +41,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,9 +78,23 @@ fun HomeScreen(
     val socketException = stringResource(id = DesignSystemR.string.socket_exception)
     val httpException = stringResource(id = DesignSystemR.string.http_exception)
     val etcException = stringResource(id = DesignSystemR.string.etc_exception)
-    val noSuchUserMessage = stringResource(id = HomeR.string.search_result_no_user)
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val currentLogins by remember(userList.itemSnapshotList) {
+        derivedStateOf { userList.itemSnapshotList.items.map { it.login } }
+    }
+
+    val isAllSelected by remember {
+        derivedStateOf {
+            val state = uiState
+            if (state is HomeUiState.Success) {
+                currentLogins.isNotEmpty() && currentLogins.all { state.selectedUsers.contains(it) }
+            } else {
+                false
+            }
+        }
+    }
 
     LaunchedEffect(viewModel.fetchState, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -85,7 +106,7 @@ fun HomeScreen(
                         FetchState.PARSE_ERROR -> httpException
                         FetchState.FAIL -> etcException
                     }
-                snackBarHostState.showSnackbar(
+                snackbarHostState.showSnackbar(
                     message = message,
                     duration = SnackbarDuration.Short,
                 )
@@ -97,32 +118,43 @@ fun HomeScreen(
         val state = uiState as HomeUiState.Success
         HomeScreen(
             uiState = state,
+            userList = userList,
+            isAllSelected = isAllSelected,
+            snackbarHostState = snackbarHostState,
             onSearch = viewModel::searchUser,
             onSearchItemReset = { viewModel.updateSearchId("") },
             onActiveChanged = viewModel::changeSearchBarState,
             onQueryChange = viewModel::updateSearchId,
-            moveToDetail = moveToDetail,
-            userList = userList,
-            snackbarHostState = snackBarHostState,
+            onToggleSelection = viewModel::changeSelectionState,
+            onToggleAllSelection = {
+                viewModel.selectCheckBox(currentLogins)
+            },
+            onClearSelection = viewModel::clearSelection,
             onDismiss = { viewModel.changeDialogState(false) },
             onConfirm = {
                 viewModel.changeDialogState(false)
                 requestAuthentication()
             },
+            moveToDetail = moveToDetail,
             modifier = modifier,
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState.Success,
     userList: LazyPagingItems<UserModel>,
+    isAllSelected: Boolean,
     snackbarHostState: SnackbarHostState,
     onSearch: (String) -> Unit,
     onSearchItemReset: () -> Unit,
     onActiveChanged: (Boolean) -> Unit,
     onQueryChange: (String) -> Unit,
+    onToggleSelection: (String) -> Unit,
+    onToggleAllSelection: () -> Unit,
+    onClearSelection: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     moveToDetail: (String) -> Unit,
@@ -130,16 +162,20 @@ internal fun HomeScreen(
 ) {
     Scaffold(
         topBar = {
-            EmbeddedSearchBar(
+            HomeTopAppBar(
+                mode = uiState.mode,
+                searchQuery = uiState.searchQuery,
+                searchState = uiState.searchState,
+                isLoading = uiState.isLoading,
+                selectedCount = uiState.selectedUsers.size,
+                isAllSelected = isAllSelected,
                 onQueryChange = onQueryChange,
-                isSearchActive = uiState.isSearchActive,
-                query = uiState.searchQuery,
                 onActiveChanged = onActiveChanged,
                 onSearch = onSearch,
                 onSearchItemReset = onSearchItemReset,
+                onToggleAll = onToggleAllSelection,
+                onClearSelection = onClearSelection,
                 moveToDetail = moveToDetail,
-                searchState = uiState.searchState,
-                loading = uiState.isLoading,
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -147,13 +183,16 @@ internal fun HomeScreen(
     ) { paddingValues ->
 
         if (userList.itemCount > 0) {
-            SearchItemList(
+            HomeItemList(
                 modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
                 users = userList,
-                onClick = { moveToDetail(it) },
+                mode = uiState.mode,
+                selectedUsers = uiState.selectedUsers,
+                onToggleSelection = onToggleSelection,
+                onClick = moveToDetail,
             )
         } else {
             NoItem(
@@ -168,6 +207,99 @@ internal fun HomeScreen(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeTopAppBar(
+    mode: HomeMode,
+    searchQuery: String,
+    searchState: SearchUiState,
+    isLoading: Boolean,
+    selectedCount: Int,
+    isAllSelected: Boolean,
+    onQueryChange: (String) -> Unit,
+    onActiveChanged: (Boolean) -> Unit,
+    onSearch: (String) -> Unit,
+    onSearchItemReset: () -> Unit,
+    onToggleAll: () -> Unit,
+    onClearSelection: () -> Unit,
+    moveToDetail: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedContent(
+        targetState = mode,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(300)) togetherWith
+                fadeOut(animationSpec = tween(300))
+        },
+        label = "TopBarModeTransition",
+        modifier = modifier,
+    ) { currentMode ->
+        when (currentMode) {
+            HomeMode.SELECT -> {
+                SelectionTopBar(
+                    selectedCount = selectedCount,
+                    isAllSelected = isAllSelected,
+                    onToggleAll = onToggleAll,
+                    onClearSelection = onClearSelection,
+                )
+            }
+
+            HomeMode.DEFAULT, HomeMode.SEARCH -> {
+                EmbeddedSearchBar(
+                    onQueryChange = onQueryChange,
+                    isSearchActive = currentMode == HomeMode.SEARCH,
+                    query = searchQuery,
+                    onActiveChanged = onActiveChanged,
+                    onSearch = onSearch,
+                    onSearchItemReset = onSearchItemReset,
+                    moveToDetail = moveToDetail,
+                    searchState = searchState,
+                    loading = isLoading,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectionTopBar(
+    selectedCount: Int,
+    isAllSelected: Boolean,
+    onToggleAll: () -> Unit,
+    onClearSelection: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(text = "${selectedCount}개 선택됨") },
+        navigationIcon = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .clickable { onToggleAll() },
+            ) {
+                androidx.compose.material3.Checkbox(
+                    checked = isAllSelected,
+                    onCheckedChange = null, // Handled by Row clickable
+                )
+                Text(
+                    text = if (isAllSelected) "모두 선택 해제" else "모두 선택",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(start = 4.dp, end = 8.dp),
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onClearSelection) {
+                Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
+            }
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -305,10 +437,13 @@ private fun AuthDialog(
 }
 
 @Composable
-private fun SearchItemList(
+private fun HomeItemList(
     users: LazyPagingItems<UserModel>,
-    modifier: Modifier = Modifier,
+    mode: HomeMode,
+    selectedUsers: Set<String>,
+    onToggleSelection: (String) -> Unit,
     onClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier =
@@ -321,11 +456,23 @@ private fun SearchItemList(
             key = { index -> users[index]?.login ?: "key_$index" },
         ) { index ->
             val user = users[index] as UserModel
+            val isSelected = selectedUsers.contains(user.login)
             UserInfoItem(
                 avatar = user.avatar,
                 login = user.login,
-                onClick = { onClick(user.login) },
-                onLongClick = {},
+                isSelected = isSelected,
+                onClick = {
+                    if (mode == HomeMode.SELECT) {
+                        onToggleSelection(user.login)
+                    } else {
+                        onClick(user.login)
+                    }
+                },
+                onLongClick = {
+                    if (mode != HomeMode.SELECT) {
+                        onToggleSelection(user.login)
+                    }
+                },
             )
         }
     }
