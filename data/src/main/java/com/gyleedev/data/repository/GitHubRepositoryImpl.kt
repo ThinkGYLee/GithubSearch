@@ -121,10 +121,6 @@ class GitHubRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun insertUser(userModel: UserModel) {
-        userDao.insertUser(userModel.toEntity())
-    }
-
     // 유닛 테스트 코드 짜봐
     override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
