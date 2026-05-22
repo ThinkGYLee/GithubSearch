@@ -185,9 +185,9 @@ internal fun HomeScreen(
         if (userList.itemCount > 0) {
             HomeItemList(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                 users = userList,
                 mode = uiState.mode,
                 selectedUsers = uiState.selectedUsers,
@@ -231,7 +231,7 @@ private fun HomeTopAppBar(
         targetState = mode,
         transitionSpec = {
             fadeIn(animationSpec = tween(300)) togetherWith
-                fadeOut(animationSpec = tween(300))
+                    fadeOut(animationSpec = tween(300))
         },
         label = "TopBarModeTransition",
         modifier = modifier,
@@ -377,11 +377,11 @@ private fun EmbeddedSearchBar(
         if (searchState is SearchUiState.Success) {
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp)
-                    .navigationBarsPadding()
-                    .imePadding(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp)
+                        .navigationBarsPadding()
+                        .imePadding(),
             ) {
                 SearchResultItem(
                     onClick = moveToDetail,
@@ -447,9 +447,9 @@ private fun HomeItemList(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
     ) {
         items(
             users.itemCount,
@@ -468,11 +468,7 @@ private fun HomeItemList(
                         onClick(user.login)
                     }
                 },
-                onLongClick = {
-                    if (mode != HomeMode.SELECT) {
-                        onToggleSelection(user.login)
-                    }
-                },
+                onLongClick = { onToggleSelection(user.login) },
             )
         }
     }
@@ -489,11 +485,11 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-        modifier
-            .padding(top = 20.dp)
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = { onClick(login) }),
+            modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
