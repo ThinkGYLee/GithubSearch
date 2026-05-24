@@ -283,4 +283,6 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun deleteAccessToken() {
         tokenPreference.deleteKey()
     }
+
+    override suspend fun deleteUsersWithSet(userIds: Set<String>): Int = userDao.deleteUsersWithSet(userIds)
 }
