@@ -461,17 +461,18 @@ private fun AuthDialog(
         title = { Text(text = stringResource(id = DesignSystemR.string.title_request_authentication)) },
         text = { Text(text = stringResource(id = DesignSystemR.string.content_request_authentication)) },
         confirmButton = {
-            Button(
-                onClick = onConfirm,
-            ) {
-                Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(id = DesignSystemR.string.text_dialog_confirm),
+                )
             }
         },
         dismissButton = {
-            Button(
-                onClick = onDismiss,
-            ) {
-                Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(id = DesignSystemR.string.text_dialog_cancel),
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         },
         modifier = modifier,
@@ -489,17 +490,16 @@ private fun DeleteDialog(
         title = { Text(text = stringResource(id = DesignSystemR.string.title_request_delete)) },
         text = { Text(text = stringResource(id = DesignSystemR.string.content_request_delete)) },
         confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-            ) {
-                Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(id = DesignSystemR.string.text_dialog_confirm))
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-            ) {
-                Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(id = DesignSystemR.string.text_dialog_cancel),
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         },
         modifier = modifier,
