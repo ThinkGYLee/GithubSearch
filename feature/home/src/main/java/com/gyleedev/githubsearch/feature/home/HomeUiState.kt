@@ -19,6 +19,7 @@ sealed interface HomeUiState {
         val mode: HomeMode,
         val selectedUsers: Set<String>,
         val showRequestAuthDialog: Boolean,
+        val showDeleteDialog: Boolean,
     ) : HomeUiState
 }
 

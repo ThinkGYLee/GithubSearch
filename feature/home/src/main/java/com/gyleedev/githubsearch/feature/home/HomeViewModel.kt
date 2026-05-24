@@ -45,6 +45,7 @@ class HomeViewModel @Inject constructor(
     private val mode = MutableStateFlow(HomeMode.DEFAULT)
     private val selectedUsers = MutableStateFlow<Set<String>>(emptySet())
     private val showRequestAuthDialog = MutableStateFlow(false)
+    private val showDeleteDialog = MutableStateFlow(false)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private val searchedUser: StateFlow<UserModel?> = searchQuery
@@ -71,6 +72,7 @@ class HomeViewModel @Inject constructor(
         mode,
         selectedUsers,
         showRequestAuthDialog,
+        showDeleteDialog,
     ) { args ->
         val query = args[0] as String
         val user = args[1] as UserModel?
@@ -78,6 +80,7 @@ class HomeViewModel @Inject constructor(
         val mode = args[3] as HomeMode
         val selected = args[4] as Set<String>
         val showAuth = args[5] as Boolean
+        val showDelete = args[6] as Boolean
 
         val searchResult = if (user == null) {
             SearchUiState.Empty
@@ -97,6 +100,7 @@ class HomeViewModel @Inject constructor(
             mode = mode,
             selectedUsers = selected,
             showRequestAuthDialog = showAuth,
+            showDeleteDialog = showDelete,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -110,7 +114,7 @@ class HomeViewModel @Inject constructor(
             isLoading.emit(true)
             val status = fetchUserUseCase(id)
             if (status == SearchStatus.NEED_AUTHENTICATION) {
-                changeDialogState(true)
+                changeAuthDialogState(true)
             }
             isLoading.emit(false)
         }
@@ -171,9 +175,16 @@ class HomeViewModel @Inject constructor(
     }
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-    fun changeDialogState(state: Boolean) {
+    fun changeAuthDialogState(state: Boolean) {
         viewModelScope.launch(exceptionHandler) {
             showRequestAuthDialog.emit(state)
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun changeDeleteDialogState(state: Boolean) {
+        viewModelScope.launch(exceptionHandler) {
+            showDeleteDialog.emit(state)
         }
     }
 
@@ -184,6 +195,13 @@ class HomeViewModel @Inject constructor(
             if (result is UserDeleteResult.Success) {
                 clearSelection()
             }
+            changeDeleteDialogState(false)
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun updateSelectedFavorite() {
+        viewModelScope.launch(exceptionHandler) {
         }
     }
 }

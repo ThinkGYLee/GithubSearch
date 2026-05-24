@@ -49,6 +49,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -143,13 +144,15 @@ fun HomeScreen(
                 viewModel.selectCheckBox(currentLogins)
             },
             onClearSelection = viewModel::clearSelection,
-            onDismiss = { viewModel.changeDialogState(false) },
-            onConfirm = {
-                viewModel.changeDialogState(false)
+            onAuthenticationDismiss = { viewModel.changeAuthDialogState(false) },
+            onAuthenticationConfirm = {
+                viewModel.changeAuthDialogState(false)
                 requestAuthentication()
             },
-            onDeleteSelectedUser = viewModel::deleteSelectedUsers,
-            onFavoriteSelectedUser = {},
+            onDeleteRequest = { viewModel.changeDeleteDialogState(true) },
+            onFavoriteRequest = {},
+            onDeleteConfirm = viewModel::deleteSelectedUsers,
+            onDeleteDismiss = { viewModel.changeDeleteDialogState(false) },
             moveToDetail = moveToDetail,
             modifier = modifier,
         )
@@ -170,10 +173,12 @@ internal fun HomeScreen(
     onToggleSelection: (String) -> Unit,
     onToggleAllSelection: () -> Unit,
     onClearSelection: () -> Unit,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    onDeleteSelectedUser: () -> Unit,
-    onFavoriteSelectedUser: () -> Unit,
+    onAuthenticationDismiss: () -> Unit,
+    onAuthenticationConfirm: () -> Unit,
+    onDeleteConfirm: () -> Unit,
+    onDeleteDismiss: () -> Unit,
+    onDeleteRequest: () -> Unit,
+    onFavoriteRequest: () -> Unit,
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -198,8 +203,8 @@ internal fun HomeScreen(
         floatingActionButton = {
             HomeFloatingToolBar(
                 isActive = uiState.selectedUsers.isNotEmpty(),
-                onDeleteSelectedUser = onDeleteSelectedUser,
-                onFavoriteSelectedUser = onFavoriteSelectedUser,
+                onDeleteRequest = onDeleteRequest,
+                onFavoriteRequest = onFavoriteRequest,
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -227,8 +232,15 @@ internal fun HomeScreen(
 
         if (uiState.showRequestAuthDialog) {
             AuthDialog(
-                onConfirm = onConfirm,
-                onDismiss = onDismiss,
+                onConfirm = onAuthenticationConfirm,
+                onDismiss = onAuthenticationDismiss,
+            )
+        }
+
+        if (uiState.showDeleteDialog) {
+            DeleteDialog(
+                onConfirm = onDeleteConfirm,
+                onDismiss = onDeleteDismiss,
             )
         }
     }
@@ -467,6 +479,34 @@ private fun AuthDialog(
 }
 
 @Composable
+private fun DeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = DesignSystemR.string.title_request_delete)) },
+        text = { Text(text = stringResource(id = DesignSystemR.string.content_request_delete)) },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+            ) {
+                Text(stringResource(id = DesignSystemR.string.text_dialog_cancel))
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun HomeItemList(
     users: LazyPagingItems<UserModel>,
     mode: HomeMode,
@@ -555,8 +595,8 @@ private fun SearchResultItem(
 @Composable
 private fun HomeFloatingToolBar(
     isActive: Boolean,
-    onDeleteSelectedUser: () -> Unit,
-    onFavoriteSelectedUser: () -> Unit,
+    onDeleteRequest: () -> Unit,
+    onFavoriteRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (isActive) {
@@ -582,7 +622,7 @@ private fun HomeFloatingToolBar(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onFavoriteSelectedUser) {
+                IconButton(onClick = onFavoriteRequest) {
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = "좋아요",
@@ -591,7 +631,7 @@ private fun HomeFloatingToolBar(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(onClick = onDeleteSelectedUser) {
+                IconButton(onClick = onDeleteRequest) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "삭제",
