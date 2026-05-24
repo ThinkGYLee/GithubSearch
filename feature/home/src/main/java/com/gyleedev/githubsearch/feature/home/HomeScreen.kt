@@ -72,6 +72,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
+import com.gyleedev.githubsearch.domain.model.UpdateFavoriteResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
@@ -94,6 +95,8 @@ fun HomeScreen(
     val etcException = stringResource(id = DesignSystemR.string.etc_exception)
     val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
+    val updateSuccess = stringResource(id = DesignSystemR.string.update_user_success)
+    val updateFail = stringResource(id = DesignSystemR.string.update_user_fail)
 
     val currentLogins by remember(userList.itemSnapshotList) {
         derivedStateOf { userList.itemSnapshotList.items.map { it.login } }
@@ -128,6 +131,22 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(viewModel.showUpdateState, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.showUpdateState.collectLatest { result ->
+                val message = if (result == UpdateFavoriteResult.Success) {
+                    updateSuccess
+                } else {
+                    updateFail
+                }
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    duration = SnackbarDuration.Short,
+                )
+            }
+        }
+    }
+
     if (uiState is HomeUiState.Success) {
         val state = uiState as HomeUiState.Success
         HomeScreen(
@@ -150,7 +169,7 @@ fun HomeScreen(
                 requestAuthentication()
             },
             onDeleteRequest = { viewModel.changeDeleteDialogState(true) },
-            onFavoriteRequest = {},
+            onFavoriteRequest = viewModel::updateSelectedFavorite,
             onDeleteConfirm = viewModel::deleteSelectedUsers,
             onDeleteDismiss = { viewModel.changeDeleteDialogState(false) },
             moveToDetail = moveToDetail,

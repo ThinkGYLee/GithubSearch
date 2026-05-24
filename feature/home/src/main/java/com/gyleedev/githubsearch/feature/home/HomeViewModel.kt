@@ -5,17 +5,21 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.domain.model.SearchStatus
+import com.gyleedev.githubsearch.domain.model.UpdateFavoriteResult
 import com.gyleedev.githubsearch.domain.model.UserDeleteResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.usecase.DeleteSelectedUsersUseCase
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
+import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteBySetUseCase
 import com.gyleedev.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +43,7 @@ class HomeViewModel @Inject constructor(
     val deleteSelectedUsersUseCase: DeleteSelectedUsersUseCase,
     private val getUserWithFlowUseCase: GetUserWithFlowUseCase,
     private val fetchUserUseCase: FetchUserUseCase,
+    private val updateFavoriteBySetUseCase: UpdateFavoriteBySetUseCase,
 ) : BaseViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val isLoading = MutableStateFlow(false)
@@ -46,6 +51,9 @@ class HomeViewModel @Inject constructor(
     private val selectedUsers = MutableStateFlow<Set<String>>(emptySet())
     private val showRequestAuthDialog = MutableStateFlow(false)
     private val showDeleteDialog = MutableStateFlow(false)
+
+    private val _showUpdateState = MutableSharedFlow<UpdateFavoriteResult>()
+    val showUpdateState: SharedFlow<UpdateFavoriteResult> = _showUpdateState
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private val searchedUser: StateFlow<UserModel?> = searchQuery
@@ -202,6 +210,11 @@ class HomeViewModel @Inject constructor(
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     fun updateSelectedFavorite() {
         viewModelScope.launch(exceptionHandler) {
+            val result = updateFavoriteBySetUseCase(selectedUsers.value, favorite = true)
+            if (result is UpdateFavoriteResult.Success) {
+                clearSelection()
+            }
+            _showUpdateState.emit(result)
         }
     }
 }
