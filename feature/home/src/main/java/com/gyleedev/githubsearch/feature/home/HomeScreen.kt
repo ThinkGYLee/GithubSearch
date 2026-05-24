@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -39,6 +40,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -46,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -135,6 +138,7 @@ fun HomeScreen(
                 viewModel.changeDialogState(false)
                 requestAuthentication()
             },
+            onDeleteSelectedUser = viewModel::deleteSelectedUsers,
             moveToDetail = moveToDetail,
             modifier = modifier,
         )
@@ -157,6 +161,7 @@ internal fun HomeScreen(
     onClearSelection: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    onDeleteSelectedUser: () -> Unit,
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -175,6 +180,7 @@ internal fun HomeScreen(
                 onSearchItemReset = onSearchItemReset,
                 onToggleAll = onToggleAllSelection,
                 onClearSelection = onClearSelection,
+                onDeleteSelectedUser = onDeleteSelectedUser,
                 moveToDetail = moveToDetail,
             )
         },
@@ -224,6 +230,7 @@ private fun HomeTopAppBar(
     onSearchItemReset: () -> Unit,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
+    onDeleteSelectedUser: () -> Unit,
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -243,6 +250,7 @@ private fun HomeTopAppBar(
                     isAllSelected = isAllSelected,
                     onToggleAll = onToggleAll,
                     onClearSelection = onClearSelection,
+                    onDeleteSelectedUser = onDeleteSelectedUser,
                 )
             }
 
@@ -270,6 +278,7 @@ private fun SelectionTopBar(
     isAllSelected: Boolean,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
+    onDeleteSelectedUser: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
@@ -294,6 +303,13 @@ private fun SelectionTopBar(
             }
         },
         actions = {
+            if (selectedCount > 0) {
+                TextButton(onClick = onDeleteSelectedUser) {
+                    Text(
+                        text = "삭제하기",
+                    )
+                }
+            }
             IconButton(onClick = onClearSelection) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
             }
@@ -328,7 +344,12 @@ private fun EmbeddedSearchBar(
                 onSearch = onSearch,
                 expanded = isSearchActive,
                 onExpandedChange = onActiveChanged,
-                placeholder = { Text(text = "search") },
+                placeholder = {
+                    Text(
+                        text = "Search With Github Id",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
                 leadingIcon = {
                     if (isSearchActive) {
                         IconButton(
@@ -528,10 +549,11 @@ private fun NoItem(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = stringResource(id = HomeR.string.home_no_item),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
+        Icon(
+            painter = painterResource(HomeR.drawable.github_svgrepo_com),
+            contentDescription = "Github Background Logo",
+            tint = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.size(280.dp),
         )
     }
 }
