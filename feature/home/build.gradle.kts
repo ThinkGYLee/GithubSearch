@@ -11,9 +11,11 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
+    implementation(libs.androidx.compose.material3)
 
     implementation(libs.landscapist.glide)
     implementation(libs.landscapist.placeholder)
+    implementation(libs.compose.cloudy)
     implementation(libs.paging.compose)
     implementation(libs.androidx.material.icons)
     testImplementation(project(":core:testing"))
