@@ -121,7 +121,11 @@ class GitHubRepositoryImpl @Inject constructor(
             }
         }
 
-    // 유닛 테스트 코드 짜봐
+    override suspend fun updateFavoriteUsers(
+        userSet: Set<String>,
+        favorite: Boolean,
+    ): Int = userDao.updateFavoriteStatus(userSet, favorite)
+
     override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
             id = id,
