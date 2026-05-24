@@ -1,5 +1,6 @@
 package com.gyleedev.githubsearch.core.designsystem.theme.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +27,8 @@ fun UserAvatar(
         modifier
             .padding(horizontal = 8.dp)
             .size(size)
-            .clip(CircleShape),
+            .clip(CircleShape)
+            .background(color = Color.White),
         component =
         rememberImageComponent {
             +ShimmerPlugin(
