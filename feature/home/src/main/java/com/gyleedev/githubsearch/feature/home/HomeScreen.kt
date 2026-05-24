@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -20,16 +21,23 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,8 +47,8 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +72,7 @@ import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.feature.home.R as HomeR
@@ -139,6 +149,7 @@ fun HomeScreen(
                 requestAuthentication()
             },
             onDeleteSelectedUser = viewModel::deleteSelectedUsers,
+            onFavoriteSelectedUser = {},
             moveToDetail = moveToDetail,
             modifier = modifier,
         )
@@ -162,6 +173,7 @@ internal fun HomeScreen(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     onDeleteSelectedUser: () -> Unit,
+    onFavoriteSelectedUser: () -> Unit,
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -180,10 +192,17 @@ internal fun HomeScreen(
                 onSearchItemReset = onSearchItemReset,
                 onToggleAll = onToggleAllSelection,
                 onClearSelection = onClearSelection,
-                onDeleteSelectedUser = onDeleteSelectedUser,
                 moveToDetail = moveToDetail,
             )
         },
+        floatingActionButton = {
+            HomeFloatingToolBar(
+                isActive = uiState.selectedUsers.isNotEmpty(),
+                onDeleteSelectedUser = onDeleteSelectedUser,
+                onFavoriteSelectedUser = onFavoriteSelectedUser,
+            )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
@@ -230,7 +249,6 @@ private fun HomeTopAppBar(
     onSearchItemReset: () -> Unit,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
-    onDeleteSelectedUser: () -> Unit,
     moveToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -250,7 +268,6 @@ private fun HomeTopAppBar(
                     isAllSelected = isAllSelected,
                     onToggleAll = onToggleAll,
                     onClearSelection = onClearSelection,
-                    onDeleteSelectedUser = onDeleteSelectedUser,
                 )
             }
 
@@ -278,7 +295,6 @@ private fun SelectionTopBar(
     isAllSelected: Boolean,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
-    onDeleteSelectedUser: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
@@ -290,7 +306,7 @@ private fun SelectionTopBar(
                     .padding(start = 8.dp)
                     .clickable { onToggleAll() },
             ) {
-                androidx.compose.material3.Checkbox(
+                Checkbox(
                     checked = isAllSelected,
                     onCheckedChange = null, // Handled by Row clickable
                 )
@@ -303,13 +319,6 @@ private fun SelectionTopBar(
             }
         },
         actions = {
-            if (selectedCount > 0) {
-                TextButton(onClick = onDeleteSelectedUser) {
-                    Text(
-                        text = "삭제하기",
-                    )
-                }
-            }
             IconButton(onClick = onClearSelection) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
             }
@@ -537,6 +546,57 @@ private fun SearchResultItem(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun HomeFloatingToolBar(
+    isActive: Boolean,
+    onDeleteSelectedUser: () -> Unit,
+    onFavoriteSelectedUser: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (isActive) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center,
+        ) {
+            Surface(
+                shape = CircleShape,
+                shadowElevation = 10.dp,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(CircleShape)
+                    .cloudy(radius = 80),
+            ) {}
+
+            Row(
+                modifier = Modifier.padding(
+                    horizontal = 20.dp,
+                    vertical = 12.dp,
+                ),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onFavoriteSelectedUser) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = "좋아요",
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(onClick = onDeleteSelectedUser) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "삭제",
+                    )
+                }
             }
         }
     }
