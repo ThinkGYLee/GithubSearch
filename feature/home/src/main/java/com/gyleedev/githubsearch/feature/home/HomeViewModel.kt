@@ -5,7 +5,9 @@ import androidx.annotation.RequiresExtension
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.gyleedev.githubsearch.domain.model.SearchStatus
+import com.gyleedev.githubsearch.domain.model.UserDeleteResult
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.domain.usecase.DeleteSelectedUsersUseCase
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
@@ -34,6 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     getUsersUseCase: GetUsersUseCase,
+    val deleteSelectedUsersUseCase: DeleteSelectedUsersUseCase,
     private val getUserWithFlowUseCase: GetUserWithFlowUseCase,
     private val fetchUserUseCase: FetchUserUseCase,
 ) : BaseViewModel() {
@@ -171,6 +174,16 @@ class HomeViewModel @Inject constructor(
     fun changeDialogState(state: Boolean) {
         viewModelScope.launch(exceptionHandler) {
             showRequestAuthDialog.emit(state)
+        }
+    }
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    fun deleteSelectedUsers() {
+        viewModelScope.launch(exceptionHandler) {
+            val result = deleteSelectedUsersUseCase(selectedUsers.value)
+            if (result is UserDeleteResult.Success) {
+                clearSelection()
+            }
         }
     }
 }
