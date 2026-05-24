@@ -46,4 +46,7 @@ interface UserDao {
 
     @Query("DELETE FROM user")
     suspend fun resetUser()
+
+    @Query("DELETE FROM user WHERE github_id IN (:userIds)")
+    suspend fun deleteUsersWithSet(userIds: Set<String>): Int
 }
