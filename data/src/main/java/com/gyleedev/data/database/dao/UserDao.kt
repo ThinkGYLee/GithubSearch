@@ -49,4 +49,7 @@ interface UserDao {
 
     @Query("DELETE FROM user WHERE github_id IN (:userIds)")
     suspend fun deleteUsersWithSet(userIds: Set<String>): Int
+
+    @Query("UPDATE user SET favorite = :isFavorite WHERE github_id IN (:userIds)")
+    suspend fun updateFavoriteStatus(userIds: Set<String>, isFavorite: Boolean): Int
 }
