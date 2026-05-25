@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.google.material)
     implementation(libs.androidx.splash)
+    implementation(libs.compose.cloudy)
 
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
