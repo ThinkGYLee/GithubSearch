@@ -5,8 +5,10 @@ import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
@@ -54,7 +56,11 @@ fun FavoriteScreen(
 
     Scaffold(
         topBar = { FavoriteTopAppBar(onClick = viewModel::updateShowFilterDialog) },
-        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier
+            .fillMaxSize()
+            // 시스템 인셋 대응
+            .navigationBarsPadding(),
     ) { paddingValues ->
         if (uiState is FavoriteUiState.Success) {
             val state = uiState as FavoriteUiState.Success
@@ -69,7 +75,9 @@ fun FavoriteScreen(
                 onItemLongClick = viewModel::showFavoriteDialog,
                 showFavoriteDialog = state.favoriteDialogState,
                 showFilterDialog = state.filterDialogState,
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding()),
             )
         }
     }
@@ -92,7 +100,7 @@ internal fun FavoriteScreen(
 ) {
     if (users.itemCount > 0) {
         FavoriteItemList(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier,
             users = users,
             onClick = onItemClick,
             onLongClick = onItemLongClick,
@@ -144,10 +152,11 @@ private fun FavoriteItemList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            top = 12.dp,
+            bottom = 16.dp,
+        ),
     ) {
         items(
             users.itemCount,

@@ -9,26 +9,24 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.browser.auth.AuthTabIntent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -77,7 +75,6 @@ fun GithubSearchScreen(
                 val resultUri = intent.data
                 if (resultUri != null) {
                     val code = resultUri.getQueryParameter("code")
-                    // 최종적으로 코드를 추출하여 상태를 업데이트
                     code?.let { code ->
                         if (code.isNotBlank()) {
                             viewModel.getAccessToken(code)
@@ -116,7 +113,56 @@ fun GithubSearchScreen(
     }
 
     Scaffold(
-        bottomBar = {
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            NavHost(
+                navController = navController,
+                startDestination = BottomNavItem.Home.screenRoute,
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()),
+            ) {
+                composable(route = BottomNavItem.Home.screenRoute) {
+                    HomeScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                        requestAuthentication = viewModel::requestGithubLogin,
+                    )
+                }
+
+                composable(
+                    route = "${BottomNavItem.Detail.screenRoute}/{id}",
+                    arguments =
+                    listOf(
+                        navArgument("id") {
+                            type = NavType.StringType
+                            nullable = false
+                        },
+                    ),
+                ) {
+                    DetailScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onBackClick = { navController.navigateUp() },
+                    )
+                }
+
+                composable(route = BottomNavItem.Favorite.screenRoute) {
+                    FavoriteScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                    )
+                }
+
+                composable(BottomNavItem.Setting.screenRoute) {
+                    SettingScreen(
+                        requestAuthentication = viewModel::requestGithubLogin,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+
             if (currentRoute != "DETAIL/{id}") {
                 BottomNavigation(
                     currentRoute = currentRoute,
@@ -129,55 +175,7 @@ fun GithubSearchScreen(
                             restoreState = true
                         }
                     },
-                    modifier = Modifier,
-                )
-            }
-        },
-        // Scaffold가 자동으로 주입하는 inset 무시
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.screenRoute,
-            modifier = modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-        ) {
-            composable(route = BottomNavItem.Home.screenRoute) {
-                HomeScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestAuthentication = viewModel::requestGithubLogin,
-                )
-            }
-
-            composable(
-                route = "${BottomNavItem.Detail.screenRoute}/{id}",
-                arguments =
-                listOf(
-                    navArgument("id") {
-                        type = NavType.StringType
-                        nullable = false
-                    },
-                ),
-            ) {
-                DetailScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    onBackClick = { navController.navigateUp() },
-                )
-            }
-
-            composable(route = BottomNavItem.Favorite.screenRoute) {
-                FavoriteScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                )
-            }
-
-            composable(BottomNavItem.Setting.screenRoute) {
-                SettingScreen(
-                    requestAuthentication = viewModel::requestGithubLogin,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
         }
@@ -190,30 +188,11 @@ fun BottomNavigation(
     onClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    val items = remember {
-        listOf(
-            BottomNavItem.Home,
-            BottomNavItem.Favorite,
-            BottomNavItem.Setting,
-        )
-    }
-
-    NavigationBar(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = item.icons,
-                        contentDescription = stringResource(id = item.title),
-                    )
-                },
-                selected = currentRoute == item.screenRoute,
-                onClick = { onClick(item.screenRoute) },
-            )
-        }
-    }
+    LiquidNavigationBar(
+        currentRoute = currentRoute,
+        onClick = onClick,
+        modifier = modifier,
+    )
 }
 
 private fun launchAuthTab(
@@ -235,11 +214,11 @@ sealed class BottomNavItem(
     val icons: ImageVector,
     val screenRoute: String,
 ) {
-    data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
+    data object Home : BottomNavItem(R.string.title_home, Icons.Filled.Home, HOME)
 
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
 
     data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
 
-    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
+    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.FavoriteBorder, FAVORITE)
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -27,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
@@ -225,28 +225,36 @@ internal fun HomeScreen(
                 isActive = uiState.selectedUsers.isNotEmpty(),
                 onDeleteRequest = onDeleteRequest,
                 onFavoriteRequest = onFavoriteRequest,
+                // 전역 내비게이션 바(80dp) 위로 올리기 위해 하단 패딩 추가
+                modifier = Modifier.padding(bottom = 80.dp),
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier
+            .fillMaxSize()
+            // 시스템 내비게이션 바 영역 확보
+            .navigationBarsPadding(),
     ) { paddingValues ->
 
         if (userList.itemCount > 0) {
             HomeItemList(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = paddingValues.calculateTopPadding()),
                 users = userList,
                 mode = uiState.mode,
                 selectedUsers = uiState.selectedUsers,
                 onToggleSelection = onToggleSelection,
                 onClick = moveToDetail,
+                // 인위적인 대형 공백 제거, 리스트 자체의 하단 여백은 최소화하여 "꽉 찬" 느낌 구현
+                bottomPadding = 56.dp,
             )
         } else {
             NoItem(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
             )
         }
 
@@ -288,7 +296,7 @@ private fun HomeTopAppBar(
         targetState = mode,
         transitionSpec = {
             fadeIn(animationSpec = tween(300)) togetherWith
-                fadeOut(animationSpec = tween(300))
+                    fadeOut(animationSpec = tween(300))
         },
         label = "TopBarModeTransition",
         modifier = modifier,
@@ -340,7 +348,7 @@ private fun SelectionTopBar(
             ) {
                 Checkbox(
                     checked = isAllSelected,
-                    onCheckedChange = null, // Handled by Row clickable
+                    onCheckedChange = null,
                 )
                 Text(
                     text = if (isAllSelected) "모두 선택 해제" else "모두 선택",
@@ -439,11 +447,11 @@ private fun EmbeddedSearchBar(
         if (searchState is SearchUiState.Success) {
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp)
-                    .navigationBarsPadding()
-                    .imePadding(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp)
+                        .navigationBarsPadding()
+                        .imePadding(),
             ) {
                 SearchResultItem(
                     onClick = moveToDetail,
@@ -534,12 +542,15 @@ private fun HomeItemList(
     onToggleSelection: (String) -> Unit,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
 ) {
     LazyColumn(
-        modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            top = 12.dp,
+            // 마지막 아이템이 바 위로 살짝만 올라오도록 조정
+            bottom = bottomPadding,
+        ),
     ) {
         items(
             users.itemCount,
@@ -575,11 +586,11 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-        modifier
-            .padding(top = 20.dp)
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = { onClick(login) }),
+            modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
