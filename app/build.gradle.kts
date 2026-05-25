@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.material)
     implementation(libs.google.material)
+    implementation(libs.androidx.splash)
 
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
