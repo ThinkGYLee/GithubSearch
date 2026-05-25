@@ -69,6 +69,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.theme.component.PulsingHeart
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
@@ -642,10 +643,7 @@ private fun HomeFloatingToolBar(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(onClick = onFavoriteRequest) {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "좋아요",
-                    )
+                    PulsingHeart()
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
