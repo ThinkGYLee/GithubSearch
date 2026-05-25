@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,6 +51,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -58,6 +60,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -240,21 +244,20 @@ internal fun HomeScreen(
 
         if (userList.itemCount > 0) {
             HomeItemList(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(top = paddingValues.calculateTopPadding()),
+                modifier = Modifier.fillMaxSize(),
                 users = userList,
                 mode = uiState.mode,
                 selectedUsers = uiState.selectedUsers,
                 onToggleSelection = onToggleSelection,
                 onClick = moveToDetail,
-                // 인위적인 대형 공백 제거, 리스트 자체의 하단 여백은 최소화하여 "꽉 찬" 느낌 구현
+                topPadding = paddingValues.calculateTopPadding(),
                 bottomPadding = 56.dp,
             )
         } else {
             NoItem(
-                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding()),
             )
         }
 
@@ -299,30 +302,47 @@ private fun HomeTopAppBar(
                     fadeOut(animationSpec = tween(300))
         },
         label = "TopBarModeTransition",
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     ) { currentMode ->
-        when (currentMode) {
-            HomeMode.SELECT -> {
-                SelectionTopBar(
-                    selectedCount = selectedCount,
-                    isAllSelected = isAllSelected,
-                    onToggleAll = onToggleAll,
-                    onClearSelection = onClearSelection,
-                )
+        Box {
+            if (currentMode != HomeMode.SEARCH) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                1f to Color.Transparent,
+                            ),
+                        )
+                        .cloudy(radius = 120),
+                ) {}
             }
 
-            HomeMode.DEFAULT, HomeMode.SEARCH -> {
-                EmbeddedSearchBar(
-                    onQueryChange = onQueryChange,
-                    isSearchActive = currentMode == HomeMode.SEARCH,
-                    query = searchQuery,
-                    onActiveChanged = onActiveChanged,
-                    onSearch = onSearch,
-                    onSearchItemReset = onSearchItemReset,
-                    moveToDetail = moveToDetail,
-                    searchState = searchState,
-                    loading = isLoading,
-                )
+            when (currentMode) {
+                HomeMode.SELECT -> {
+                    SelectionTopBar(
+                        selectedCount = selectedCount,
+                        isAllSelected = isAllSelected,
+                        onToggleAll = onToggleAll,
+                        onClearSelection = onClearSelection,
+                    )
+                }
+
+                HomeMode.DEFAULT, HomeMode.SEARCH -> {
+                    EmbeddedSearchBar(
+                        onQueryChange = onQueryChange,
+                        isSearchActive = currentMode == HomeMode.SEARCH,
+                        query = searchQuery,
+                        onActiveChanged = onActiveChanged,
+                        onSearch = onSearch,
+                        onSearchItemReset = onSearchItemReset,
+                        moveToDetail = moveToDetail,
+                        searchState = searchState,
+                        loading = isLoading,
+                    )
+                }
             }
         }
     }
@@ -363,6 +383,10 @@ private fun SelectionTopBar(
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
             }
         },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent,
+        ),
         modifier = modifier,
     )
 }
@@ -436,10 +460,17 @@ private fun EmbeddedSearchBar(
                         }
                     }
                 },
+                modifier = Modifier.background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                    shape = SearchBarDefaults.inputFieldShape,
+                ),
             )
         },
         expanded = isSearchActive,
         onExpandedChange = onActiveChanged,
+        colors = SearchBarDefaults.colors(
+            containerColor = if (isSearchActive) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) else Color.Transparent,
+        ),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = animatePadding),
@@ -542,12 +573,13 @@ private fun HomeItemList(
     onToggleSelection: (String) -> Unit,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    topPadding: androidx.compose.ui.unit.Dp = 0.dp,
     bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            top = 12.dp,
+            top = topPadding + 12.dp,
             // 마지막 아이템이 바 위로 살짝만 올라오도록 조정
             bottom = bottomPadding,
         ),
