@@ -42,7 +42,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -229,37 +228,44 @@ internal fun HomeScreen(
                 moveToDetail = moveToDetail,
             )
         },
-        floatingActionButton = {
-            HomeFloatingToolBar(
-                isActive = uiState.selectedUsers.isNotEmpty(),
-                onDeleteRequest = onDeleteRequest,
-                onFavoriteRequest = onFavoriteRequest,
-                // system navigation bar, liquidbar, bottomMargin 계산해서 padding 주기
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
                 modifier = Modifier
                     .navigationBarsPadding()
                     .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         },
-        floatingActionButtonPosition = FabPosition.Center,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
-        if (userList.itemCount > 0) {
-            HomeItemList(
-                modifier = Modifier.fillMaxSize(),
-                users = userList,
-                mode = uiState.mode,
-                selectedUsers = uiState.selectedUsers,
-                onToggleSelection = onToggleSelection,
-                onClick = moveToDetail,
-                topPadding = paddingValues.calculateTopPadding(),
-            )
-        } else {
-            NoItem(
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (userList.itemCount > 0) {
+                HomeItemList(
+                    modifier = Modifier.fillMaxSize(),
+                    users = userList,
+                    mode = uiState.mode,
+                    selectedUsers = uiState.selectedUsers,
+                    onToggleSelection = onToggleSelection,
+                    onClick = moveToDetail,
+                    topPadding = paddingValues.calculateTopPadding(),
+                )
+            } else {
+                NoItem(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = paddingValues.calculateTopPadding()),
+                )
+            }
+
+            HomeFloatingToolBar(
+                isActive = uiState.selectedUsers.isNotEmpty(),
+                onDeleteRequest = onDeleteRequest,
+                onFavoriteRequest = onFavoriteRequest,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding()),
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         }
 

@@ -11,6 +11,9 @@ import androidx.annotation.RequiresExtension
 import androidx.browser.auth.AuthTabIntent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +58,7 @@ import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.core.designsystem.LocalAnimatedVisibilityScope
 import com.gyleedev.githubsearch.core.designsystem.LocalSharedTransitionScope
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
@@ -127,7 +131,14 @@ fun GithubSearchScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+            )
+        },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier.fillMaxSize(),
     ) { paddingValue ->
@@ -145,6 +156,10 @@ fun GithubSearchScreen(
                         navController = navController,
                         startDestination = BottomNavItem.Home.screenRoute,
                         modifier = modifier.fillMaxSize(),
+                        enterTransition = { fadeIn(animationSpec = tween(500)) },
+                        exitTransition = { fadeOut(animationSpec = tween(500)) },
+                        popEnterTransition = { fadeIn(animationSpec = tween(500)) },
+                        popExitTransition = { fadeOut(animationSpec = tween(500)) },
                     ) {
                         composable(route = BottomNavItem.Home.screenRoute) {
                             CompositionLocalProvider(

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -49,10 +48,9 @@ fun FlippableUserAvatar(
                 size = size,
             )
         } else {
-            // Replicate UserAvatar's layout padding and size
+            // Replicate UserAvatar's size and shape
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
                     .size(size)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)

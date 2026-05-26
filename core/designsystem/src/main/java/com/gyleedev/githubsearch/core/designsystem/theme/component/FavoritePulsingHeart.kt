@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FavoritePulsingHeart(
-    isFavorited: Boolean,
+    isFavorite: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     activeTint: Color = Color.Red,
@@ -36,7 +36,7 @@ fun FavoritePulsingHeart(
 ) {
     val scale = remember { Animatable(1f) }
 
-    LaunchedEffect(isFavorited) {
+    LaunchedEffect(isFavorite) {
         launch {
             scale.animateTo(
                 targetValue = 1.3f,
@@ -49,8 +49,8 @@ fun FavoritePulsingHeart(
         }
     }
 
-    val icon = if (isFavorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder
-    val tint = if (isFavorited) activeTint else inactiveTint
+    val icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+    val tint = if (isFavorite) activeTint else inactiveTint
     val interactionSource = remember { MutableInteractionSource() }
 
     Icon(
@@ -81,7 +81,7 @@ private fun FavoritePulsingHeartFavoritedPreview() {
                     .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                FavoritePulsingHeart(isFavorited = true, onClick = {}, modifier = Modifier.size(48.dp))
+                FavoritePulsingHeart(isFavorite = true, onClick = {}, modifier = Modifier.size(48.dp))
             }
         }
     }
@@ -98,7 +98,7 @@ private fun FavoritePulsingHeartUnfavoritedPreview() {
                     .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                FavoritePulsingHeart(isFavorited = false, onClick = {}, modifier = Modifier.size(48.dp))
+                FavoritePulsingHeart(isFavorite = false, onClick = {}, modifier = Modifier.size(48.dp))
             }
         }
     }
