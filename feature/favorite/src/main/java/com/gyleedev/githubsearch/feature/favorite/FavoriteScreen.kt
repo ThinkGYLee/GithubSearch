@@ -3,6 +3,7 @@ package com.gyleedev.githubsearch.feature.favorite
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -37,6 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -58,9 +60,7 @@ fun FavoriteScreen(
         topBar = { FavoriteTopAppBar(onClick = viewModel::updateShowFilterDialog) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier
-            .fillMaxSize()
-            // 시스템 인셋 대응
-            .navigationBarsPadding(),
+            .fillMaxSize(),
     ) { paddingValues ->
         if (uiState is FavoriteUiState.Success) {
             val state = uiState as FavoriteUiState.Success
@@ -155,7 +155,6 @@ private fun FavoriteItemList(
         modifier = modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
             top = 12.dp,
-            bottom = 16.dp,
         ),
     ) {
         items(
@@ -169,9 +168,23 @@ private fun FavoriteItemList(
                     onClick = { onClick(user.login) },
                     onLongClick = { onLongClick(user) },
                     avatar = user.avatar,
+                    name = user.name,
                     login = user.login,
+                    follower = user.followers,
+                    company = user.company,
                 )
             }
+        }
+
+        // 마지막 아이템이 하단 내비게이션 바에 가리지 않도록 빈 공간 추가
+        // 시스템 바 영역 + LiquidNavBar + 여유 확보
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+            )
         }
     }
 }
