@@ -43,19 +43,19 @@ fun UserAvatar(
     GlideImage(
         imageModel = { avatar },
         modifier =
-            modifier
-                .size(size)
-                .then(sharedElementModifier)
-                .clip(CircleShape)
-                .background(color = Color.White),
+        modifier
+            .size(size)
+            .then(sharedElementModifier)
+            .clip(CircleShape)
+            .background(color = Color.White),
         component =
-            rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
+        rememberImageComponent {
+            +ShimmerPlugin(
+                Shimmer.Flash(
+                    baseColor = Color.White,
+                    highlightColor = Color.LightGray,
+                ),
+            )
+        },
     )
 }

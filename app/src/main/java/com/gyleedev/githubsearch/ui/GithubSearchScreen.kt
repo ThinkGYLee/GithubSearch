@@ -161,12 +161,12 @@ fun GithubSearchScreen(
                         composable(
                             route = "${BottomNavItem.Detail.screenRoute}/{id}",
                             arguments =
-                                listOf(
-                                    navArgument("id") {
-                                        type = NavType.StringType
-                                        nullable = false
-                                    },
-                                ),
+                            listOf(
+                                navArgument("id") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                            ),
                         ) {
                             CompositionLocalProvider(
                                 LocalAnimatedVisibilityScope provides this@composable,
@@ -240,7 +240,7 @@ fun BottomNavigation(
                         0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                         1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
 
-                        ),
+                    ),
                 )
                 .cloudy(radius = 60),
         ) {}

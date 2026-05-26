@@ -302,7 +302,7 @@ private fun HomeTopAppBar(
         targetState = mode == HomeMode.SELECT,
         transitionSpec = {
             fadeIn(animationSpec = tween(300)) togetherWith
-                    fadeOut(animationSpec = tween(300))
+                fadeOut(animationSpec = tween(300))
         },
         label = "TopBarModeTransition",
         modifier = modifier.fillMaxWidth(),
@@ -500,10 +500,10 @@ private fun EmbeddedSearchBar(
         if (searchState is SearchUiState.Success) {
             Box(
                 modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 12.dp)
-                        .imePadding(),
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp)
+                    .imePadding(),
             ) {
                 SearchResultItem(
                     onClick = moveToDetail,
@@ -650,11 +650,11 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-            modifier
-                .padding(top = 20.dp)
-                .fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .clickable(onClick = { onClick(login) }),
+        modifier
+            .padding(top = 20.dp)
+            .fillMaxWidth()
+            .heightIn(min = 80.dp)
+            .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -723,7 +723,7 @@ private fun HomeFloatingToolBar(
             ) {
                 // IconButton 대신 PulsingHeart에 직접 onClick을 전달하여 터치 간섭 해결
                 PulsingHeart(
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(24.dp),
                     onClick = {
                         onFavoriteRequest()
                     },
