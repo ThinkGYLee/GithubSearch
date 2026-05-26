@@ -1,6 +1,5 @@
 package com.gyleedev.githubsearch.ui
 
-import android.graphics.BlurMaskFilter
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -30,21 +29,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.nativePaint
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.skydoves.cloudy.cloudy
+import com.skydoves.cloudy.liquidGlass
 
 @Composable
 fun LiquidNavigationBar(
@@ -65,14 +62,23 @@ fun LiquidNavigationBar(
     val surfaceContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
     val selectedIndex = navItems.indexOfFirst { it.screenRoute == currentRoute }.coerceAtLeast(0)
 
+    // 라이트/다크 모드에 따른 지능형 광원 색상 선택
+    val isLightMode = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val highlightColor = if (isLightMode) {
+        // 라이트 모드: 순수 흰색보다는 테마의 가장 밝은 배경색(Surface)을 기반으로 한 선명한 하이라이트
+        MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+    } else {
+        // 다크 모드: 푸른 기를 뺀 중립적이고 차분한 화이트 톤 (OnSurfaceVariant 활용)
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+    }
+
     val navBarPadding = 24.dp
-    val navBarHeight = 64.dp
-    val navBarVerticalPadding = 16.dp
+    val navBarHeight = LiquidNavBarDefaults.Height
 
     BoxWithConstraints(
         modifier = modifier
             .padding(horizontal = navBarPadding)
-            .padding(bottom = navBarVerticalPadding)
+            .padding(bottom = LiquidNavBarDefaults.BottomMargin) // 부모 컨테이너가 시스템 바 위에 있으므로 단순 마진만 적용
             .fillMaxWidth()
             .height(navBarHeight),
         contentAlignment = Alignment.CenterStart,
@@ -80,72 +86,72 @@ fun LiquidNavigationBar(
         val maxWidth = maxWidth
         val itemWidth = maxWidth / navItems.size
 
+        // 1. 역동적인 Liquid 이동을 위한 애니메이션 상태 정의
         val animatedOffsetX by animateDpAsState(
             targetValue = itemWidth * selectedIndex,
-            animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f),
-            label = "pill_movement_animation",
+            animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f), // 기존의 부드러운 수치로 복구
+            label = "pill_move",
         )
 
-        // 1. 배경 레이어 (Glassmorphism)
-        val blurRadius = 200
+        val pillExtraWidth by animateDpAsState(
+            targetValue = 0.dp,
+            animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f),
+            label = "pill_stretch",
+        )
 
+        // Dp를 Px로 변환하기 위한 밀도(Density) 정보
+        val density = LocalDensity.current
+        val basePillWidth = itemWidth - 8.dp
+        val lensHeightPx = with(density) { (navBarHeight - 8.dp).toPx() }
+        val cornerRadiusPx = with(density) { 28.dp.toPx() }
+
+        // 2. 배경 레이어 (Glassmorphism)
         Surface(
             shape = CircleShape,
-            color = surfaceContainerColor.copy(alpha = 0.85f),
+            color = surfaceContainerColor.copy(alpha = 0.9f), // 투명도를 극대화하여 리스트 비침 효과 강조
             shadowElevation = 12.dp,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(CircleShape)
-                .cloudy(blurRadius),
+                .cloudy(radius = 80),
         ) {}
 
-        // 2. 선택 영역 캡슐 레이어: 수제 광원 효과 (liquidGlass 아티팩트 완전 제거)
+        // 3. 선택 영역 캡슐 레이어: 테마 대응형 liquidGlass + 입체감 보정
         Box(
             modifier = Modifier
                 .offset {
-                    // State 기반 값은 람다 오버로드를 사용하여 불필요한 Recomposition 방지
                     IntOffset(x = animatedOffsetX.roundToPx(), y = 0)
                 }
                 .padding(horizontal = 4.dp, vertical = 4.dp)
-                .width(itemWidth - 8.dp)
+                .width(basePillWidth + pillExtraWidth)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(28.dp))
-                // 1) 캡슐 내부 입체감을 위한 베이스 그라데이션
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            onSurfaceColor.copy(alpha = 0.12f),
-                            onSurfaceColor.copy(alpha = 0.02f),
-                            onSurfaceColor.copy(alpha = 0.08f),
-                        ),
-                    ),
-                )
-                // 2) 사실적인 액체 유리 광택을 위한 Radial 광원 (좌상단 중심)
+                // 1) 내부 입체감 보정: 테마별 하이라이트 적용
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            // 광원 중심
-                            Color.White.copy(alpha = 0.35f),
-                            // 주변으로 확산
+                            highlightColor, // 테마에 최적화된 광원 색상
                             Color.Transparent,
                         ),
-                        center = Offset(x = 100f, y = 50f),
-                        radius = 450f,
+                        center = Offset(x = with(density) { (basePillWidth + pillExtraWidth).toPx() / 2 }, y = 0f),
+                        radius = with(density) { (basePillWidth + pillExtraWidth).toPx() },
                     ),
                 )
-                // 3) 상단 Rim Light (유리의 날카로운 반사면)
-                .liquidInnerShadowStable(
-                    blur = 2.dp,
-                    color = Color.White.copy(alpha = 0.45f),
-                    offsetY = (-1.2).dp,
-                    borderRadius = 28.dp,
-                )
-                // 4) 전체적인 글로우 및 그림자
-                .liquidInnerShadowStable(
-                    blur = 10.dp,
-                    color = onSurfaceColor.copy(alpha = 0.15f),
-                    offsetY = 2.dp,
-                    borderRadius = 28.dp,
+                // 2) 고도화된 셰이더 기반 볼록 렌즈 효과 (테마별 강도 조절)
+                .liquidGlass(
+                    lensCenter = Offset(
+                        x = with(density) { (basePillWidth + pillExtraWidth).toPx() / 2 },
+                        y = lensHeightPx / 2,
+                    ),
+                    lensSize = androidx.compose.ui.geometry.Size(
+                        width = with(density) { (basePillWidth + pillExtraWidth).toPx() },
+                        height = lensHeightPx,
+                    ),
+                    refraction = 0.45f,
+                    curve = 0.85f,
+                    cornerRadius = cornerRadiusPx,
+                    tint = onSurfaceColor.copy(alpha = if (isLightMode) 0.05f else 0.15f), // 라이트 모드에선 더 투명하게
+                    edge = if (isLightMode) 0.25f else 0.45f, // 다크 모드에서 반사광을 더 선명하게
                 ),
         )
 
@@ -186,65 +192,5 @@ fun LiquidNavigationBar(
                 }
             }
         }
-    }
-}
-
-/**
- * 안정적인 내부 그림자 구현체.
- * 렌더링 간섭을 피하기 위해 최적화된 Path 연산을 사용합니다.
- */
-fun Modifier.liquidInnerShadowStable(
-    blur: Dp = 4.dp,
-    color: Color = Color.Black.copy(alpha = 0.2f),
-    offsetX: Dp = 0.dp,
-    offsetY: Dp = 0.dp,
-    borderRadius: Dp = 0.dp,
-) = this.drawBehind {
-    val size = size
-    val borderRadiusPx = borderRadius.toPx()
-    val blurPx = blur.toPx()
-
-    drawIntoCanvas { canvas ->
-        val paint = Paint()
-        val nativePaint = paint.nativePaint
-
-        paint.color = color
-        paint.isAntiAlias = true
-        if (blurPx > 0) {
-            nativePaint.maskFilter = BlurMaskFilter(blurPx, BlurMaskFilter.Blur.NORMAL)
-        }
-
-        canvas.save()
-        val path = androidx.compose.ui.graphics.Path().apply {
-            addRoundRect(
-                androidx.compose.ui.geometry.RoundRect(
-                    left = 0f,
-                    top = 0f,
-                    right = size.width,
-                    bottom = size.height,
-                    radiusX = borderRadiusPx,
-                    radiusY = borderRadiusPx,
-                ),
-            )
-        }
-        canvas.clipPath(path)
-
-        val shadowPath = android.graphics.Path().apply {
-            // 외부 여백을 충분히 두어 하드 엣지 방지
-            val margin = blurPx * 3
-            addRect(-margin, -margin, size.width + margin, size.height + margin, android.graphics.Path.Direction.CW)
-            addRoundRect(
-                offsetX.toPx(),
-                offsetY.toPx(),
-                size.width + offsetX.toPx(),
-                size.height + offsetY.toPx(),
-                borderRadiusPx,
-                borderRadiusPx,
-                android.graphics.Path.Direction.CCW,
-            )
-        }
-
-        canvas.nativeCanvas.drawPath(shadowPath, nativePaint)
-        canvas.restore()
     }
 }
