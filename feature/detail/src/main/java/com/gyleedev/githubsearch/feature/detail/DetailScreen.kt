@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
+import com.gyleedev.githubsearch.core.designsystem.theme.component.FavoritePulsingHeart
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.feature.detail.component.DetailRepoItem
@@ -50,7 +51,7 @@ fun DetailScreen(
             DetailAppBar(
                 onBackClick = onBackClick,
                 onFavoriteClick = viewModel::updateFavoriteStatus,
-                favorite = user?.favorite,
+                favorite = user?.favorite ?: false,
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -140,7 +141,7 @@ private fun DetailScreen(
 private fun DetailAppBar(
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    favorite: Boolean?,
+    favorite: Boolean,
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
@@ -154,19 +155,11 @@ private fun DetailAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onFavoriteClick) {
-                if (favorite == true) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.FavoriteBorder,
-                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
-                    )
-                }
-            }
+            FavoritePulsingHeart(
+                isFavorited = favorite,
+                onClick = onFavoriteClick,
+                modifier = Modifier.padding(end = 12.dp),
+            )
         },
         modifier = modifier,
     )
