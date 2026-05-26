@@ -53,6 +53,7 @@ fun DetailUserProfile(
     ) {
         UserAvatar(
             avatar = avatar,
+            login = login,
             size = 120.dp,
         )
         Spacer(modifier = Modifier.height(20.dp))

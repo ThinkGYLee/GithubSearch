@@ -313,7 +313,7 @@ private fun HomeTopAppBar(
 
             // 모드 별 topbar, statusbar 영역 블러 처리
             if (mode != HomeMode.SEARCH) {
-                //투명처리
+                // 투명처리
                 Box(
                     modifier = Modifier
                         .matchParentSize()
@@ -336,7 +336,7 @@ private fun HomeTopAppBar(
                 )
             }
 
-            //TopBar 처리
+            // TopBar 처리
             Box(modifier = Modifier.statusBarsPadding()) {
                 if (isSelectMode) {
                     SelectionTopBar(
@@ -658,7 +658,11 @@ private fun SearchResultItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        UserAvatar(avatar = avatar)
+        UserAvatar(
+            avatar = avatar,
+            login = login,
+            modifier = Modifier.padding(horizontal = 8.dp),
+        )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {
             if (name != null) {

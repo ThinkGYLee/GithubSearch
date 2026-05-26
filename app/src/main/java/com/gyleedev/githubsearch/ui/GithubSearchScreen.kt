@@ -9,6 +9,8 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.browser.auth.AuthTabIntent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,6 +53,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.core.designsystem.LocalAnimatedVisibilityScope
+import com.gyleedev.githubsearch.core.designsystem.LocalSharedTransitionScope
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
@@ -59,6 +64,7 @@ import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchScreen(
@@ -131,47 +137,69 @@ fun GithubSearchScreen(
             modifier = Modifier
                 .padding(paddingValue),
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = BottomNavItem.Home.screenRoute,
-                modifier = modifier.fillMaxSize(),
-            ) {
-                composable(route = BottomNavItem.Home.screenRoute) {
-                    HomeScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                        requestAuthentication = viewModel::requestGithubLogin,
-                    )
-                }
-
-                composable(
-                    route = "${BottomNavItem.Detail.screenRoute}/{id}",
-                    arguments =
-                    listOf(
-                        navArgument("id") {
-                            type = NavType.StringType
-                            nullable = false
-                        },
-                    ),
+            SharedTransitionLayout {
+                CompositionLocalProvider(
+                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
                 ) {
-                    DetailScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        onBackClick = { navController.navigateUp() },
-                    )
-                }
+                    NavHost(
+                        navController = navController,
+                        startDestination = BottomNavItem.Home.screenRoute,
+                        modifier = modifier.fillMaxSize(),
+                    ) {
+                        composable(route = BottomNavItem.Home.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                HomeScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                                    requestAuthentication = viewModel::requestGithubLogin,
+                                )
+                            }
+                        }
 
-                composable(route = BottomNavItem.Favorite.screenRoute) {
-                    FavoriteScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    )
-                }
+                        composable(
+                            route = "${BottomNavItem.Detail.screenRoute}/{id}",
+                            arguments =
+                                listOf(
+                                    navArgument("id") {
+                                        type = NavType.StringType
+                                        nullable = false
+                                    },
+                                ),
+                        ) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                DetailScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    onBackClick = { navController.navigateUp() },
+                                )
+                            }
+                        }
 
-                composable(BottomNavItem.Setting.screenRoute) {
-                    SettingScreen(
-                        requestAuthentication = viewModel::requestGithubLogin,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                        composable(route = BottomNavItem.Favorite.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                FavoriteScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                                )
+                            }
+                        }
+
+                        composable(BottomNavItem.Setting.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                SettingScreen(
+                                    requestAuthentication = viewModel::requestGithubLogin,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -212,7 +240,7 @@ fun BottomNavigation(
                         0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                         1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
 
-                    ),
+                        ),
                 )
                 .cloudy(radius = 60),
         ) {}

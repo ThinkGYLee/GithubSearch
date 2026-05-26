@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FlippableUserAvatar(
     avatar: String,
+    login: String,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
@@ -44,6 +45,7 @@ fun FlippableUserAvatar(
         if (rotation <= 90f) {
             UserAvatar(
                 avatar = avatar,
+                login = login,
                 size = size,
             )
         } else {
