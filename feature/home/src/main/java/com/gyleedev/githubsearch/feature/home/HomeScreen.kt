@@ -16,13 +16,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -73,6 +77,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.core.designsystem.theme.component.PulsingHeart
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
@@ -229,19 +234,17 @@ internal fun HomeScreen(
                 isActive = uiState.selectedUsers.isNotEmpty(),
                 onDeleteRequest = onDeleteRequest,
                 onFavoriteRequest = onFavoriteRequest,
-                // 전역 내비게이션 바(80dp) 위로 올리기 위해 하단 패딩 추가
-                modifier = Modifier.padding(bottom = 80.dp),
+                // system navigation bar, liquidbar, bottomMargin 계산해서 padding 주기
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        modifier = modifier
-            .fillMaxSize()
-            // 시스템 내비게이션 바 영역 확보
-            .navigationBarsPadding(),
+        modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
-
         if (userList.itemCount > 0) {
             HomeItemList(
                 modifier = Modifier.fillMaxSize(),
@@ -251,7 +254,6 @@ internal fun HomeScreen(
                 onToggleSelection = onToggleSelection,
                 onClick = moveToDetail,
                 topPadding = paddingValues.calculateTopPadding(),
-                bottomPadding = 56.dp,
             )
         } else {
             NoItem(
@@ -296,44 +298,57 @@ private fun HomeTopAppBar(
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
-        targetState = mode,
+        // SELECT 모드 여부로만 전환 트리거
+        targetState = mode == HomeMode.SELECT,
         transitionSpec = {
             fadeIn(animationSpec = tween(300)) togetherWith
                     fadeOut(animationSpec = tween(300))
         },
         label = "TopBarModeTransition",
         modifier = modifier.fillMaxWidth(),
-    ) { currentMode ->
+    ) { isSelectMode ->
         Box {
-            if (currentMode != HomeMode.SEARCH) {
+            // 1. 배경 블러 레이어 (화면 최상단 상태바 영역부터 덮음)
+            val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+            // 모드 별 topbar, statusbar 영역 블러 처리
+            if (mode != HomeMode.SEARCH) {
+                //투명처리
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .background(
                             brush = Brush.verticalGradient(
-                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                                0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), // 짙은 농도 복구
+                                0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                                 1f to Color.Transparent,
                             ),
                         )
-                        .cloudy(radius = 120),
+                        .cloudy(radius = 60),
                 ) {}
+            } else {
+                // 서치와 디폴트일 때
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(statusBarPadding)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
+                )
             }
 
-            when (currentMode) {
-                HomeMode.SELECT -> {
+            //TopBar 처리
+            Box(modifier = Modifier.statusBarsPadding()) {
+                if (isSelectMode) {
                     SelectionTopBar(
                         selectedCount = selectedCount,
                         isAllSelected = isAllSelected,
                         onToggleAll = onToggleAll,
                         onClearSelection = onClearSelection,
                     )
-                }
-
-                HomeMode.DEFAULT, HomeMode.SEARCH -> {
+                } else {
                     EmbeddedSearchBar(
                         onQueryChange = onQueryChange,
-                        isSearchActive = currentMode == HomeMode.SEARCH,
+                        isSearchActive = mode == HomeMode.SEARCH,
                         query = searchQuery,
                         onActiveChanged = onActiveChanged,
                         onSearch = onSearch,
@@ -359,6 +374,7 @@ private fun SelectionTopBar(
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = "${selectedCount}개 선택됨") },
+        windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -410,6 +426,7 @@ private fun EmbeddedSearchBar(
         label = "animatePadding",
     )
     SearchBar(
+        windowInsets = WindowInsets(0, 0, 0, 0),
         inputField = {
             SearchBarDefaults.InputField(
                 query = query,
@@ -460,10 +477,15 @@ private fun EmbeddedSearchBar(
                         }
                     }
                 },
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                    shape = SearchBarDefaults.inputFieldShape,
-                ),
+                // searchBar 의 placeholder 영역 음영
+                modifier = if (isSearchActive) {
+                    Modifier
+                } else {
+                    Modifier.background(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                        shape = SearchBarDefaults.inputFieldShape,
+                    )
+                },
             )
         },
         expanded = isSearchActive,
@@ -481,7 +503,6 @@ private fun EmbeddedSearchBar(
                     Modifier
                         .fillMaxSize()
                         .padding(horizontal = 12.dp)
-                        .navigationBarsPadding()
                         .imePadding(),
             ) {
                 SearchResultItem(
@@ -574,14 +595,11 @@ private fun HomeItemList(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     topPadding: androidx.compose.ui.unit.Dp = 0.dp,
-    bottomPadding: androidx.compose.ui.unit.Dp = 16.dp,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
             top = topPadding + 12.dp,
-            // 마지막 아이템이 바 위로 살짝만 올라오도록 조정
-            bottom = bottomPadding,
         ),
     ) {
         items(
@@ -593,6 +611,9 @@ private fun HomeItemList(
             UserInfoItem(
                 avatar = user.avatar,
                 login = user.login,
+                name = user.name,
+                follower = user.followers,
+                company = user.company,
                 isSelected = isSelected,
                 onClick = {
                     if (mode == HomeMode.SELECT) {
@@ -602,6 +623,17 @@ private fun HomeItemList(
                     }
                 },
                 onLongClick = { onToggleSelection(user.login) },
+            )
+        }
+
+        // 마지막 아이템이 하단 내비게이션 바에 가리지 않도록 빈 공간 추가
+        // 시스템 바 영역 + LiquidNavBar + 여유 확보
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         }
     }
@@ -669,8 +701,8 @@ private fun HomeFloatingToolBar(
         ) {
             Surface(
                 shape = CircleShape,
-                shadowElevation = 10.dp,
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                shadowElevation = 12.dp,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
                 modifier = Modifier
                     .matchParentSize()
                     .clip(CircleShape)
@@ -685,16 +717,23 @@ private fun HomeFloatingToolBar(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onFavoriteRequest) {
-                    PulsingHeart()
-                }
+                // IconButton 대신 PulsingHeart에 직접 onClick을 전달하여 터치 간섭 해결
+                PulsingHeart(
+                    modifier = Modifier.size(32.dp),
+                    onClick = {
+                        onFavoriteRequest()
+                    },
+                )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-                IconButton(onClick = onDeleteRequest) {
+                IconButton(onClick = {
+                    onDeleteRequest()
+                }) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "삭제",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
