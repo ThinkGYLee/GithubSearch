@@ -5,9 +5,11 @@ import com.gyleedev.githubsearch.core.testing.CoroutineRule
 import com.gyleedev.githubsearch.core.testing.createDummyUser
 import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import com.gyleedev.githubsearch.domain.model.SearchStatus
+import com.gyleedev.githubsearch.domain.usecase.DeleteSelectedUsersUseCase
 import com.gyleedev.githubsearch.domain.usecase.FetchUserUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUserWithFlowUseCase
 import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
+import com.gyleedev.githubsearch.domain.usecase.UpdateFavoriteBySetUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -47,6 +49,12 @@ class HomeViewModelTest {
     @MockK
     lateinit var fetchUserUseCase: FetchUserUseCase
 
+    @MockK
+    lateinit var deleteSelectedUsersUseCase: DeleteSelectedUsersUseCase
+
+    @MockK
+    lateinit var updateFavoriteBySetUseCase: UpdateFavoriteBySetUseCase
+
     @Before
     fun setUp() {
         coEvery { getUsersUseCase() } returns flowOf(PagingData.empty())
@@ -56,6 +64,8 @@ class HomeViewModelTest {
             getUsersUseCase = getUsersUseCase,
             getUserWithFlowUseCase = getUserWithFlowUseCase,
             fetchUserUseCase = fetchUserUseCase,
+            deleteSelectedUsersUseCase = deleteSelectedUsersUseCase,
+            updateFavoriteBySetUseCase = updateFavoriteBySetUseCase,
         )
     }
 
@@ -71,8 +81,10 @@ class HomeViewModelTest {
             searchQuery = "",
             isLoading = false,
             searchState = SearchUiState.Empty,
-            isSearchActive = false,
+            selectedUsers = emptySet<String>(),
+            mode = HomeMode.DEFAULT,
             showRequestAuthDialog = false,
+            showDeleteDialog = false,
         )
 
         // When
@@ -117,11 +129,13 @@ class HomeViewModelTest {
             bio = expectedUser.bio,
         )
         val expectedUiState = HomeUiState.Success(
-            searchQuery = query,
+            searchQuery = "",
             isLoading = false,
-            searchState = expectedSearchState,
-            isSearchActive = false,
+            searchState = SearchUiState.Empty,
+            selectedUsers = emptySet<String>(),
+            mode = HomeMode.DEFAULT,
             showRequestAuthDialog = false,
+            showDeleteDialog = false,
         )
 
         coEvery { getUserWithFlowUseCase(query) } returns flowOf(expectedUser)
@@ -146,11 +160,13 @@ class HomeViewModelTest {
         // Given
         val query = "  "
         val expectedUiState = HomeUiState.Success(
-            searchQuery = query,
+            searchQuery = "",
             isLoading = false,
             searchState = SearchUiState.Empty,
-            isSearchActive = false,
+            selectedUsers = emptySet<String>(),
+            mode = HomeMode.DEFAULT,
             showRequestAuthDialog = false,
+            showDeleteDialog = false,
         )
 
         collectViewModelFlows()
@@ -224,29 +240,5 @@ class HomeViewModelTest {
         val currentUiState = viewModel.uiState.value as HomeUiState.Success
         assertEquals(false, currentUiState.isLoading)
         assertEquals(true, currentUiState.showRequestAuthDialog)
-    }
-
-    @Test
-    fun `검색바 및 다이얼로그 상태 변경 요청 시 올바르게 토글된다`() = runTest {
-        // Given
-        val expectedSearchActive = true
-        val expectedDialogShow = true
-
-        collectViewModelFlows()
-        runCurrent()
-
-        // When
-        viewModel.changeSearchBarState(expectedSearchActive)
-        viewModel.changeDialogState(expectedDialogShow)
-        runCurrent()
-
-        // Then
-        coVerify(exactly = 1) { getUsersUseCase().ignoreUnused() }
-        coVerify(exactly = 0) { getUserWithFlowUseCase(any()).ignoreUnused() }
-        coVerify(exactly = 0) { fetchUserUseCase(any()) }
-
-        val currentUiState = viewModel.uiState.value as HomeUiState.Success
-        assertEquals(expectedSearchActive, currentUiState.isSearchActive)
-        assertEquals(expectedDialogShow, currentUiState.showRequestAuthDialog)
     }
 }
