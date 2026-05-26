@@ -9,15 +9,20 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.browser.auth.AuthTabIntent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -28,6 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
@@ -48,6 +55,7 @@ import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
+import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 
@@ -115,14 +123,18 @@ fun GithubSearchScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        modifier = modifier.fillMaxSize(),
+    ) { paddingValue ->
+        // 콘텐츠 영역: Scaffold의 패딩을 무시하고 화면 전체를 점유하게 함
+        // 이를 통해 리스트 아이템이 하단 내비게이션 바와 시스템 바 뒤로 흐르게 됨
+        Box(
+            modifier = Modifier
+                .padding(paddingValue),
+        ) {
             NavHost(
                 navController = navController,
                 startDestination = BottomNavItem.Home.screenRoute,
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()),
+                modifier = modifier.fillMaxSize(),
             ) {
                 composable(route = BottomNavItem.Home.screenRoute) {
                     HomeScreen(
@@ -163,6 +175,7 @@ fun GithubSearchScreen(
                 }
             }
 
+            // 내비게이션 바를 Scaffold 바깥 오버레이로 배치하여 리스트가 뒤로 비치게 함
             if (currentRoute != "DETAIL/{id}") {
                 BottomNavigation(
                     currentRoute = currentRoute,
@@ -175,7 +188,8 @@ fun GithubSearchScreen(
                             restoreState = true
                         }
                     },
-                    modifier = Modifier.align(Alignment.BottomCenter),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter),
                 )
             }
         }
@@ -188,11 +202,36 @@ fun BottomNavigation(
     onClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    LiquidNavigationBar(
-        currentRoute = currentRoute,
-        onClick = onClick,
-        modifier = modifier,
-    )
+    Box(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to Color.Transparent, // 짙은 농도 복구
+                        0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                        1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+
+                    ),
+                )
+                .cloudy(radius = 60),
+        ) {}
+        Column(
+            modifier = modifier
+                .fillMaxWidth(),
+        ) {
+            LiquidNavigationBar(
+                currentRoute = currentRoute,
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
+            )
+        }
+    }
 }
 
 private fun launchAuthTab(
