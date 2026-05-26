@@ -26,6 +26,10 @@ GitHub Search의 UI는 사용자에게 직관적이고 효율적인 검색 경�
 ### 1. Material 3 Adaptive & Layout
 * **Adaptive Layout**: `ListDetailPaneScaffold` 등 Adaptive 라이브러리를 적극 활용하여 스마트폰, 폴더블, 태블릿 등 다양한 화면 크기에 최적화된 레이아웃을 구현합니다.
 * **Expressive Design**: M3 원칙에 따라 생동감 있는 색상 대비와 역동적인 모션을 UI에 반영합니다.
+* **WindowInsets Management (Edge-to-Edge)**:
+    - 앱 상단에 `Box(modifier = Modifier.statusBarsPadding())` 처럼 이미 상태바 패딩을 처리하는 컨테이너가 있는 경우, 그 내부에 배치되는 Material 3 컴포넌트(`CenterAlignedTopAppBar`, `SearchBar` 등)는 기본적으로 상태바 크기만큼의 Inset 패딩을 **중복**으로 더하게 됩니다.
+    - 이러한 중복 패딩(Double Padding)을 방지하려면 내부 M3 컴포넌트에 명시적으로 `windowInsets = WindowInsets(0, 0, 0, 0)`을 설정해야 합니다.
+    - 배경을 시스템바 위로 확장하면서 내용은 안전 영역에 배치해야 할 경우, `SearchBar` 애니메이션 등에 의존하기보다는 최상단 컨테이너에서 배경(Box)만 별도로 칠하고 내용물은 `statusBarsPadding()` 하위에 배치하는 구조가 안정적입니다.
 
 ---
 
