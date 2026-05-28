@@ -129,9 +129,9 @@ class HomeViewModelTest {
             bio = expectedUser.bio,
         )
         val expectedUiState = HomeUiState.Success(
-            searchQuery = "",
+            searchQuery = query,
             isLoading = false,
-            searchState = SearchUiState.Empty,
+            searchState = expectedSearchState,
             selectedUsers = emptySet<String>(),
             mode = HomeMode.DEFAULT,
             showRequestAuthDialog = false,
@@ -160,7 +160,7 @@ class HomeViewModelTest {
         // Given
         val query = "  "
         val expectedUiState = HomeUiState.Success(
-            searchQuery = "",
+            searchQuery = query,
             isLoading = false,
             searchState = SearchUiState.Empty,
             selectedUsers = emptySet<String>(),
