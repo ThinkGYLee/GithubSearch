@@ -77,7 +77,10 @@ class SyncUserDataRepositoryImplTest {
             favorite = true,
         )
 
-        val expectedMergedEntity: UserEntity = remoteUserResponse.toModel().copy(favorite = true).toEntity()
+        val expectedMergedEntity: UserEntity = remoteUserResponse.toModel().copy(
+            id = localUserEntity.id,
+            favorite = true,
+        ).toEntity()
         val expectedGeneratedId = 100L
         val expectedResult = UserSyncResult.Success(expectedGeneratedId)
 
