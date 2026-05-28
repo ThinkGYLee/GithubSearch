@@ -83,6 +83,7 @@ import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.UpdateFavoriteResult
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.feature.home.R
 import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
@@ -91,7 +92,8 @@ import com.gyleedev.githubsearch.feature.home.R as HomeR
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
-    moveToDetail: (String, String) -> Unit,
+    onUserClick: (String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -181,7 +183,8 @@ fun HomeScreen(
             onFavoriteRequest = viewModel::updateSelectedFavorite,
             onDeleteConfirm = viewModel::deleteSelectedUsers,
             onDeleteDismiss = { viewModel.changeDeleteDialogState(false) },
-            moveToDetail = moveToDetail,
+            onUserClick = onUserClick,
+            onSearchUserClick = onSearchUserClick,
             modifier = modifier,
         )
     }
@@ -207,7 +210,8 @@ internal fun HomeScreen(
     onDeleteDismiss: () -> Unit,
     onDeleteRequest: () -> Unit,
     onFavoriteRequest: () -> Unit,
-    moveToDetail: (String, String) -> Unit,
+    onUserClick: (String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -225,7 +229,7 @@ internal fun HomeScreen(
                 onSearchItemReset = onSearchItemReset,
                 onToggleAll = onToggleAllSelection,
                 onClearSelection = onClearSelection,
-                moveToDetail = moveToDetail,
+                onSearchUserClick = onSearchUserClick,
             )
         },
         snackbarHost = {
@@ -241,13 +245,13 @@ internal fun HomeScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (userList.itemCount > 0) {
-                HomeItemList(
+                HomeScreenSuccess(
                     modifier = Modifier.fillMaxSize(),
                     users = userList,
                     mode = uiState.mode,
                     selectedUsers = uiState.selectedUsers,
                     onToggleSelection = onToggleSelection,
-                    onClick = { moveToDetail(it, "home") },
+                    onClick = onUserClick,
                     topPadding = paddingValues.calculateTopPadding(),
                 )
             } else {
@@ -300,7 +304,7 @@ private fun HomeTopAppBar(
     onSearchItemReset: () -> Unit,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
-    moveToDetail: (String, String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -359,7 +363,7 @@ private fun HomeTopAppBar(
                         onActiveChanged = onActiveChanged,
                         onSearch = onSearch,
                         onSearchItemReset = onSearchItemReset,
-                        moveToDetail = { moveToDetail(it, "search") },
+                        moveToDetail = onSearchUserClick,
                         searchState = searchState,
                         loading = isLoading,
                     )
@@ -379,7 +383,7 @@ private fun SelectionTopBar(
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = "${selectedCount}개 선택됨") },
+        title = { Text(text = stringResource(id = R.string.text_selected_count, selectedCount)) },
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
             Row(
@@ -393,7 +397,7 @@ private fun SelectionTopBar(
                     onCheckedChange = null,
                 )
                 Text(
-                    text = if (isAllSelected) "모두 선택 해제" else "모두 선택",
+                    text = if (isAllSelected) stringResource(id = R.string.text_unselect_all) else stringResource(id = R.string.text_select_all),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp),
@@ -402,7 +406,7 @@ private fun SelectionTopBar(
         },
         actions = {
             IconButton(onClick = onClearSelection) {
-                Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
+                Icon(imageVector = Icons.Rounded.Close, contentDescription = stringResource(id = R.string.text_exit_selection))
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -442,7 +446,7 @@ private fun EmbeddedSearchBar(
                 onExpandedChange = onActiveChanged,
                 placeholder = {
                     Text(
-                        text = "Search With Github Id",
+                        text = stringResource(id = R.string.text_search_placeholder),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -593,7 +597,7 @@ private fun DeleteDialog(
 }
 
 @Composable
-private fun HomeItemList(
+private fun HomeScreenSuccess(
     users: LazyPagingItems<UserModel>,
     mode: HomeMode,
     selectedUsers: Set<String>,
