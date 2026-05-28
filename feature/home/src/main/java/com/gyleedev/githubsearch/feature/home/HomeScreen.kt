@@ -265,7 +265,7 @@ internal fun HomeScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin + 20.dp),
             )
         }
 
@@ -523,14 +523,14 @@ private fun EmbeddedSearchBar(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                Button(
+                /*Button(
                     onClick = { onSearch(query) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
                 ) {
                     Text("검색하세요")
-                }
+                }*/
             }
         }
     }
