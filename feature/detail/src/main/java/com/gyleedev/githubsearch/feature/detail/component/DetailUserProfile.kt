@@ -44,6 +44,7 @@ fun DetailUserProfile(
     blogUrl: String?,
     onBlogClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    transitionKeyPrefix: String = "",
 ) {
     Column(
         modifier = modifier
@@ -55,6 +56,7 @@ fun DetailUserProfile(
             avatar = avatar,
             login = login,
             size = 120.dp,
+            transitionKeyPrefix = transitionKeyPrefix,
         )
         Spacer(modifier = Modifier.height(20.dp))
         if (name != null) {

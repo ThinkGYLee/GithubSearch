@@ -26,6 +26,7 @@ fun FlippableUserAvatar(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
+    transitionKeyPrefix: String = "",
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (isSelected) 180f else 0f,
@@ -46,6 +47,7 @@ fun FlippableUserAvatar(
                 avatar = avatar,
                 login = login,
                 size = size,
+                transitionKeyPrefix = transitionKeyPrefix,
             )
         } else {
             // Replicate UserAvatar's size and shape

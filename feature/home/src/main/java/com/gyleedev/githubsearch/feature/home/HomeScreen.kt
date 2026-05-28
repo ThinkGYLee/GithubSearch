@@ -91,7 +91,7 @@ import com.gyleedev.githubsearch.feature.home.R as HomeR
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
-    moveToDetail: (String) -> Unit,
+    moveToDetail: (String, String) -> Unit,
     requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -207,7 +207,7 @@ internal fun HomeScreen(
     onDeleteDismiss: () -> Unit,
     onDeleteRequest: () -> Unit,
     onFavoriteRequest: () -> Unit,
-    moveToDetail: (String) -> Unit,
+    moveToDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -247,7 +247,7 @@ internal fun HomeScreen(
                     mode = uiState.mode,
                     selectedUsers = uiState.selectedUsers,
                     onToggleSelection = onToggleSelection,
-                    onClick = moveToDetail,
+                    onClick = { moveToDetail(it, "home") },
                     topPadding = paddingValues.calculateTopPadding(),
                 )
             } else {
@@ -300,7 +300,7 @@ private fun HomeTopAppBar(
     onSearchItemReset: () -> Unit,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
-    moveToDetail: (String) -> Unit,
+    moveToDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -359,7 +359,7 @@ private fun HomeTopAppBar(
                         onActiveChanged = onActiveChanged,
                         onSearch = onSearch,
                         onSearchItemReset = onSearchItemReset,
-                        moveToDetail = moveToDetail,
+                        moveToDetail = { moveToDetail(it, "search") },
                         searchState = searchState,
                         loading = isLoading,
                     )
@@ -621,6 +621,7 @@ private fun HomeItemList(
                 follower = user.followers,
                 company = user.company,
                 isSelected = isSelected,
+                transitionKeyPrefix = "home",
                 onClick = {
                     if (mode == HomeMode.SELECT) {
                         onToggleSelection(user.login)
@@ -668,6 +669,7 @@ private fun SearchResultItem(
             avatar = avatar,
             login = login,
             modifier = Modifier.padding(horizontal = 8.dp),
+            transitionKeyPrefix = "search",
         )
 
         Column(modifier = Modifier.align(Alignment.CenterVertically)) {

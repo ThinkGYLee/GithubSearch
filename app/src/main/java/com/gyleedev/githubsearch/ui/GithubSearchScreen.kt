@@ -167,26 +167,35 @@ fun GithubSearchScreen(
                             ) {
                                 HomeScreen(
                                     modifier = Modifier.fillMaxSize(),
-                                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                                    moveToDetail = { id, from ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    },
                                     requestAuthentication = viewModel::requestGithubLogin,
                                 )
                             }
                         }
 
                         composable(
-                            route = "${BottomNavItem.Detail.screenRoute}/{id}",
+                            route = "${BottomNavItem.Detail.screenRoute}/{id}?from={from}",
                             arguments =
                             listOf(
                                 navArgument("id") {
                                     type = NavType.StringType
                                     nullable = false
                                 },
+                                navArgument("from") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                    defaultValue = ""
+                                },
                             ),
-                        ) {
+                        ) { backStackEntry ->
+                            val from = backStackEntry.arguments?.getString("from") ?: ""
                             CompositionLocalProvider(
                                 LocalAnimatedVisibilityScope provides this@composable,
                             ) {
                                 DetailScreen(
+                                    from = from,
                                     modifier = Modifier.fillMaxSize(),
                                     onBackClick = { navController.navigateUp() },
                                 )
@@ -199,7 +208,9 @@ fun GithubSearchScreen(
                             ) {
                                 FavoriteScreen(
                                     modifier = Modifier.fillMaxSize(),
-                                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
+                                    moveToDetail = { id, from ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    },
                                 )
                             }
                         }

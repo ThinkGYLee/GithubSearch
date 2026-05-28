@@ -35,43 +35,35 @@ fun UserAvatar(
     login: String,
     modifier: Modifier = Modifier,
     size: Dp = 56.dp,
+    transitionKeyPrefix: String = "",
 ) {
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
-    var isSuccess by remember { mutableStateOf(false) }
+
+    var isSuccess by remember(avatar) { mutableStateOf(false) }
 
     // 1. 화면 전환 상태 감지
     val transition = animatedVisibilityScope?.transition
-    val isTransitionFinished = transition?.let {
-        it.currentState == it.targetState
-    } ?: true
 
-    // 2. 현재 화면이 나타나는 중(Entering)인지 확인
-    val isEntering = transition?.targetState == EnterExitState.Visible
+    // 2. 현재 화면이 "완전히" 정지해 있는 상태인지 확인 (전환 중이 아님)
+    val isIdle = transition?.let {
+        it.currentState == it.targetState && it.currentState == EnterExitState.Visible
+    } ?: false
 
-    // 3. 투명도 로직 최적화:
-    // - 출발지(Exiting)일 때는 배경을 유지(1f)하여 깜빡임 방지
-    // - 도착지(Entering)일 때는 전환 완료 후 배경 노출(0f -> 1f)
-    val targetAlpha = if (isSuccess) {
-        if (isEntering) {
-            if (isTransitionFinished) 1f else 0f
-        } else {
-            1f // 사라지는 화면에서는 배경을 그대로 둠
-        }
-    } else {
-        0f
-    }
-
+    // 3. 투명도 로직: 전환 중이거나 로딩 중이면 배경을 숨김
+    val targetAlpha = if (isSuccess && isIdle) 1f else 0f
     val backgroundAlpha by animateFloatAsState(
         targetValue = targetAlpha,
-        animationSpec = tween(durationMillis = 400),
+        // 사라질 때(300ms)와 나타날 때(400ms) 모두 부드럽게 처리
+        animationSpec = if (targetAlpha == 0f) tween(durationMillis = 300) else tween(durationMillis = 400),
         label = "avatarBackgroundAlphaTransition",
     )
 
-    val sharedElementModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+    val sharedBoundsModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
         with(sharedTransitionScope) {
-            Modifier.sharedElement(
-                rememberSharedContentState(key = "avatar-$login"),
+            val key = if (transitionKeyPrefix.isEmpty()) "avatar-$login" else "$transitionKeyPrefix-avatar-$login"
+            Modifier.sharedBounds(
+                rememberSharedContentState(key = key),
                 animatedVisibilityScope = animatedVisibilityScope,
                 boundsTransform = { _, _ ->
                     tween(durationMillis = 500)
@@ -86,12 +78,15 @@ fun UserAvatar(
     Box(
         modifier = modifier
             .size(size)
+            .then(sharedBoundsModifier)
             .drawBehind {
-                // 투명도(alpha)를 적용하여 전환 완료 후에만 배경색이 보이도록 정밀 제어
-                drawCircle(
-                    color = Color.White.copy(alpha = backgroundAlpha),
-                    radius = size.toPx() / 2f - 0.5f,
-                )
+                // 투명도가 어느 정도 있을 때만 배경 원을 그림
+                if (backgroundAlpha > 0.01f) {
+                    drawCircle(
+                        color = Color.White.copy(alpha = backgroundAlpha),
+                        radius = size.toPx() / 2f - 0.5f,
+                    )
+                }
             },
         contentAlignment = Alignment.Center,
     ) {
@@ -102,10 +97,8 @@ fun UserAvatar(
             },
             modifier = Modifier
                 .fillMaxSize()
-                .clip(CircleShape)
-                .then(sharedElementModifier),
-            component =
-            rememberImageComponent {
+                .clip(CircleShape),
+            component = rememberImageComponent {
                 +ShimmerPlugin(
                     Shimmer.Flash(
                         baseColor = Color.White,

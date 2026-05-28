@@ -49,7 +49,7 @@ import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteScreen(
-    moveToDetail: (String) -> Unit,
+    moveToDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
@@ -71,7 +71,7 @@ fun FavoriteScreen(
                 onFilterClick = viewModel::updateFilter,
                 onFavoriteDelete = viewModel::updateFavoriteStatus,
                 onDeleteCancel = viewModel::updateShowFavoriteDialog,
-                onItemClick = moveToDetail,
+                onItemClick = { moveToDetail(it, "favorite") },
                 onItemLongClick = viewModel::showFavoriteDialog,
                 showFavoriteDialog = state.favoriteDialogState,
                 showFilterDialog = state.filterDialogState,
@@ -172,6 +172,7 @@ private fun FavoriteItemList(
                     login = user.login,
                     follower = user.followers,
                     company = user.company,
+                    transitionKeyPrefix = "favorite",
                 )
             }
         }

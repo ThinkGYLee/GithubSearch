@@ -38,6 +38,7 @@ import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 fun DetailScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    from: String = "",
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
@@ -70,6 +71,7 @@ fun DetailScreen(
                     repoList = repoList,
                     paddingValues = paddingValues,
                     onBlogClick = { uriHandler.openUri(it) },
+                    from = from,
                 )
             }
         }
@@ -92,6 +94,7 @@ private fun DetailScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onBlogClick: (String) -> Unit,
+    from: String = "",
 ) {
     LazyColumn(
         modifier =
@@ -113,6 +116,7 @@ private fun DetailScreen(
                 email = email,
                 blogUrl = blogUrl,
                 onBlogClick = onBlogClick,
+                transitionKeyPrefix = from,
             )
         }
 

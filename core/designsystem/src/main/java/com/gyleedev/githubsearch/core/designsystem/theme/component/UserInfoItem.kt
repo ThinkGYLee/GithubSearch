@@ -35,6 +35,7 @@ fun UserInfoItem(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
+    transitionKeyPrefix: String = "",
 ) {
     val exposeTitle = if (name != null) {
         "$name ($login)"
@@ -59,6 +60,7 @@ fun UserInfoItem(
             login = login,
             isSelected = isSelected,
             modifier = Modifier.padding(horizontal = 8.dp),
+            transitionKeyPrefix = transitionKeyPrefix,
         )
         Column {
             Text(
