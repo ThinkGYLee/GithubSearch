@@ -145,6 +145,7 @@ class HomeViewModelTest {
 
         // When
         viewModel.updateSearchId(query)
+        runCurrent()
         advanceTimeBy(300L)
         runCurrent()
 
@@ -174,6 +175,7 @@ class HomeViewModelTest {
 
         // When
         viewModel.updateSearchId(query)
+        runCurrent()
         advanceTimeBy(300L)
         runCurrent()
 
