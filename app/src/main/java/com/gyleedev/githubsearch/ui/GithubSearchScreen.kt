@@ -167,8 +167,11 @@ fun GithubSearchScreen(
                             ) {
                                 HomeScreen(
                                     modifier = Modifier.fillMaxSize(),
-                                    moveToDetail = { id, from ->
-                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    onUserClick = { id ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=home")
+                                    },
+                                    onSearchUserClick = { id ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=search")
                                     },
                                     requestAuthentication = viewModel::requestGithubLogin,
                                 )
@@ -208,8 +211,8 @@ fun GithubSearchScreen(
                             ) {
                                 FavoriteScreen(
                                     modifier = Modifier.fillMaxSize(),
-                                    moveToDetail = { id, from ->
-                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    onUserClick = { id ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=favorite")
                                     },
                                 )
                             }
@@ -230,7 +233,7 @@ fun GithubSearchScreen(
             }
 
             // 내비게이션 바를 Scaffold 바깥 오버레이로 배치하여 리스트가 뒤로 비치게 함
-            if (currentRoute != "DETAIL/{id}") {
+            if (currentRoute != null && !currentRoute.startsWith(DETAIL)) {
                 BottomNavigation(
                     currentRoute = currentRoute,
                     onClick = { route ->
@@ -265,7 +268,6 @@ fun BottomNavigation(
                         0f to Color.Transparent, // 짙은 농도 복구
                         0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                         1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-
                     ),
                 )
                 .cloudy(radius = 60),
