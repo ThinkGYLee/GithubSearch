@@ -98,9 +98,9 @@ private fun DetailScreen(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 4.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp),
         contentPadding = paddingValues,
     ) {
         item {
@@ -147,7 +147,7 @@ private fun DetailAppBar(
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = "User Profile") },
+        title = { Text(text = stringResource(id = R.string.title_user_profile)) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(

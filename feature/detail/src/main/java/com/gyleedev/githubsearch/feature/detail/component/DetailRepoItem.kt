@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
@@ -29,6 +30,7 @@ import com.gyleedev.githubsearch.core.designsystem.util.getColor
 import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
 import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.feature.detail.R
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
 @Composable
@@ -96,7 +98,7 @@ fun DetailRepoItem(
                     Icon(
                         imageVector = Icons.Filled.Circle,
                         tint = getColor(language),
-                        contentDescription = "repository language",
+                        contentDescription = stringResource(id = R.string.content_description_repository_language),
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
