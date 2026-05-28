@@ -4,6 +4,7 @@
     <string name="title_favorite">Favorite</string>
     <string name="title_search">Search</string>
     <string name="title_setting">Setting</string>
+    <string name="title_home">Home</string>
     <string name="placeholder_searchbar">Search</string>
     <string name="home_no_item">No Saved Items</string>
     <string name="detail_user_title_repos">repos</string>

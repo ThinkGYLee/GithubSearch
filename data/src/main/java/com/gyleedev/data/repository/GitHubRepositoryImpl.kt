@@ -121,7 +121,11 @@ class GitHubRepositoryImpl @Inject constructor(
             }
         }
 
-    // 유닛 테스트 코드 짜봐
+    override suspend fun updateFavoriteUsers(
+        userSet: Set<String>,
+        favorite: Boolean,
+    ): Int = userDao.updateFavoriteStatus(userSet, favorite)
+
     override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
         val entity = AccessTimeEntity(
             id = id,
@@ -197,10 +201,18 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun syncUserData(githubId: String): UserSyncResult {
         val userFetchResult = fetchUser(githubId)
         val localUser = getUserWithFlow(githubId).first()
+
         return if (userFetchResult is UserFetchResult.Success && localUser != null) {
-            val insertUser = userFetchResult.user.copy(favorite = localUser.favorite)
-            val entityId = upsertUser(insertUser)
-            UserSyncResult.Success(entityId = entityId)
+            val insertUser = userFetchResult.user.copy(
+                id = localUser.id,
+                favorite = localUser.favorite,
+            )
+            val upsertResult = upsertUser(insertUser)
+
+            // upsert 결과가 -1이면 업데이트가 일어난 것이므로 기존 localUser.id 사용
+            val finalEntityId = if (upsertResult == -1L) localUser.id else upsertResult
+
+            UserSyncResult.Success(entityId = finalEntityId)
         } else {
             UserSyncResult.Fail
         }
@@ -275,4 +287,6 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun deleteAccessToken() {
         tokenPreference.deleteKey()
     }
+
+    override suspend fun deleteUsersWithSet(userIds: Set<String>): Int = userDao.deleteUsersWithSet(userIds)
 }

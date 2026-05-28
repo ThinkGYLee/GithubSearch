@@ -1,0 +1,20 @@
+<resources>
+    <string name="unknown_host_exception">네트워크 연결을 확인해주세요.</string>
+    <string name="socket_exception">네트워크 신호가 약합니다.</string>
+    <string name="http_exception">네트워크 상태가 좋지 않습니다.</string>
+    <string name="etc_exception">검색에 실패했습니다.</string>
+    <string name="title_request_authentication">인증 요청</string>
+    <string name="content_request_authentication">더 많은 검색을 위해 인증이 필요합니다.</string>
+    <string name="text_dialog_confirm">예</string>
+    <string name="text_dialog_cancel">아니오</string>
+    <string name="title_request_delete">사용자 삭제</string>
+    <string name="content_request_delete">선택한 사용자를 삭제하시겠습니까?</string>
+
+    <string name="update_user_success">사용자 정보가 업데이트되었습니다.</string>
+    <string name="update_user_fail">사용자 정보 업데이트에 실패했습니다.</string>
+
+    <string name="text_filter_title">필터</string>
+    <string name="text_filter_content">필터 조건을 설정하세요.</string>
+    <string name="text_filter_cancel">취소</string>
+    <string name="text_filter_confirm">확인</string>
+</resources>

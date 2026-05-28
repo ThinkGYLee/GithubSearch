@@ -3,10 +3,13 @@ package com.gyleedev.githubsearch.feature.favorite
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
@@ -35,6 +38,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
@@ -45,7 +49,7 @@ import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteScreen(
-    moveToDetail: (String) -> Unit,
+    moveToDetail: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FavoriteViewModel = hiltViewModel(),
 ) {
@@ -54,7 +58,9 @@ fun FavoriteScreen(
 
     Scaffold(
         topBar = { FavoriteTopAppBar(onClick = viewModel::updateShowFilterDialog) },
-        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier
+            .fillMaxSize(),
     ) { paddingValues ->
         if (uiState is FavoriteUiState.Success) {
             val state = uiState as FavoriteUiState.Success
@@ -65,11 +71,13 @@ fun FavoriteScreen(
                 onFilterClick = viewModel::updateFilter,
                 onFavoriteDelete = viewModel::updateFavoriteStatus,
                 onDeleteCancel = viewModel::updateShowFavoriteDialog,
-                onItemClick = moveToDetail,
+                onItemClick = { moveToDetail(it, "favorite") },
                 onItemLongClick = viewModel::showFavoriteDialog,
                 showFavoriteDialog = state.favoriteDialogState,
                 showFilterDialog = state.filterDialogState,
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding()),
             )
         }
     }
@@ -92,7 +100,7 @@ internal fun FavoriteScreen(
 ) {
     if (users.itemCount > 0) {
         FavoriteItemList(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier,
             users = users,
             onClick = onItemClick,
             onLongClick = onItemLongClick,
@@ -144,10 +152,10 @@ private fun FavoriteItemList(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 12.dp),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            top = 12.dp,
+        ),
     ) {
         items(
             users.itemCount,
@@ -160,9 +168,24 @@ private fun FavoriteItemList(
                     onClick = { onClick(user.login) },
                     onLongClick = { onLongClick(user) },
                     avatar = user.avatar,
+                    name = user.name,
                     login = user.login,
+                    follower = user.followers,
+                    company = user.company,
+                    transitionKeyPrefix = "favorite",
                 )
             }
+        }
+
+        // 마지막 아이템이 하단 내비게이션 바에 가리지 않도록 빈 공간 추가
+        // 시스템 바 영역 + LiquidNavBar + 여유 확보
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+            )
         }
     }
 }

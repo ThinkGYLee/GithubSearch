@@ -2,6 +2,12 @@ package com.gyleedev.githubsearch.feature.home
 
 import androidx.compose.runtime.Stable
 
+enum class HomeMode {
+    DEFAULT,
+    SEARCH,
+    SELECT,
+}
+
 @Stable
 sealed interface HomeUiState {
     data object Loading : HomeUiState
@@ -10,8 +16,10 @@ sealed interface HomeUiState {
         val searchQuery: String,
         val isLoading: Boolean,
         val searchState: SearchUiState,
-        val isSearchActive: Boolean,
+        val mode: HomeMode,
+        val selectedUsers: Set<String>,
         val showRequestAuthDialog: Boolean,
+        val showDeleteDialog: Boolean,
     ) : HomeUiState
 }
 

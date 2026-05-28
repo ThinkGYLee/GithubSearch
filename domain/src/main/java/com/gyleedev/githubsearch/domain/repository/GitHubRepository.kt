@@ -22,6 +22,10 @@ interface GitHubRepository {
 
     suspend fun fetchRepos(id: String): List<RepositoryModel>
 
+    suspend fun updateFavoriteUsers(userSet: Set<String>, favorite: Boolean): Int
+
+    suspend fun deleteUsersWithSet(userIds: Set<String>): Int
+
     suspend fun insertRepositoryList(
         userEntityId: Long,
         list: List<RepositoryModel>,

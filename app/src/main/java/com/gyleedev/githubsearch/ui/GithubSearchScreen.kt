@@ -9,27 +9,38 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.browser.auth.AuthTabIntent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
@@ -45,14 +56,19 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gyleedev.githubsearch.R
+import com.gyleedev.githubsearch.core.designsystem.LocalAnimatedVisibilityScope
+import com.gyleedev.githubsearch.core.designsystem.LocalSharedTransitionScope
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenUseCaseResult
 import com.gyleedev.githubsearch.feature.detail.DetailScreen
 import com.gyleedev.githubsearch.feature.favorite.FavoriteScreen
 import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
+import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
 import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun GithubSearchScreen(
@@ -77,7 +93,6 @@ fun GithubSearchScreen(
                 val resultUri = intent.data
                 if (resultUri != null) {
                     val code = resultUri.getQueryParameter("code")
-                    // 최종적으로 코드를 추출하여 상태를 업데이트
                     code?.let { code ->
                         if (code.isNotBlank()) {
                             viewModel.getAccessToken(code)
@@ -116,7 +131,105 @@ fun GithubSearchScreen(
     }
 
     Scaffold(
-        bottomBar = {
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier.fillMaxSize(),
+    ) { paddingValue ->
+        // 콘텐츠 영역: Scaffold의 패딩을 무시하고 화면 전체를 점유하게 함
+        // 이를 통해 리스트 아이템이 하단 내비게이션 바와 시스템 바 뒤로 흐르게 됨
+        Box(
+            modifier = Modifier
+                .padding(paddingValue),
+        ) {
+            SharedTransitionLayout {
+                CompositionLocalProvider(
+                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                ) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = BottomNavItem.Home.screenRoute,
+                        modifier = modifier.fillMaxSize(),
+                        enterTransition = { fadeIn(animationSpec = tween(500)) },
+                        exitTransition = { fadeOut(animationSpec = tween(500)) },
+                        popEnterTransition = { fadeIn(animationSpec = tween(500)) },
+                        popExitTransition = { fadeOut(animationSpec = tween(500)) },
+                    ) {
+                        composable(route = BottomNavItem.Home.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                HomeScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    moveToDetail = { id, from ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    },
+                                    requestAuthentication = viewModel::requestGithubLogin,
+                                )
+                            }
+                        }
+
+                        composable(
+                            route = "${BottomNavItem.Detail.screenRoute}/{id}?from={from}",
+                            arguments =
+                            listOf(
+                                navArgument("id") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                                navArgument("from") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                    defaultValue = ""
+                                },
+                            ),
+                        ) { backStackEntry ->
+                            val from = backStackEntry.arguments?.getString("from") ?: ""
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                DetailScreen(
+                                    from = from,
+                                    modifier = Modifier.fillMaxSize(),
+                                    onBackClick = { navController.navigateUp() },
+                                )
+                            }
+                        }
+
+                        composable(route = BottomNavItem.Favorite.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                FavoriteScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    moveToDetail = { id, from ->
+                                        navController.navigate("${BottomNavItem.Detail.screenRoute}/$id?from=$from")
+                                    },
+                                )
+                            }
+                        }
+
+                        composable(BottomNavItem.Setting.screenRoute) {
+                            CompositionLocalProvider(
+                                LocalAnimatedVisibilityScope provides this@composable,
+                            ) {
+                                SettingScreen(
+                                    requestAuthentication = viewModel::requestGithubLogin,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 내비게이션 바를 Scaffold 바깥 오버레이로 배치하여 리스트가 뒤로 비치게 함
             if (currentRoute != "DETAIL/{id}") {
                 BottomNavigation(
                     currentRoute = currentRoute,
@@ -129,55 +242,8 @@ fun GithubSearchScreen(
                             restoreState = true
                         }
                     },
-                    modifier = Modifier,
-                )
-            }
-        },
-        // Scaffold가 자동으로 주입하는 inset 무시
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.screenRoute,
-            modifier = modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-        ) {
-            composable(route = BottomNavItem.Home.screenRoute) {
-                HomeScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                    requestAuthentication = viewModel::requestGithubLogin,
-                )
-            }
-
-            composable(
-                route = "${BottomNavItem.Detail.screenRoute}/{id}",
-                arguments =
-                listOf(
-                    navArgument("id") {
-                        type = NavType.StringType
-                        nullable = false
-                    },
-                ),
-            ) {
-                DetailScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    onBackClick = { navController.navigateUp() },
-                )
-            }
-
-            composable(route = BottomNavItem.Favorite.screenRoute) {
-                FavoriteScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    moveToDetail = { navController.navigate("${BottomNavItem.Detail.screenRoute}/$it") },
-                )
-            }
-
-            composable(BottomNavItem.Setting.screenRoute) {
-                SettingScreen(
-                    requestAuthentication = viewModel::requestGithubLogin,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter),
                 )
             }
         }
@@ -190,27 +256,33 @@ fun BottomNavigation(
     onClick: (String) -> Unit,
     modifier: Modifier,
 ) {
-    val items = remember {
-        listOf(
-            BottomNavItem.Home,
-            BottomNavItem.Favorite,
-            BottomNavItem.Setting,
-        )
-    }
+    Box(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to Color.Transparent, // 짙은 농도 복구
+                        0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                        1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
 
-    NavigationBar(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = item.icons,
-                        contentDescription = stringResource(id = item.title),
-                    )
-                },
-                selected = currentRoute == item.screenRoute,
-                onClick = { onClick(item.screenRoute) },
+                    ),
+                )
+                .cloudy(radius = 60),
+        ) {}
+        Column(
+            modifier = modifier
+                .fillMaxWidth(),
+        ) {
+            LiquidNavigationBar(
+                currentRoute = currentRoute,
+                onClick = onClick,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
             )
         }
     }
@@ -235,11 +307,11 @@ sealed class BottomNavItem(
     val icons: ImageVector,
     val screenRoute: String,
 ) {
-    data object Home : BottomNavItem(R.string.app_name, Icons.Filled.Home, HOME)
+    data object Home : BottomNavItem(R.string.title_home, Icons.Filled.Home, HOME)
 
     data object Detail : BottomNavItem(R.string.title_detail, Icons.Filled.Details, DETAIL)
 
     data object Setting : BottomNavItem(R.string.title_setting, Icons.Filled.Settings, SETTING)
 
-    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.StarBorder, FAVORITE)
+    data object Favorite : BottomNavItem(R.string.title_favorite, Icons.Filled.FavoriteBorder, FAVORITE)
 }

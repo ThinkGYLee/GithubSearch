@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
+import com.gyleedev.githubsearch.core.designsystem.theme.component.FavoritePulsingHeart
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.feature.detail.component.DetailRepoItem
@@ -39,6 +38,7 @@ import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 fun DetailScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    from: String = "",
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
@@ -50,7 +50,7 @@ fun DetailScreen(
             DetailAppBar(
                 onBackClick = onBackClick,
                 onFavoriteClick = viewModel::updateFavoriteStatus,
-                favorite = user?.favorite,
+                favorite = user?.favorite ?: false,
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -71,6 +71,7 @@ fun DetailScreen(
                     repoList = repoList,
                     paddingValues = paddingValues,
                     onBlogClick = { uriHandler.openUri(it) },
+                    from = from,
                 )
             }
         }
@@ -93,6 +94,7 @@ private fun DetailScreen(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
     onBlogClick: (String) -> Unit,
+    from: String = "",
 ) {
     LazyColumn(
         modifier =
@@ -114,6 +116,7 @@ private fun DetailScreen(
                 email = email,
                 blogUrl = blogUrl,
                 onBlogClick = onBlogClick,
+                transitionKeyPrefix = from,
             )
         }
 
@@ -140,7 +143,7 @@ private fun DetailScreen(
 private fun DetailAppBar(
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    favorite: Boolean?,
+    favorite: Boolean,
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
@@ -154,19 +157,11 @@ private fun DetailAppBar(
             }
         },
         actions = {
-            IconButton(onClick = onFavoriteClick) {
-                if (favorite == true) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_filled),
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.FavoriteBorder,
-                        contentDescription = stringResource(id = R.string.icon_content_description_favorite_bordered),
-                    )
-                }
-            }
+            FavoritePulsingHeart(
+                isFavorite = favorite,
+                onClick = onFavoriteClick,
+                modifier = Modifier.padding(end = 12.dp),
+            )
         },
         modifier = modifier,
     )

@@ -7,6 +7,11 @@
     <string name="content_request_authentication">Authentication is required to search more</string>
     <string name="text_dialog_confirm">Yes</string>
     <string name="text_dialog_cancel">No</string>
+    <string name="title_request_delete">Delete User</string>
+    <string name="content_request_delete">Would you like to delete selected Users?</string>
+
+    <string name="update_user_success">User Update Success</string>
+    <string name="update_user_fail">User Update Favorite</string>
 
     <string name="text_filter_title">Filter</string>
     <string name="text_filter_content">Set Filter Conditions</string>
