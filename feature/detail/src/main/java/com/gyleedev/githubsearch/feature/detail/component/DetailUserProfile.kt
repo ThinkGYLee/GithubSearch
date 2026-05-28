@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
+import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.feature.detail.extractDomain
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
@@ -136,7 +137,7 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = repos.toString(),
+                        text = repos.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
@@ -154,7 +155,7 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = followers.toString(),
+                        text = followers.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
@@ -172,7 +173,7 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = following.toString(),
+                        text = following.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,

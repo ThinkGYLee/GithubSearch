@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.theme.Yellow
 import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
+import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
@@ -63,7 +64,7 @@ fun DetailRepoInfo(
                 tint = Yellow,
             )
             Text(
-                text = stargazer.toString(),
+                text = stargazer.toCompactString(),
                 modifier = Modifier.padding(8.dp),
             )
             if (language != null) {

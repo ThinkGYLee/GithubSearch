@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.util.getColor
 import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
+import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
@@ -67,7 +68,7 @@ fun DetailRepoItem(
                     )
                 }
                 CustomSurfaceChip(
-                    text = stargazer.toString(),
+                    text = stargazer.toCompactString(),
                     icon = Icons.Outlined.StarOutline,
                     onClick = {},
                     enabled = false,
