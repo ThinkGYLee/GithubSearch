@@ -2,4 +2,12 @@
     <string name="placeholder_searchbar">Search</string>
     <string name="home_no_item">No Saved Items</string>
     <string name="search_result_no_user">no such user change the keyword</string>
+    <string name="text_selected_count">%d selected</string>
+    <string name="text_select_all">Select All</string>
+    <string name="text_unselect_all">Unselect All</string>
+    <string name="text_exit_selection">Exit Selection</string>
+    <string name="text_search_placeholder">Search With Github Id</string>
+    <string name="text_search_button">Search</string>
+    <string name="content_description_delete">Delete</string>
+    <string name="content_description_background_logo">Github Background Logo</string>
 </resources>
