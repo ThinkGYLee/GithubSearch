@@ -17,23 +17,28 @@ trim_trailing_whitespace = false
 [*.{kt,kts}]
 indent_style = space
 indent_size = 4
-continuation_indent_size = 8
+continuation_indent_size = 4
 
-# ktlint 설정 (또는 android)
-# @noinspection UndefinedProperty
-ktlint_code_style = intellij_idea
+# 할당 연산자(=) 이후에 줄바꿈을 수동으로 했을 때, 포매터가 이를 강제로 한 줄로 합치지 않고 허용하도록 설정합니다.
+ij_kotlin_assignment_wrap = normal
 
-# 팀 기준에 맞게 120 등으로 바꿔도 됨 (현재는 비활성화)
-max_line_length = off
+# IntelliJ Kotlin 포맷터 설정 (Spotless/Ktlint와 일치)
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_imports_layout = *, java.**, javax.**, kotlin.**, kotlinx.**
+ij_kotlin_name_count_to_use_star_import = 99
+ij_kotlin_name_count_to_use_star_import_for_members = 99
+ij_kotlin_packages_to_use_import_on_demand = unset
+ij_kotlin_continuation_indent_size = 4
+
+# ktlint 설정
+ktlint_code_style = android
+max_line_length = 120
 
 # ktlint 1.8.0 표준으로 승격된 규칙 중 비활성화할 규칙 지정
-# 프로젝트 상황에 따라 when 진입점의 중괄호 강제 규칙을 끕니다
-# @noinspection UndefinedProperty
 ktlint_standard_when-entry-bracing = disabled
 
 # Compose 등 함수명 예외: 대문자/스크린명 컨벤션 허용
-# ktlint 1.x 버전에서 아래 속성으로 주석된 애너테이션의 함수명은 무시
-# @noinspection UndefinedProperty
 ktlint_function_naming_ignore_when_annotated_with = Composable,Preview,Test
 
 # 필요 시 개별 룰 끄기 (예: 파일명 규칙)
