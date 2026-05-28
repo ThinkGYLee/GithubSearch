@@ -1,7 +1,8 @@
 package com.gyleedev.githubsearch.core.designsystem.theme.component
 
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,12 +40,32 @@ fun UserAvatar(
     val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
     var isSuccess by remember { mutableStateOf(false) }
 
-    // 로딩 중에는 Shimmer 효과를 극대화하기 위해 투명(Transparent) 배경을 유지,
-    // 완료 후에만 투명 아바타를 위해 흰색 배경으로 전환
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isSuccess) Color.White else Color.Transparent,
+    // 1. 화면 전환 상태 감지
+    val transition = animatedVisibilityScope?.transition
+    val isTransitionFinished = transition?.let {
+        it.currentState == it.targetState
+    } ?: true
+
+    // 2. 현재 화면이 나타나는 중(Entering)인지 확인
+    val isEntering = transition?.targetState == EnterExitState.Visible
+
+    // 3. 투명도 로직 최적화:
+    // - 출발지(Exiting)일 때는 배경을 유지(1f)하여 깜빡임 방지
+    // - 도착지(Entering)일 때는 전환 완료 후 배경 노출(0f -> 1f)
+    val targetAlpha = if (isSuccess) {
+        if (isEntering) {
+            if (isTransitionFinished) 1f else 0f
+        } else {
+            1f // 사라지는 화면에서는 배경을 그대로 둠
+        }
+    } else {
+        0f
+    }
+
+    val backgroundAlpha by animateFloatAsState(
+        targetValue = targetAlpha,
         animationSpec = tween(durationMillis = 400),
-        label = "avatarPlaceholderTransition",
+        label = "avatarBackgroundAlphaTransition",
     )
 
     val sharedElementModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
@@ -66,8 +87,11 @@ fun UserAvatar(
         modifier = modifier
             .size(size)
             .drawBehind {
-                // 배경 원을 0.5px 미세하게 작게 그려 이미지 외곽 번짐(Bleeding) 방지
-                drawCircle(backgroundColor, radius = size.toPx() / 2f - 0.5f)
+                // 투명도(alpha)를 적용하여 전환 완료 후에만 배경색이 보이도록 정밀 제어
+                drawCircle(
+                    color = Color.White.copy(alpha = backgroundAlpha),
+                    radius = size.toPx() / 2f - 0.5f,
+                )
             },
         contentAlignment = Alignment.Center,
     ) {
