@@ -36,6 +36,7 @@
 - `android-coding-conventions.md`: Kotlin/Android 코드 작성 규칙과 commit convention.
 - `change-report-template.md`: 최종 응답, 커밋 메시지, PR 설명 재사용 형식.
 - `template-sync-policy.md`: skill template과 project docs 간 sync 정책.
+- `subagents.md`: GithubSearch에서 단계적으로 사용할 Codex subagent 4개 역할과 운영 규칙 초안.
 
 ## Preserved Custom Docs
 
