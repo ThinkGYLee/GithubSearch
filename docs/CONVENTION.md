@@ -25,7 +25,7 @@
 - **Comments:** 
     - 코드와 같은 줄에 주석을 작성하는 것을 금지함 (Inline comment 금지).
     - 주석은 해당 변수, 함수, 클래스 등 관련 내용의 바로 윗줄에 작성하여 가독성을 확보함.
-- **Command:** 커밋 전 `./gradlew spotlessApply` 필수.
+- **Command:** 코드 수정 후 검증 명령 선택은 `docs/ai/quality-gates.md`를 따른다.
 
 ## 3. Implementation Guidelines
 - **State Management:** `ViewModel`과 `StateFlow`를 사용하여 상태 관리.
@@ -36,6 +36,8 @@
     - 스키마 변경 이력 관리를 위해 `exportSchema = true` 유지.
 
 ## 4. Git Commit Convention (MUST FOLLOW)
+커밋 컨벤션의 source of truth는 `docs/ai/android-coding-conventions.md`입니다.
+
 - **Format:** `<Type>(Scope) : Subject`
 - **Type Rules:**
     - `Feat`: 새로운 기능 추가
@@ -60,10 +62,10 @@
     3. 사용자의 **"OK"** 또는 승인 입력을 받은 뒤에만 수정을 시작함.
 
 ### [Post-Modification Hook]
-- **역할:** 빌드 및 스타일 검증 강제.
+- **역할:** 변경 범위에 맞는 빌드 및 스타일 검증 수행.
 - **로직:**
-    - 코드를 수정한 직후, 반드시 다음 명령어를 실행하여 검증함:
-      ```bash
-      ./gradlew spotlessApply && ./gradlew :$MODULE_NAME:compileDebugKotlin
-      ```
-- **성공 조건:** 컴파일 에러가 없고 Spotless가 성공적으로 적용되어야만 작업을 종료할 수 있음. 오류 발생 시 해결 전까지 종료 금지.
+    - 코드 수정 후 `docs/ai/quality-gates.md`에 따라 변경 범위에 맞는 최소 검증을 선택한다.
+    - Kotlin/Android 코드 수정 시 Spotless가 설정되어 있으면 `./gradlew spotlessApply`를 우선 고려한다.
+    - Android module 변경은 `./gradlew :$MODULE_NAME:compileDebugKotlin` 또는 `./gradlew assembleDebug`를 고려한다.
+    - 문서-only 변경은 Gradle 검증 대신 `rg`, `git diff`, `git status` 등으로 변경 범위를 확인할 수 있다.
+- **성공 조건:** 선택한 검증 결과를 최종 응답에 명확히 보고하고, 실패가 있으면 남은 리스크를 숨기지 않는다.

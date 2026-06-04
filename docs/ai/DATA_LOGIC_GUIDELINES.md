@@ -5,12 +5,23 @@
 
 ---
 
+## 🔗 Core Docs Reference
+
+일반 Kotlin/Android convention과 작업 판단은 core docs를 source of truth로 둡니다. 이 문서는 GithubSearch의 data/domain/ViewModel/Flow 특화 규칙만 보존합니다.
+
+* **Kotlin/Android Convention**: `docs/ai/android-coding-conventions.md`
+* **Task Scope / Risky Change**: `docs/ai/task-scope-control.md`
+* **Verification / Migration Check**: `docs/ai/quality-gates.md`
+* **Final Report Format**: `docs/ai/change-report-template.md`
+
+---
+
 ## 🏗️ Architecture Layers
 
 ### 1. Data Layer (Entity & RepositoryImpl)
 * **Entity-Model Separation**: Entity(Data)와 Model(Domain) 분리 체계를 엄격히 준수합니다.
 * **Mapping Strategy**: 데이터 레이어에서 도메인 레이어로 데이터를 전달할 때 반드시 매퍼 확장 함수(예: `toDomain()`)를 사용합니다.
-* **Room Optimizing**: 외래키 사용 시 반드시 `indices = true`를 설정하여 쿼리 성능을 확보합니다.
+* **Room Convention**: `ForeignKey` index, `exportSchema`, migration 영향 판단은 core docs의 Room/DB 규칙을 따릅니다.
 
 ### 2. Domain Layer (UseCase & Model)
 * **UseCase Structure**: 하나의 UseCase는 하나의 비즈니스 책임만 가집니다. (`operator fun invoke` 선호)
@@ -28,7 +39,7 @@
 
 ### 2. Error & Flow Handling
 * **Sealed State**: `UiState`와 에러 모델링에 `sealed interface`를 적극 활용합니다.
-* **No `runCatching`**: 예외 처리는 반드시 `try-catch` 블록으로 명시합니다.
+* **Explicit Error Handling**: `runCatching`, non-null assertion 등 일반 Kotlin 금지 규칙은 `docs/ai/android-coding-conventions.md`를 따릅니다.
 
 ---
 
@@ -36,4 +47,4 @@
 1. Entity와 Domain Model이 명확히 분리되었는가?
 2. ViewModel 상태 노출 시 `WhileSubscribed(5000)`가 적용되었는가?
 3. 비즈니스 로직이 UI 레이어에 침투하지 않았는가?
-4. Room 엔티티의 인덱스 설정이 적절한가?
+4. Room/DB 변경이 있다면 `task-scope-control.md`와 `quality-gates.md` 기준으로 migration 영향을 먼저 확인했는가?

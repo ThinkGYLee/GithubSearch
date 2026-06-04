@@ -10,31 +10,31 @@ GitHub Search 프로젝트의 AI는 답변을 생성하기 전 다음 지침을 
 
 ---
 
-## ⚙️ 2. 4단계 추론 워크플로우 (The 4-Step Thinking)
+## ⚙️ 2. Core Docs Reference
 
-모든 코딩 작업은 아래의 논리적 단계를 생략하지 않고 수행합니다.
+공통 workflow와 검증 정책은 core docs를 source of truth로 둡니다. 이 문서는 GithubSearch 프로젝트에서 특히 확인해야 할 coding quality checklist만 보존합니다.
 
-| 단계 | 명칭 | AI의 액션 |
-| --- | --- | --- |
-| **1단계** | **Analyze** | 요구사항과 관련된 모듈(`feature`, `domain`, `data` 등)의 코드를 검색하고 의존성을 파악합니다. |
-| **2단계** | **Design** | 구현할 클래스/인터페이스 구조를 텍스트로 먼저 제안하여 사용자 승인을 받습니다. |
-| **3단계** | **Implement** | 스타일 가이드 및 `CONVENTION.md`에 따라 코드를 작성합니다. |
-| **4단계** | **Verify** | Hooks를 통해 Spotless, Compile, Unit Test를 자동으로 실행하여 검증합니다. |
+- Workflow trigger와 공통 작업 흐름: `docs/ai/workflows.md`
+- Verification 명령 선택과 결과 보고: `docs/ai/quality-gates.md`
+- 작업 범위, 사용자 승인, risky change 판단: `docs/ai/task-scope-control.md`
+- Kotlin/Android coding convention: `docs/ai/android-coding-conventions.md`
+- 최종 응답과 commit message 형식: `docs/ai/change-report-template.md`
 
 ---
 
 ## 🛠 3. AI 전용 파워 툴 활용
 
 * **최신성 유지 (`google_web_search`):** AndroidX, Compose 등 라이브러리 업데이트가 잦은 분야는 실시간 검색을 통해 최신 API를 확인합니다.
-* **대규모 코드 분석:** 특정 파일만 보는 것이 아니라, 관련 모듈 전체를 훑어 아키텍처 일관성을 유지합니다.
+* **아키텍처 일관성 확인:** 특정 파일만 보는 것이 아니라, 관련 모듈(`feature`, `domain`, `data`, `core`) 전체를 훑어 의존성과 책임 경계가 유지되는지 확인합니다.
 
 ---
 
-## 🧩 4. 코드 품질 통제 (Quality Control)
+## 🧩 4. GithubSearch Quality Checklist
 
-AI가 스스로 작성한 코드를 검열하는 기준입니다.
+AI가 스스로 작성한 코드를 검열하는 프로젝트 특화 기준입니다.
 * **Single Responsibility:** 하나의 클래스나 Composable이 너무 많은 역할을 수행하지 않는가?
-* **Error Resilience:** `try-catch` 및 명시적 에러 처리가 되어 있는가? (`runCatching` 금지 규칙 준수)
+* **Error Resilience:** 실패 경로가 명시적으로 처리되고, 에러 상태가 UI/Domain/Data 계층 경계에 맞게 전달되는가?
 * **Clean Dependency:** 상위 레이어가 하위 레이어의 상세 구현에 의존하지 않는가?
+* **Module Boundary:** `feature`, `domain`, `data`, `core` 모듈의 책임과 의존 방향이 유지되는가?
 
 ---

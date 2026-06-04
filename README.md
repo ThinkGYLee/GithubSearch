@@ -41,7 +41,7 @@ Third Party Library | Glide
 ![img](https://lh6.googleusercontent.com/jIm6sL0mqukk0OROYyStYNsBulEFLZki-z2Y9OD73K-cpvEre-VP1wmdSC-bDpNJrGdhB4bOZbABRspBcn4FJCtJs4uQKKwWesOdThS-B75HwnCdTCqEKXAClxOimOtIu9WbabaP_Mpel6dDpLSSQVk)
 
 ### Module
-본 프로젝트는 Single-module 구조입니다.
+본 프로젝트는 `:app`, `:feature:*`, `:core:*`, `:data`, `:domain` 기반의 Multi-module 구조입니다.
 
 ## Github OAuth 로그인 구현
 

@@ -5,15 +5,27 @@ GitHub Search의 UI는 사용자에게 직관적이고 효율적인 검색 경�
 
 ---
 
+## 🔗 Core Docs Reference
+
+일반 naming, Preview suffix, 작업 범위, 검증, 최종 보고 형식은 core docs를 source of truth로 둡니다. 이 문서는 GithubSearch의 Compose/UI 특화 규칙만 보존합니다.
+
+* **Kotlin/Android UI Convention**: `docs/ai/android-coding-conventions.md`
+* **State / Flow Detail**: `docs/ai/DATA_LOGIC_GUIDELINES.md`
+* **Task Scope / Risky Change**: `docs/ai/task-scope-control.md`
+* **Verification**: `docs/ai/quality-gates.md`
+* **Final Report Format**: `docs/ai/change-report-template.md`
+
+---
+
 ## 🏗️ Compose Core Principles
 
 ### 1. Structure & Reusability
-* **Naming**: Composable은 `PascalCase`, 파라미터는 `camelCase`로 명명합니다.
+* **Naming**: 일반 Composable naming과 Preview suffix 규칙은 `docs/ai/android-coding-conventions.md`를 따릅니다.
 * **Modifier First**: `modifier: Modifier = Modifier`를 첫 번째 선택 파라미터로 배치하여 레이아웃 조정의 유연성을 확보합니다.
 * **Separation**: 단일 Composable 함수가 100줄을 초과할 경우, 논리적 단위(Header, Content, Footer 등)로 분리하여 컴포넌트화합니다.
 
 ### 2. State & Lifecycle
-* **State Hoisting**: UI 상태는 ViewModel에서 관리하는 단일 `UiState`를 구독하여 처리하며, UI는 무상태(Stateless)를 지향합니다.
+* **State Hoisting**: UI 상태는 ViewModel에서 관리하는 단일 `UiState`를 구독하여 처리하며, 하위 Composable은 무상태(Stateless)를 지향하고 UI event를 상위로 올립니다.
 * **Stability & Reusability**:
     - **No ViewModel in Sub-Composables**: Screen 하위의 서브 컴포저블에는 **ViewModel을 직접 전달하지 않습니다.**
     - **Stable Parameter Only**: 하위 컴포저블은 원시 타입, `@Stable`한 도메인 모델, 또는 상태 변경을 위한 람다(`() -> Unit`)만을 파라미터로 받도록 설계하여 불필요한 리컴포지션을 방지합니다.
