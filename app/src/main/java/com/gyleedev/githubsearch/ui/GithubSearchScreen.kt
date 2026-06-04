@@ -55,6 +55,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 import com.gyleedev.githubsearch.R
 import com.gyleedev.githubsearch.core.designsystem.LocalAnimatedVisibilityScope
 import com.gyleedev.githubsearch.core.designsystem.LocalSharedTransitionScope
@@ -66,7 +67,6 @@ import com.gyleedev.githubsearch.feature.home.HomeScreen
 import com.gyleedev.githubsearch.feature.setting.SettingScreen
 import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
-import com.gyleedev.githubsearch.BuildConfig as AppBuildConfig
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
