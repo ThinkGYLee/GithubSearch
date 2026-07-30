@@ -23,6 +23,11 @@ Change Report:
   - Command: <command or not run>
   - Result: <passed / failed / not run>
   - Notes: <short explanation>
+- Evidence & Retrospective:
+  - Related documents / code: <paths or ids>
+  - Instruction coverage: <fulfilled / partial / not fulfilled>
+  - Skills evaluated: <skill and outcome>
+  - Improvement candidate: <none or add / update / merge / deprecate / delete>
 - Risks:
   - <remaining risks or "None identified">
 - Follow-up:
@@ -32,21 +37,7 @@ Suggested Commit Message:
 - Full Message Line: `<Type>(Scope) : Subject`
 - Type: <Feat / Fix / Design / Refactor / Docs / Test / Chore / Rename>
 - Scope: <short change area>
-- Subject: <short imperative summary>
-- Body:
-  - <why changed>
-  - <what changed>
-  - <verification>
-```
-
-## Suggested Commit Message
-
-```text
-Suggested Commit Message:
-- Full Message Line: `<Type>(Scope) : Subject`
-- Type: <Feat / Fix / Design / Refactor / Docs / Test / Chore / Rename>
-- Scope: <short change area>
-- Subject: <short imperative summary>
+- Subject: <short Korean change summary>
 - Body:
   - <why changed>
   - <what changed>
@@ -81,6 +72,6 @@ Commit convention의 source of truth는 `docs/ai/android-coding-conventions.md`�
 - Format: `<Type>(Scope) : Subject`
 - Type: `Feat`, `Fix`, `Design`, `Refactor`, `Docs`, `Test`, `Chore`, `Rename`
 - Scope는 변경 영역을 짧게 나타낸다.
-- Subject는 영어 명령형으로 작성하고 50자 이내로 유지한다.
+- Subject는 한국어 변경 요약으로 작성하고 50자 이내로 유지한다. 코드 식별자처럼 번역이 부정확한 용어만 영어를 사용한다.
 - Subject 끝에 마침표를 붙이지 않는다.
 - Body는 선택이며, 작성 시 한국어로 변경 이유와 핵심 내용을 설명한다.

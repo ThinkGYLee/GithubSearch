@@ -11,6 +11,7 @@
 - Room schema, navigation route, public API, Gradle dependency, DI graph 변경은 subagent 결과만으로 바로 적용하지 않고 주 작업자가 별도 위험 변경으로 보고한다.
 - 최종 응답과 검증 보고는 항상 `docs/ai/change-report-template.md`와 `docs/ai/quality-gates.md`를 따른다.
 - 테스트 전략 판단은 `test-strategy-reviewer`가 우선 담당하며, 다른 subagent는 자기 영역의 구조적 위험만 보고한다.
+- 주 작업자는 `knowledge-operations.md`에 따라 근거·작업 이력·최종 보고를 책임지며, subagent는 그 책임을 대체하지 않는다.
 
 ## Subagent 1: `compose-ui-reviewer`
 

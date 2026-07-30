@@ -1,0 +1,239 @@
+schema_version = 1
+
+[[document]]
+id = "root-agents"
+path = "AGENTS.md"
+kind = "instruction"
+authority = "primary"
+code_paths = ["app", "domain", "data", "feature", "core", "build-logic"]
+
+[[document]]
+id = "architecture"
+path = "docs/ARCHITECTURE.md"
+kind = "architecture"
+authority = "auxiliary"
+code_paths = ["app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "convention"
+path = "docs/CONVENTION.md"
+kind = "policy"
+authority = "auxiliary"
+code_paths = ["app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "identity"
+path = "docs/IDENTITY.md"
+kind = "reference"
+authority = "auxiliary"
+code_paths = ["docs"]
+
+[[document]]
+id = "ai-coding-guidelines"
+path = "docs/ai/CODING_GUIDELINES.md"
+kind = "policy"
+authority = "auxiliary"
+code_paths = ["app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "data-logic"
+path = "docs/ai/DATA_LOGIC_GUIDELINES.md"
+kind = "architecture"
+authority = "primary"
+code_paths = ["domain", "data", "feature", "core"]
+
+[[document]]
+id = "gemini-adapter"
+path = "docs/ai/GEMINI.md"
+kind = "instruction"
+authority = "auxiliary"
+code_paths = ["docs/ai"]
+
+[[document]]
+id = "ai-readme"
+path = "docs/ai/README.md"
+kind = "index"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex/agents", "docs/ai"]
+
+[[document]]
+id = "skills-catalog"
+path = "docs/ai/SKILLS_CATALOG.md"
+kind = "index"
+authority = "primary"
+code_paths = [".codex/skills", "docs/ai/registry"]
+
+[[document]]
+id = "ui-guidelines"
+path = "docs/ai/UI_GUIDELINES.md"
+kind = "architecture"
+authority = "primary"
+code_paths = ["app", "feature", "core"]
+
+[[document]]
+id = "coding-conventions"
+path = "docs/ai/android-coding-conventions.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["app", "domain", "data", "feature", "core", "build-logic"]
+
+[[document]]
+id = "change-report"
+path = "docs/ai/change-report-template.md"
+kind = "template"
+authority = "primary"
+code_paths = ["AGENTS.md", "docs/history", "scripts/ai"]
+
+[[document]]
+id = "knowledge-operations"
+path = "docs/ai/knowledge-operations.md"
+kind = "workflow"
+authority = "primary"
+code_paths = ["docs", "scripts/ai", ".codex/agents"]
+
+[[document]]
+id = "quality-gates"
+path = "docs/ai/quality-gates.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["build.gradle.kts", ".github", "scripts/ai"]
+
+[[document]]
+id = "reporting-system-migration-plan"
+path = "docs/ai/reporting-system-migration-plan.md"
+kind = "roadmap"
+authority = "primary"
+code_paths = ["docs", "scripts/ai", ".codex"]
+
+[[document]]
+id = "subagents"
+path = "docs/ai/subagents.md"
+kind = "index"
+authority = "primary"
+code_paths = [".codex/agents", "docs/ai"]
+
+[[document]]
+id = "task-scope"
+path = "docs/ai/task-scope-control.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["app", "domain", "data", "feature", "core", "build-logic"]
+
+[[document]]
+id = "template-sync-policy"
+path = "docs/ai/template-sync-policy.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["docs", ".codex"]
+
+[[document]]
+id = "workflows"
+path = "docs/ai/workflows.md"
+kind = "workflow"
+authority = "primary"
+code_paths = ["docs", "scripts/ai", ".codex"]
+
+[[document]]
+id = "design-guide"
+path = "docs/design/DESIGN_GUIDE.md"
+kind = "architecture"
+authority = "auxiliary"
+code_paths = ["app", "feature", "core"]
+
+[[document]]
+id = "project-guide"
+path = "docs/build/PROJECT_GUIDE.md"
+kind = "architecture"
+authority = "primary"
+code_paths = ["settings.gradle.kts", "build-logic", "app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "style-guide"
+path = "docs/build/STYLE_GUIDE.md"
+kind = "policy"
+authority = "auxiliary"
+code_paths = ["app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "liquid-navigation-guide"
+path = "docs/design/LIQUID_NAVIGATION_GUIDE.md"
+kind = "architecture"
+authority = "auxiliary"
+code_paths = ["app", "core", "feature"]
+
+[[document]]
+id = "multi-module-migration-template"
+path = "docs/multi-module-migration-template.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["settings.gradle.kts", "build-logic", "app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "jacoco-setup-plan"
+path = "docs/plan/JACOCO_SETUP_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["build.gradle.kts", "app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "multi-module-refactoring-plan"
+path = "docs/plan/MULTI_MODULE_REFACTORING_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["settings.gradle.kts", "build-logic", "app", "domain", "data", "feature", "core"]
+
+[[document]]
+id = "type-safe-navigation-plan"
+path = "docs/plan/TYPE_SAFE_NAVIGATION_MIGRATION_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["app", "feature"]
+
+[[document]]
+id = "unit-test-improvement-plan"
+path = "docs/plan/UNIT_TEST_IMPROVEMENT_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["domain", "data", "feature", "core/testing"]
+
+[[document]]
+id = "screenshot-test-plan"
+path = "docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md"
+kind = "roadmap"
+authority = "primary"
+code_paths = ["gradle", "feature/setting", "core/designsystem", ".github"]
+
+[[document]]
+id = "testing-guide"
+path = "docs/testing/TESTING_GUIDE.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["domain", "data", "feature", "core/testing"]
+
+[[document]]
+id = "development-flow"
+path = "docs/workflow/DEVELOPMENT_FLOW.md"
+kind = "workflow"
+authority = "auxiliary"
+code_paths = [".github", "AGENTS.md"]
+
+[[document]]
+id = "history-readme"
+path = "docs/history/README.md"
+kind = "workflow"
+authority = "primary"
+code_paths = ["docs/history", "scripts/ai"]
+
+[[document]]
+id = "knowledge-readme"
+path = "docs/knowledge/README.md"
+kind = "index"
+authority = "primary"
+code_paths = ["docs/ai/registry", "docs"]
+
+[[document]]
+id = "knowledge-index"
+path = "docs/knowledge/INDEX.md"
+kind = "index"
+authority = "generated"
+code_paths = ["docs/ai/registry", "scripts/ai"]

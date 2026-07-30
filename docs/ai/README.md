@@ -37,6 +37,9 @@
 - `change-report-template.md`: 최종 응답, 커밋 메시지, PR 설명 재사용 형식.
 - `template-sync-policy.md`: skill template과 project docs 간 sync 정책.
 - `subagents.md`: GithubSearch에서 단계적으로 사용할 Codex subagent 4개 역할과 운영 규칙 초안.
+- `reporting-system-migration-plan.md`: SmartTimer식 보고·작업 이력·지식 운영 체계의 GithubSearch 이식 범위와 phase별 exit gate.
+- `knowledge-operations.md`: 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고 규칙.
+- `SKILLS_CATALOG.md`: project skill의 trigger와 경계.
 
 ## Preserved Custom Docs
 

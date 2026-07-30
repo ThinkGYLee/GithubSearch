@@ -67,7 +67,9 @@ Screenshot test 도입 후의 module별 `updateDebugScreenshotTest`·`validateDe
 
 사용자의 자연어 요청이 workflow trigger examples와 비슷하면 `docs/ai/workflows.md`의 대응 workflow를 적용한다. workflow 이름은 Codex CLI의 내장 명령이 아니다.
 
-최종 응답 형식은 `docs/ai/change-report-template.md`, 검증 판단은 `docs/ai/quality-gates.md`, 작업 범위 판단은 `docs/ai/task-scope-control.md`를 따른다.
+최종 응답 형식은 `docs/ai/change-report-template.md`, 검증 판단은 `docs/ai/quality-gates.md`, 작업 범위 판단은 `docs/ai/task-scope-control.md`를 따른다. Medium·Large·Risky Change와 policy·skill·agent 변경은 관련 근거와 회고를 Change Report에 포함하고 `docs/history/` 작업 이력에도 기록한다.
+
+문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고의 정본은 `docs/ai/knowledge-operations.md`와 `docs/knowledge/INDEX.md`다.
 
 ## Coding Conventions
 

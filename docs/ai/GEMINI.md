@@ -10,6 +10,7 @@ Codex/agent 작업 기준 source of truth는 root `AGENTS.md`와 `docs/ai/*` cor
 - Task scope / risky change: `docs/ai/task-scope-control.md`
 - Coding and commit convention: `docs/ai/android-coding-conventions.md`
 - Final response and commit message format: `docs/ai/change-report-template.md`
+- Evidence, history, and retrospective: `docs/ai/knowledge-operations.md`, `docs/history/README.md`
 
 ---
 

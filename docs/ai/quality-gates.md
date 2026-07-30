@@ -14,6 +14,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 - 문서만 수정한 경우 Gradle 검증은 필요 없다고 보고한다.
 - 실패한 검증이 있으면 실패 사실과 남은 리스크를 숨기지 않는다.
 - 기존 작업트리에 사용자 변경이 있으면 그 변경을 건드리지 않았는지 `git status --short`로 확인한다.
+- 문서·project skill·custom agent·작업 이력 변경은 `python3 scripts/ai/generate_knowledge_index.py --check`와 `python3 scripts/ai/verify_knowledge_graph.py`를 실행한다.
 
 ## 변경 유형별 기본 선택
 
@@ -28,6 +29,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 - Room / DB 변경: migration 영향 분석을 먼저 수행한다.
 - Gradle / build-logic 변경: `./gradlew assembleDebug` 또는 CI full command를 고려한다.
 - 문서-only 변경: Gradle 검증은 실행하지 않아도 되며 `rg`, `git diff`, `git status` 등으로 확인한다.
+- 문서·project skill·custom agent·작업 이력 변경: knowledge index와 graph 검증을 실행한다. Gradle 검증은 생략할 수 있으나 사유를 보고한다.
 
 ## CI Reference
 

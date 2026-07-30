@@ -52,7 +52,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 
 - Format: `<Type>(Scope) : Subject`
 - Type: `Feat`, `Fix`, `Design`, `Refactor`, `Docs`, `Test`, `Chore`, `Rename`
-- Subject는 영어 명령형으로 작성한다.
+- Subject는 한국어 변경 요약으로 작성한다. 코드 식별자처럼 번역이 부정확한 용어만 영어를 사용한다.
 - Subject는 50자 이내로 작성한다.
 - Subject 끝에 마침표를 붙이지 않는다.
 - Body는 선택이며, 작성 시 한국어로 변경 이유와 핵심 내용을 설명한다.
