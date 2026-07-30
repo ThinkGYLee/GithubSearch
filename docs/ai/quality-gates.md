@@ -16,6 +16,18 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 - 기존 작업트리에 사용자 변경이 있으면 그 변경을 건드리지 않았는지 `git status --short`로 확인한다.
 - 문서·project skill·custom agent·작업 이력 변경은 `python3 scripts/ai/generate_knowledge_index.py --check`와 `python3 scripts/ai/verify_knowledge_graph.py`를 실행한다.
 
+## Knowledge Verification Hook
+
+문서·skill·agent·registry·지식 검증 스크립트의 staged 변경은 version-controlled `.githooks/pre-commit`이 generator 최신성과 graph 관계를 확인한다. hook은 파일·Git index·설정을 수정하지 않으며, 무관한 staged 변경은 즉시 통과한다.
+
+원하는 개발자는 repository-local hook을 다음 한 번의 명령으로 설치할 수 있다. 이 명령은 현재 repository의 Git 설정만 바꾸며 전역 설정은 바꾸지 않는다.
+
+```bash
+git config --local core.hooksPath .githooks
+```
+
+hook이 stale generated Index 또는 관계 오류로 실패하면 `python3 scripts/ai/generate_knowledge_index.py`를 실행하고 생성된 `docs/knowledge/INDEX.md`를 검토·stage한 뒤 다시 커밋한다. `--no-verify`로 hook을 우회할 수 있으므로 PR의 `Knowledge verification` CI가 최종 보호막이다.
+
 ## 변경 유형별 기본 선택
 
 - Kotlin/Android 코드 수정 공통: Spotless가 설정되어 있으면 `./gradlew spotlessApply`를 우선 고려한다.
@@ -33,7 +45,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 
 ## CI Reference
 
-현재 `.github/workflows/build.yml`은 Markdown과 `docs/**`만 변경된 경우 CI build를 건너뛴다. 코드 변경으로 판단되면 다음 명령을 실행한다.
+현재 `.github/workflows/build.yml`은 Markdown과 `docs/**`만 변경된 경우 CI build를 건너뛴다. `.github/workflows/knowledge.yml`은 문서·skill·agent·registry·검증 스크립트 변경에서 generator와 graph verifier만 실행하는 별도 최소 권한 workflow다. 코드 변경으로 판단되면 build workflow는 다음 명령을 실행한다.
 
 ```bash
 ./gradlew spotlessCheck lintDebug assembleDebug assembleDebugAndroidTest testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand

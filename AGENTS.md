@@ -71,6 +71,8 @@ Screenshot test 도입 후의 module별 `updateDebugScreenshotTest`·`validateDe
 
 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고의 정본은 `docs/ai/knowledge-operations.md`와 `docs/knowledge/INDEX.md`다.
 
+단순 질의와 짧은 상태 응답을 제외한 모든 project 작업은 시작 시 `project-knowledge-grounding`을 적용한다. 파일을 수정하는 모든 project 작업은 종료 전에 `session-retrospective`를 적용해 작업 이력, generated Index, 지식 관계 검증과 Change Report를 함께 점검한다.
+
 ## Coding Conventions
 
 Kotlin/Android 코드 작성 규칙의 source of truth는 `docs/ai/android-coding-conventions.md`다. 기존 프로젝트 custom docs도 함께 보존한다.

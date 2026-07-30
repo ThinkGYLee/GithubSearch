@@ -5,7 +5,7 @@ description: GithubSearch의 분석, 구현, 리뷰, 문서 작업 전에 관련
 
 # Project Knowledge Grounding
 
-작업 시작 전에 `AGENTS.md`, `docs/ai/workflows.md`, `docs/ai/knowledge-operations.md`를 읽고 `docs/knowledge/INDEX.md`와 registry에서 요청에 맞는 최소 문서·코드 경로를 선택한다.
+단순 질의와 짧은 상태 응답을 제외한 모든 project 작업의 시작 전에 `AGENTS.md`, `docs/ai/workflows.md`, `docs/ai/knowledge-operations.md`를 읽고 `docs/knowledge/INDEX.md`와 registry에서 요청에 맞는 최소 문서·코드 경로를 선택한다.
 
 1. 사용자 요구사항, 제약, 현재 커밋을 확인한다.
 2. 선택한 문서와 현재 코드·테스트·설정을 함께 읽는다.

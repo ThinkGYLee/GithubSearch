@@ -5,6 +5,8 @@
 > **Scope:** SmartTimer의 근거 기반 Change Report, 영속 작업 이력, 지식 registry, 검증 스크립트, 시작·종료 skill을 GithubSearch의 기존 AI 문서와 4개 review-first agent에 맞게 이식한다.
 > **Source of truth:** 이 문서는 이식 범위와 순서를 정의한다. 실제 운영 규칙은 완료한 phase에서 지정하는 `docs/ai/*` 정본 문서로 이동한다.
 
+> **Follow-up:** 이식 후 확인된 local document, verifier 범위, hook·CI 강제의 보강은 [지식 운영 강제 체계 보강 명세](knowledge-governance-enforcement-plan.md)에서 별도로 관리한다.
+
 ## 목적
 
 GithubSearch의 기능·정책·문서 업데이트가 이어질 때, 최종 응답만으로는 이전 결정의 근거와 검증을 재사용하기 어렵다. 이 체계는 다음 연결을 보장한다.

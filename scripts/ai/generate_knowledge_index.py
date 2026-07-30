@@ -11,7 +11,8 @@ from registry import load
 
 
 def render(root: Path) -> str:
-    documents = load(root / "docs/ai/registry/documents.toml")["document"]
+    # `local_document` entries deliberately stay outside the shared index.
+    documents = load(root / "docs/ai/registry/documents.toml").get("document", [])
     groups: dict[str, list[dict[str, object]]] = defaultdict(list)
     for document in documents:
         groups[str(document["kind"])].append(document)

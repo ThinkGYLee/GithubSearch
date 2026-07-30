@@ -32,6 +32,8 @@ Medium·Large·Risky Change, policy·skill·agent 변경은 `docs/history/README
 
 생성물은 직접 고치지 않는다. registry를 수정한 뒤 index generator로 재생성하고 graph verifier로 관계를 확인한다.
 
+`documents.toml`의 `[[local_document]]`는 개인 보조 문서의 경로와 목적만 기록한다. local document는 공유 정본이 아니므로 generated Index, project skill·agent 입력, 공통 history `related_documents`, 공통 Markdown link 검증에서 제외한다. 파일이 없는 clean checkout과 CI에서도 오류가 아니며, local document의 내용·Git 추적 상태는 이 체계가 변경하지 않는다.
+
 ## 세션 회고와 개선 권한
 
 파일 수정 작업의 종료에는 지시 이행, 근거, 변경, 검증, 사용 skill·agent, 개선 후보를 비교한다.

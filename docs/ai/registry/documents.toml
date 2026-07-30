@@ -106,6 +106,20 @@ authority = "primary"
 code_paths = ["docs", "scripts/ai", ".codex"]
 
 [[document]]
+id = "knowledge-governance-enforcement-plan"
+path = "docs/ai/knowledge-governance-enforcement-plan.md"
+kind = "roadmap"
+authority = "primary"
+code_paths = ["docs", "scripts/ai", ".codex", ".github"]
+
+[[document]]
+id = "knowledge-governance-enforcement-prompt"
+path = "docs/ai/knowledge-governance-enforcement-prompt.md"
+kind = "template"
+authority = "primary"
+code_paths = ["docs", "scripts/ai", ".codex", ".github"]
+
+[[document]]
 id = "subagents"
 path = "docs/ai/subagents.md"
 kind = "index"
@@ -161,12 +175,10 @@ kind = "architecture"
 authority = "auxiliary"
 code_paths = ["app", "core", "feature"]
 
-[[document]]
+[[local_document]]
 id = "multi-module-migration-template"
 path = "docs/multi-module-migration-template.md"
-kind = "roadmap"
-authority = "auxiliary"
-code_paths = ["settings.gradle.kts", "build-logic", "app", "domain", "data", "feature", "core"]
+purpose = "사용자 local 멀티 모듈 마이그레이션 초안. 공유 정본·생성 Index·공통 작업 이력 참조에서는 제외한다."
 
 [[document]]
 id = "jacoco-setup-plan"

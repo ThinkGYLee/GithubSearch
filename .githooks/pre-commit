@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+# GithubSearch pre-commit hook: verify staged knowledge-operation changes only.
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+hook_script="$repo_root/scripts/git-hooks/run-staged-knowledge-check.sh"
+
+if [ ! -f "$hook_script" ]; then
+    exit 0
+fi
+
+exec sh "$hook_script"

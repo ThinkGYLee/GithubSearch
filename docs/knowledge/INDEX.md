@@ -56,7 +56,7 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `jacoco-setup-plan` | [docs/plan/JACOCO_SETUP_PLAN.md](../../docs/plan/JACOCO_SETUP_PLAN.md) | auxiliary | `build.gradle.kts, app, domain, data, feature, core` |
-| `multi-module-migration-template` | [docs/multi-module-migration-template.md](../../docs/multi-module-migration-template.md) | auxiliary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |
+| `knowledge-governance-enforcement-plan` | [docs/ai/knowledge-governance-enforcement-plan.md](../../docs/ai/knowledge-governance-enforcement-plan.md) | primary | `docs, scripts/ai, .codex, .github` |
 | `multi-module-refactoring-plan` | [docs/plan/MULTI_MODULE_REFACTORING_PLAN.md](../../docs/plan/MULTI_MODULE_REFACTORING_PLAN.md) | auxiliary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |
 | `reporting-system-migration-plan` | [docs/ai/reporting-system-migration-plan.md](../../docs/ai/reporting-system-migration-plan.md) | primary | `docs, scripts/ai, .codex` |
 | `screenshot-test-plan` | [docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md](../../docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md) | primary | `gradle, feature/setting, core/designsystem, .github` |
@@ -68,6 +68,7 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `change-report` | [docs/ai/change-report-template.md](../../docs/ai/change-report-template.md) | primary | `AGENTS.md, docs/history, scripts/ai` |
+| `knowledge-governance-enforcement-prompt` | [docs/ai/knowledge-governance-enforcement-prompt.md](../../docs/ai/knowledge-governance-enforcement-prompt.md) | primary | `docs, scripts/ai, .codex, .github` |
 
 ## workflow
 

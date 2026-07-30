@@ -20,7 +20,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 
 ## 문서·코드 근거와 작업 이력
 
-분석·구현·리뷰·문서 작업은 `knowledge-operations.md`에 따라 관련 문서와 코드·테스트·설정을 함께 확인한다. Medium·Large·Risky Change와 policy·skill·agent 변경은 작업 시작 시 history record를 만들고, 종료 시 지시 이행·검증·개선 후보를 갱신한다.
+단순 질의와 짧은 상태 응답을 제외한 모든 project 작업은 시작 시 `project-knowledge-grounding`을 적용해 `knowledge-operations.md`의 관련 문서와 코드·테스트·설정을 함께 확인한다. 파일을 수정하는 모든 project 작업은 종료 전에 `session-retrospective`를 적용한다. Medium·Large·Risky Change와 policy·skill·agent 변경은 작업 시작 시 history record를 만들고, 종료 시 지시 이행·검증·개선 후보를 갱신한다.
 
 근거가 불충분하거나 문서와 코드가 충돌하면 추측으로 결론을 내리거나 수정하지 않는다. 추가 조사 또는 `insufficient context` 보고를 선택한다.
 

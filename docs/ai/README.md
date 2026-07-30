@@ -38,6 +38,8 @@
 - `template-sync-policy.md`: skill template과 project docs 간 sync 정책.
 - `subagents.md`: GithubSearch에서 단계적으로 사용할 Codex subagent 4개 역할과 운영 규칙 초안.
 - `reporting-system-migration-plan.md`: SmartTimer식 보고·작업 이력·지식 운영 체계의 GithubSearch 이식 범위와 phase별 exit gate.
+- `knowledge-governance-enforcement-plan.md`: local document 분리, graph verifier 확대, AI 절차·hook·별도 CI 강제의 후속 실행 명세.
+- `knowledge-governance-enforcement-prompt.md`: 위 실행 명세를 구현할 때 사용하는 제약 포함 실행 프롬프트.
 - `knowledge-operations.md`: 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고 규칙.
 - `SKILLS_CATALOG.md`: project skill의 trigger와 경계.
 
