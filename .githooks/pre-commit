@@ -1,12 +1,17 @@
 #!/usr/bin/env sh
-# GithubSearch pre-commit hook: verify staged knowledge-operation changes only.
+# GithubSearch pre-commit hook: run narrow staged-change guards.
 set -eu
 
 repo_root=$(git rev-parse --show-toplevel)
-hook_script="$repo_root/scripts/git-hooks/run-staged-knowledge-check.sh"
 
-if [ ! -f "$hook_script" ]; then
-    exit 0
-fi
+run_guard() {
+    guard_script="$repo_root/scripts/git-hooks/$1"
+    if [ -f "$guard_script" ]; then
+        sh "$guard_script"
+    fi
+}
 
-exec sh "$hook_script"
+# Each guard decides whether the staged paths are relevant and otherwise exits
+# successfully. Missing guards keep older branches and worktrees usable.
+run_guard "run-staged-knowledge-check.sh"
+run_guard "run-staged-resource-lint.sh"

@@ -16,9 +16,12 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 - 기존 작업트리에 사용자 변경이 있으면 그 변경을 건드리지 않았는지 `git status --short`로 확인한다.
 - 문서·project skill·custom agent·작업 이력 변경은 `python3 scripts/ai/generate_knowledge_index.py --check`와 `python3 scripts/ai/verify_knowledge_graph.py`를 실행한다.
 
-## Knowledge Verification Hook
+## Pre-commit Hook
 
-문서·skill·agent·registry·지식 검증 스크립트의 staged 변경은 version-controlled `.githooks/pre-commit`이 generator 최신성과 graph 관계를 확인한다. hook은 파일·Git index·설정을 수정하지 않으며, 무관한 staged 변경은 즉시 통과한다.
+version-controlled `.githooks/pre-commit`은 staged 경로를 자체 판단하는 여러 좁은 guard의 단일 진입점이다. hook은 파일·Git index·설정을 수정하지 않으며, 모든 guard에 무관한 staged 변경은 즉시 통과한다.
+
+- 문서·skill·agent·registry·지식 검증 스크립트 변경은 `run-staged-knowledge-check.sh`가 generator 최신성과 graph 관계를 확인한다.
+- `*/src/main/res/values*/*.xml` 변경은 `run-staged-resource-lint.sh`가 해당 Gradle module의 `lintDebug`를 실행한다. `feature/home/...`은 `:feature:home:lintDebug`로 변환하므로 중첩 module도 지원한다.
 
 원하는 개발자는 repository-local hook을 다음 한 번의 명령으로 설치할 수 있다. 이 명령은 현재 repository의 Git 설정만 바꾸며 전역 설정은 바꾸지 않는다.
 
@@ -26,7 +29,7 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 git config --local core.hooksPath .githooks
 ```
 
-hook이 stale generated Index 또는 관계 오류로 실패하면 `python3 scripts/ai/generate_knowledge_index.py`를 실행하고 생성된 `docs/knowledge/INDEX.md`를 검토·stage한 뒤 다시 커밋한다. `--no-verify`로 hook을 우회할 수 있으므로 PR의 `Knowledge verification` CI가 최종 보호막이다.
+hook은 Gradle이 working tree를 읽기 때문에 values 리소스를 수정한 경우 관련 변경을 모두 stage한 상태에서 커밋한다. 번역 lint가 실패하면 해당 module의 lint 결과를 수정하고 다시 stage한다. stale generated Index 또는 관계 오류는 `python3 scripts/ai/generate_knowledge_index.py` 실행 뒤 생성된 `docs/knowledge/INDEX.md`를 검토·stage해 해결한다. `--no-verify`로 hook을 우회할 수 있으므로 CI가 최종 보호막이다.
 
 ## 변경 유형별 기본 선택
 

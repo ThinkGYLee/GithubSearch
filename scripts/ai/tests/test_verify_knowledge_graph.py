@@ -302,9 +302,13 @@ skills_used: [test-skill]
     def test_hook_skips_unrelated_changes_and_checks_relevant_changes(self) -> None:
         root = self.make_root()
         self.write(root / "docs/knowledge/INDEX.md", render(root))
-        hook = root / "scripts/git-hooks/run-staged-knowledge-check.sh"
+        hook = root / ".githooks/pre-commit"
         hook.parent.mkdir(parents=True)
-        copy2(PROJECT_ROOT / "scripts/git-hooks/run-staged-knowledge-check.sh", hook)
+        copy2(PROJECT_ROOT / ".githooks/pre-commit", hook)
+        for name in ("run-staged-knowledge-check.sh", "run-staged-resource-lint.sh"):
+            target = root / "scripts/git-hooks" / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            copy2(PROJECT_ROOT / "scripts/git-hooks" / name, target)
         for name in ("registry.py", "generate_knowledge_index.py", "verify_knowledge_graph.py"):
             target = root / "scripts/ai" / name
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -328,3 +332,33 @@ skills_used: [test-skill]
         stale_index = subprocess.run(["sh", str(hook)], cwd=root, text=True, capture_output=True, check=False)
         self.assertNotEqual(0, stale_index.returncode)
         self.assertIn("Knowledge index is stale.", stale_index.stdout)
+
+    def test_resource_lint_hook_skips_unrelated_paths_and_supports_nested_modules(self) -> None:
+        root = self.make_root()
+        resource_hook = root / ".githooks/pre-commit"
+        resource_hook.parent.mkdir(parents=True)
+        copy2(PROJECT_ROOT / ".githooks/pre-commit", resource_hook)
+        target = root / "scripts/git-hooks/run-staged-resource-lint.sh"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        copy2(PROJECT_ROOT / "scripts/git-hooks/run-staged-resource-lint.sh", target)
+        self.write(root / "gradlew", '#!/usr/bin/env sh\nprintf "%s\\n" "$@" >> .gradle-arguments\n')
+        (root / "gradlew").chmod(0o755)
+        self.write(root / "README.txt", "unrelated\n")
+        subprocess.run(["git", "add", "README.txt"], cwd=root, check=True)
+
+        unrelated = subprocess.run(["sh", str(resource_hook)], cwd=root, text=True, capture_output=True, check=False)
+        self.assertEqual(0, unrelated.returncode, unrelated.stderr)
+        self.assertFalse((root / ".gradle-arguments").exists())
+
+        self.write(root / "app/src/main/res/values/strings.xml", '<resources />\n')
+        self.write(root / "feature/home/src/main/res/values-ko/strings.xml", '<resources />\n')
+        subprocess.run(
+            ["git", "add", "app/src/main/res/values/strings.xml", "feature/home/src/main/res/values-ko/strings.xml"],
+            cwd=root,
+            check=True,
+        )
+
+        relevant = subprocess.run(["sh", str(resource_hook)], cwd=root, text=True, capture_output=True, check=False)
+        self.assertEqual(0, relevant.returncode, relevant.stderr)
+        self.assertIn("staged values resources detected", relevant.stdout)
+        self.assertEqual(":app:lintDebug\n:feature:home:lintDebug\n", (root / ".gradle-arguments").read_text())

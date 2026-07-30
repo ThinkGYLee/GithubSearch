@@ -35,7 +35,7 @@ hook과 CI는 파일을 자동 수정하거나 자동 stage하지 않는다. 실
 | 문서 registry | 등록 문서는 모두 공유·추적된 파일이라는 전제이며, 없으면 오류 | 개인 문서는 `local_document`로 별도 분류한다. 공유 정본과 생성 Index에서는 제외한다. |
 | graph verifier | ID 중복, skill frontmatter·Catalog, agent 형식, history의 skill·코드 참조까지 확인 | 검증 범위를 같은 수준으로 확대하되 GithubSearch registry 구조와 경로만 사용한다. |
 | AI workflow | 시작 grounding·종료 retrospective skill을 모든 작업 흐름에 연결 | 이미 도입한 두 skill을 AI 문서와 루트 지시에서 명시적으로 필수화한다. |
-| pre-commit hook | 개인 PC의 shared hook 경로에서 번역 XML 변경만 빠르게 lint | 저장소 안의 version-controlled hook으로 문서 관계 최신성만 확인한다. 개인 절대 경로는 사용하지 않는다. |
+| pre-commit hook | 개인 PC의 shared hook 경로에서 번역 XML 변경만 빠르게 lint | 저장소 안의 단일 dispatcher가 문서 관계 최신성과 staged 번역 XML의 영향을 받은 module lint를 순서대로 확인한다. 개인 절대 경로는 사용하지 않는다. |
 | PR CI | Android build와 screenshot 검증만 수행하며 지식 관계 검증은 없음 | 비밀값·배포 권한이 없는 별도 `knowledge` workflow를 추가한다. |
 
 SmartTimer의 원칙은 가져오되 구현을 복사하지 않는다. 특히 SmartTimer의 `core.hooksPath`는 개인 PC 절대 경로를 사용하므로 GithubSearch의 공통 설치 방식으로 적합하지 않다.
@@ -99,10 +99,10 @@ SmartTimer의 원칙은 가져오되 구현을 복사하지 않는다. 특히 Sm
 
 로컬 hook은 다음 설계로 추가한다.
 
-- 경로: `.githooks/pre-commit`, 실제 검사: `scripts/git-hooks/run-staged-knowledge-check.sh`.
-- 적용 경로: `AGENTS.md`, `docs/**/*.md`, `docs/ai/registry/**/*.toml`, `.codex/skills/**`, `.codex/agents/**`, `scripts/ai/**`.
+- 경로: `.githooks/pre-commit`, 실제 검사: `scripts/git-hooks/run-staged-knowledge-check.sh`, `scripts/git-hooks/run-staged-resource-lint.sh`.
+- 적용 경로: `AGENTS.md`, `docs/**/*.md`, `docs/ai/registry/**/*.toml`, `.codex/skills/**`, `.codex/agents/**`, `scripts/ai/**`, `*/src/main/res/values*/*.xml`.
 - 해당 staged 변경이 없으면 즉시 성공한다.
-- 해당 변경이 있으면 repository root에서 `generate_knowledge_index.py --check`와 `verify_knowledge_graph.py`만 실행한다.
+- 지식 변경이 있으면 repository root에서 `generate_knowledge_index.py --check`와 `verify_knowledge_graph.py`를, values resource 변경이 있으면 중첩 경로까지 실제 Gradle module 경로로 변환한 `:<module>:lintDebug`를 실행한다.
 - working tree, index, Git 설정을 수정하지 않는다. `--no-verify`는 기술적으로 가능하므로 CI가 최종 보호막이다.
 - 설치는 version-controlled `.githooks`를 가리키는 repository-local `core.hooksPath` 설정 방법만 문서화한다. 설치 여부와 Git 전역 설정 변경은 사용자가 결정한다.
 
@@ -138,7 +138,7 @@ SmartTimer의 원칙은 가져오되 구현을 복사하지 않는다. 특히 Sm
 
 **Exit gate:** 현재 repository는 0 error, 의도적으로 잘못 만든 fixture는 해당 오류를 낸다.
 
-**실행 결과:** [x] registry ID·경로, shared Markdown link, skill frontmatter·Catalog, agent TOML, history metadata·참조를 검사하도록 확대했다. 정상 fixture와 9개 실패/동작 fixture를 포함한 10개 unittest가 통과했다.
+**실행 결과:** [x] registry ID·경로, shared Markdown link, skill frontmatter·Catalog, agent TOML, history metadata·참조를 검사하도록 확대했다. 정상 fixture와 10개 실패/동작 fixture를 포함한 11개 unittest가 통과했다.
 
 ### Phase 3 — P2 AI 절차와 hook
 
@@ -148,7 +148,7 @@ SmartTimer의 원칙은 가져오되 구현을 복사하지 않는다. 특히 Sm
 
 **Exit gate:** hook은 문서를 자동 수정하지 않고, 관련 변경에서만 정확히 실패 또는 성공한다.
 
-**실행 결과:** [x] `.githooks/pre-commit`과 staged knowledge 검사 script를 추가했다. 회귀 검증에서 무관한 staged 변경은 통과하고, 관련 변경은 통과하며, stale Index는 실패하는 것을 확인했다.
+**실행 결과:** [x] `.githooks/pre-commit`을 knowledge 검사와 staged values resource lint를 순서대로 호출하는 dispatcher로 정렬했다. 회귀 검증에서 무관한 staged 변경은 통과하고, 관련 변경은 통과하며, stale Index는 실패하고, `app`·`feature/home` resource는 각각 정확한 Gradle module lint를 호출하는 것을 확인했다.
 
 ### Phase 4 — P2 CI
 
