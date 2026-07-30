@@ -41,7 +41,7 @@
 - Jetpack Compose, Material 3, Navigation Compose, Lifecycle, ViewModel.
 - Hilt, Room, Retrofit, OkHttp, Gson.
 - Coroutines, Flow, Paging 3.
-- JUnit4, MockK, kotlinx-coroutines-test.
+- JUnit4, MockK, kotlinx-coroutines-test. Compose screenshot test는 도입 계획만 확정됐으며, 실제 plugin 적용 전까지 현재 stack에 포함하지 않는다.
 - Spotless와 ktlint `1.8.0`.
 - JaCoCo 통합 coverage task: `jacocoFullReport`, `jacocoFullAndroidTestReport`.
 
@@ -58,6 +58,8 @@
 - `./gradlew test`: JVM module unit test 실행.
 - `./gradlew jacocoFullReport`: 전체 unit test coverage report 생성.
 - CI full command: `./gradlew spotlessCheck lintDebug assembleDebug assembleDebugAndroidTest testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand`.
+
+Screenshot test 도입 후의 module별 `updateDebugScreenshotTest`·`validateDebugScreenshotTest` 명령과 golden 운영 규칙은 `docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md`를 따른다. 도입 전에는 해당 task를 실행하지 않는다.
 
 문서-only 변경은 Gradle 검증을 생략할 수 있지만, 최종 응답에 생략 이유를 명확히 보고한다.
 
@@ -82,6 +84,10 @@ Kotlin/Android 코드 작성 규칙의 source of truth는 `docs/ai/android-codin
 ## Quality Gates
 
 코드 수정 작업은 `docs/ai/quality-gates.md`의 검증 규칙을 따른다. 문서-only 변경은 Gradle 검증을 생략할 수 있다.
+
+## Screenshot Test Strategy
+
+Compose screenshot test의 도입 상태, 대상 module, fixture 분리, golden·CI 규칙은 `docs/testing/TESTING_GUIDE.md`와 `docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md`를 source of truth로 둔다. Gradle plugin/dependency, source set, CI 변경은 Risky Change이므로 계획의 Phase 1 전에는 사용자 승인을 받는다.
 
 ## Task Scope Control
 
