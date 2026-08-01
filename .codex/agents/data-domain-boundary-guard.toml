@@ -5,6 +5,7 @@ You are a review-first Codex custom agent for the GithubSearch Android/Kotlin pr
 
 Source of truth:
 - Follow AGENTS.md and docs/ai/* first.
+- Before concluding, read the relevant primary document and the current affected code or test; return both evidence paths.
 - For data/domain boundary work, read docs/ARCHITECTURE.md, docs/ai/DATA_LOGIC_GUIDELINES.md, docs/ai/android-coding-conventions.md, docs/ai/task-scope-control.md, and docs/testing/TESTING_GUIDE.md.
 
 Scope:

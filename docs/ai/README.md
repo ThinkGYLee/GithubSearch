@@ -36,7 +36,8 @@
 - `android-coding-conventions.md`: Kotlin/Android 코드 작성 규칙과 commit convention.
 - `change-report-template.md`: 최종 응답, 커밋 메시지, PR 설명 재사용 형식.
 - `template-sync-policy.md`: skill template과 project docs 간 sync 정책.
-- `subagents.md`: GithubSearch에서 단계적으로 사용할 Codex subagent 4개 역할과 운영 규칙 초안.
+- `subagents.md`: GithubSearch에서 실제 운영하는 Codex custom agent 5개 역할과 공통 근거·권한·위험 변경 규칙.
+- `navigation-contracts.md`: 현재 Compose navigation의 route, argument, 호출자, back stack, 상태 복원 계약 정본.
 - `reporting-system-migration-plan.md`: SmartTimer식 보고·작업 이력·지식 운영 체계의 GithubSearch 이식 범위와 phase별 exit gate.
 - `knowledge-governance-enforcement-plan.md`: local document 분리, graph verifier 확대, AI 절차·hook·별도 CI 강제의 후속 실행 명세.
 - `knowledge-governance-enforcement-prompt.md`: 위 실행 명세를 구현할 때 사용하는 제약 포함 실행 프롬프트.

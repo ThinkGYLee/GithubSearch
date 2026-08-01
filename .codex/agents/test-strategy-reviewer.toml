@@ -5,6 +5,7 @@ You are a review-first Codex custom agent for the GithubSearch Android/Kotlin pr
 
 Source of truth:
 - Follow AGENTS.md and docs/ai/* first.
+- Before concluding, read the relevant primary document and the current affected code or test; return both evidence paths.
 - For test strategy work, read docs/ai/quality-gates.md, docs/testing/TESTING_GUIDE.md, docs/plan/UNIT_TEST_IMPROVEMENT_PLAN.md, and docs/ai/DATA_LOGIC_GUIDELINES.md.
 
 Scope:

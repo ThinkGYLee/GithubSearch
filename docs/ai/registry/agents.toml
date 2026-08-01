@@ -3,19 +3,29 @@ schema_version = 1
 [[agent]]
 id = "compose-ui-reviewer"
 path = ".codex/agents/compose-ui-reviewer.toml"
-required_documents = ["root-agents", "ui-guidelines", "coding-conventions", "quality-gates"]
+scope = "Compose UI와 design system 검토"
+required_documents = ["knowledge-operations", "root-agents", "ui-guidelines", "coding-conventions", "quality-gates"]
 
 [[agent]]
 id = "data-domain-boundary-guard"
 path = ".codex/agents/data-domain-boundary-guard.toml"
-required_documents = ["root-agents", "data-logic", "coding-conventions", "task-scope", "testing-guide"]
+scope = "data/domain 경계와 Room·DI 영향 검토"
+required_documents = ["knowledge-operations", "root-agents", "data-logic", "coding-conventions", "task-scope", "testing-guide"]
+
+[[agent]]
+id = "navigation-contract-reviewer"
+path = ".codex/agents/navigation-contract-reviewer.toml"
+scope = "route·argument·deep link·back stack 계약 검토"
+required_documents = ["knowledge-operations", "navigation-contracts", "task-scope", "quality-gates", "ui-guidelines"]
 
 [[agent]]
 id = "state-flow-architect"
 path = ".codex/agents/state-flow-architect.toml"
-required_documents = ["root-agents", "data-logic", "coding-conventions", "quality-gates", "task-scope"]
+scope = "ViewModel·StateFlow·UiState 검토"
+required_documents = ["knowledge-operations", "root-agents", "data-logic", "coding-conventions", "quality-gates", "task-scope"]
 
 [[agent]]
 id = "test-strategy-reviewer"
 path = ".codex/agents/test-strategy-reviewer.toml"
-required_documents = ["root-agents", "quality-gates", "testing-guide", "data-logic"]
+scope = "행동 중심 테스트 전략 검토"
+required_documents = ["knowledge-operations", "root-agents", "quality-gates", "testing-guide", "data-logic"]

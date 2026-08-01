@@ -127,6 +127,13 @@ authority = "primary"
 code_paths = [".codex/agents", "docs/ai"]
 
 [[document]]
+id = "navigation-contracts"
+path = "docs/ai/navigation-contracts.md"
+kind = "architecture"
+authority = "primary"
+code_paths = ["app", "feature/detail"]
+
+[[document]]
 id = "task-scope"
 path = "docs/ai/task-scope-control.md"
 kind = "policy"

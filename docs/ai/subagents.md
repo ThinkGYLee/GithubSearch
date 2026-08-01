@@ -1,14 +1,17 @@
 # Codex Subagents
 
-이 문서는 `GithubSearch`에서 Codex subagent를 단계적으로 도입하기 위한 적용 초안이다. subagent는 독립적으로 판단을 위임하는 도구가 아니라, 주 작업자가 놓치기 쉬운 검토 축을 병렬로 확인하는 보조 역할로 사용한다.
+이 문서는 `GithubSearch`에서 실제 운영하는 Codex custom agent의 역할과 공통 계약을 정의한다. 적용된 agent와 정본 문서 연결은 `docs/ai/registry/agents.toml`과 `docs/ai/registry/documents.toml`이 source of truth다. custom agent는 독립적으로 최종 판단을 위임하는 도구가 아니라, 주 작업자가 놓치기 쉬운 검토 축을 확인하는 보조 역할로 사용한다.
 
 ## 공통 운영 규칙
 
-- 주 작업자는 요청 범위, 위험 변경 여부, 최종 적용 여부를 계속 책임진다.
+- 모든 custom agent는 review-first·기본 read-only로 동작한다. 파일 수정은 주 작업자가 명시적으로 위임한 제한된 write scope에서만 가능하다.
+- 모든 custom agent는 결론 전에 관련 primary document와 현재 영향 코드 또는 테스트를 읽고, 결과에 두 근거 경로를 모두 남긴다.
+- 주 작업자는 요청 범위, 위험 변경 여부, 최종 적용 여부, 검증, 최종 보고를 계속 책임진다.
 - subagent에는 한 번에 하나의 명확한 산출물을 요청한다.
 - subagent가 파일 수정을 맡는 경우 write scope를 명시하고, 다른 subagent와 같은 파일을 동시에 수정하지 않는다.
+- 모든 custom agent는 `git add`, `git commit`, `git push`, destructive Git operation을 실행하지 않는다.
 - `local.properties`, keystore, signing config, API key, token, password, `google-services.json` 내용은 읽거나 출력하지 않는다.
-- Room schema, navigation route, public API, Gradle dependency, DI graph 변경은 subagent 결과만으로 바로 적용하지 않고 주 작업자가 별도 위험 변경으로 보고한다.
+- navigation route, public API, module dependency, Gradle, DI graph, Room schema/migration, 대규모 리팩터링, 파일 삭제·이동·이름 변경, generated file 편집은 위험 변경으로 먼저 보고한다. subagent 결과만으로 바로 적용하지 않는다.
 - 최종 응답과 검증 보고는 항상 `docs/ai/change-report-template.md`와 `docs/ai/quality-gates.md`를 따른다.
 - 테스트 전략 판단은 `test-strategy-reviewer`가 우선 담당하며, 다른 subagent는 자기 영역의 구조적 위험만 보고한다.
 - 주 작업자는 `knowledge-operations.md`에 따라 근거·작업 이력·최종 보고를 책임지며, subagent는 그 책임을 대체하지 않는다.
@@ -151,9 +154,44 @@ Android/Kotlin 코드 변경에 필요한 테스트 전략을 리뷰하고, 기�
 - 테스트 실패를 flaky로 단정하지 않고 실패 로그, 변경 범위, 기존 테스트 구조를 근거로 판단한다.
 - 구현 세부 리팩토링보다 테스트로 확인해야 할 observable behavior를 우선 정리한다.
 
-## Initial Rollout Plan
+## Subagent 5: `navigation-contract-reviewer`
 
-1. 문서 초안 단계에서는 위 4개 역할만 사용한다.
-2. 실제 작업에서 subagent를 호출할 때는 요청 문장에 `Use compose-ui-reviewer`, `Use state-flow-architect`, `Use data-domain-boundary-guard`, `Use test-strategy-reviewer`처럼 역할명을 명시한다.
-3. 3~5회 작업 후 중복되는 지시와 빠진 guardrail을 `docs/ai/subagents.md`에 반영한다.
-4. 안정화되면 repository 전용 `.codex` 또는 `.agents` 설정 파일로 승격할지 별도 작업으로 판단한다.
+### Purpose
+
+현재 Compose navigation의 route·argument·호출자/목적지 호환성, back stack, 상태 복원, 화면 전환 테스트 필요성을 검토한다.
+
+### When To Use
+
+- `NavHost`, `composable`, `NavController.navigate`, `navigateUp`, 하단 navigation 변경.
+- route 또는 argument, `from` 같은 출발 화면 구분 값, deep link, back stack, `SavedStateHandle` 전달 경로 변경.
+- 사용자가 "navigation", "route", "deep link", "뒤로 가기", "탭 상태 복원"을 언급한 경우.
+
+### Required Context
+
+- `AGENTS.md`
+- `docs/ai/knowledge-operations.md`
+- `docs/ai/navigation-contracts.md`
+- `docs/ai/task-scope-control.md`
+- `docs/ai/quality-gates.md`
+- `docs/ai/UI_GUIDELINES.md`
+- 변경 파일 목록 또는 diff 요약.
+
+### Output
+
+- 영향받는 호출자와 목적지, route·argument 호환성 점검 결과.
+- back stack, 상태 복원, 하단 navigation 표시, deep link 계약의 위험 여부.
+- 필요한 navigation behavior 검증 시나리오와 가장 좁은 검증 명령.
+- primary document 경로와 현재 코드 또는 테스트 근거 경로.
+
+### Guardrails
+
+- route 제거·이름 변경, argument 계약, deep link, public API, module dependency, Gradle, DI, Room schema/migration, 대규모 리팩터링은 위험 변경으로 먼저 보고한다.
+- 명시적 승인과 rollback 고려 없이 호환 경로를 단순화하거나 제거하지 않는다.
+- 구현·테스트 파일은 주 작업자가 제한된 write scope를 명시했을 때만 수정한다.
+
+## 운영과 재검토
+
+1. 현재 `.codex/agents/`에 compose UI, state/Flow, data/domain, test strategy, navigation contract의 5개 역할이 적용돼 있다.
+2. 실제 작업에서 custom agent를 호출할 때는 요청 문장에 `Use compose-ui-reviewer`, `Use state-flow-architect`, `Use data-domain-boundary-guard`, `Use test-strategy-reviewer`, `Use navigation-contract-reviewer`처럼 역할명을 명시한다. 자동 역할 선택은 하지 않는다.
+3. 각 역할의 범위와 필수 문서는 registry의 `scope`, `required_documents`를 갱신해 관리한다.
+4. 실제 사용 중 중복되는 지시나 빠진 guardrail이 확인되면 이 문서와 agent TOML을 같은 작업에서 함께 갱신한다.

@@ -12,6 +12,7 @@
 | `data-logic` | [docs/ai/DATA_LOGIC_GUIDELINES.md](../../docs/ai/DATA_LOGIC_GUIDELINES.md) | primary | `domain, data, feature, core` |
 | `design-guide` | [docs/design/DESIGN_GUIDE.md](../../docs/design/DESIGN_GUIDE.md) | auxiliary | `app, feature, core` |
 | `liquid-navigation-guide` | [docs/design/LIQUID_NAVIGATION_GUIDE.md](../../docs/design/LIQUID_NAVIGATION_GUIDE.md) | auxiliary | `app, core, feature` |
+| `navigation-contracts` | [docs/ai/navigation-contracts.md](../../docs/ai/navigation-contracts.md) | primary | `app, feature/detail` |
 | `ui-guidelines` | [docs/ai/UI_GUIDELINES.md](../../docs/ai/UI_GUIDELINES.md) | primary | `app, feature, core` |
 
 ## index
