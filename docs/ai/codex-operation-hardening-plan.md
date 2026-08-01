@@ -1,6 +1,6 @@
 # Codex 운영 정책 보강 명세
 
-> **Status:** active — Phase 0 completed, Phase 1 pending
+> **Status:** active — Phase 0 and Phase 1 completed, Phase 2 pending
 >
 > **Purpose:** GithubSearch의 Codex 운영 정책을 공식 Codex 가이드의 durable guidance, bounded subagent, 최소 권한, worktree 안전성 원칙에 맞춰 단계적으로 보강한다.
 >
@@ -13,8 +13,8 @@
 | 책임 영역 | 정본·담당 | 현재 상태 | 다음 변경 phase |
 | --- | --- | --- | --- |
 | 작업 범위·최종 판단·보고 | main agent, `AGENTS.md`, `knowledge-operations.md` | 운영 중 | 유지 |
-| reviewer 역할·근거·write 권한 | `.codex/agents/*.toml`, `subagents.md` | 정책상 review-first | Phase 1에서 hard read-only로 강제 |
-| Codex session 기본값 | 사용자 전역 config, project `.codex/config.toml` | project config 없음 | Phase 1에서 project 불변값만 추가 |
+| reviewer 역할·근거·write 권한 | `.codex/agents/*.toml`, `subagents.md` | hard read-only 설정과 runtime 결과 형식 확인 완료 | 유지 |
+| Codex session 기본값 | 사용자 전역 config, project `.codex/config.toml` | reviewer 최대 병렬 수 3 적용 | 유지 |
 | staged 변경 검사 | `.githooks/pre-commit` | 운영 중, clone/worktree별 설치 필요 | 유지 |
 | 문서·agent 지식 관계 | registry, generated Index, `knowledge.yml` | 운영 중, read-only CI | 유지 |
 | Android build·coverage·배포 권한 | `build.yml`, 저장소 관리자 | 한 job에 혼재 | Phase 2에서 verify/comment/deploy 분리 |
@@ -23,7 +23,7 @@
 
 이 분리는 다음 경계를 고정한다.
 
-- main agent와 reviewer의 책임은 즉시 분리한다. Phase 1 전까지 reviewer의 현재 제한된 write 예외는 유지되지만, main agent가 write scope·최종 적용·검증을 계속 소유한다.
+- main agent와 reviewer의 책임은 분리한다. reviewer는 hard read-only이며, main agent가 구현·write scope·최종 적용·검증을 계속 소유한다.
 - project repository는 팀 공통 불변값만 보관한다. 모델·reasoning·개인 connector·승인 설정은 사용자 전역 config에 남긴다.
 - Git hook은 commit 시점, `knowledge.yml`은 PR 시점, 향후 Codex lifecycle hook은 세션 시점을 담당한다. 동일 검사를 여러 계층에 복제하지 않는다.
 - CI 권한, OAuth secret, Pages 배포, branch protection은 repository 관리자와 명시적 Risky Change 승인 없이는 변경하지 않는다.
@@ -121,18 +121,25 @@ Uncertainty: <none or missing evidence>
 
 ### 체크리스트
 
-- [ ] 모든 reviewer TOML의 name, description, scope, required documents가 registry와 일치한다.
-- [ ] 모든 reviewer가 read-only sandbox, Git 금지, secret 금지, 위험 변경 보고, 근거 경로 반환을 가진다.
-- [ ] `subagents.md`에 Small 변경은 single agent, 독립 read-only 검토는 최대 3개 병렬, write는 1명이라는 dispatcher 표를 추가한다.
-- [ ] `AGENTS.md`에 “명시적 요청 또는 project workflow가 정한 경우에만 subagent 위임” 원칙을 추가한다.
-- [ ] reviewer가 답변만 하고 파일을 수정하지 않는 수동 확인을 한 번 기록한다.
+- [x] 모든 reviewer TOML의 name, description, scope, required documents가 registry와 일치한다.
+- [x] 모든 reviewer가 read-only sandbox, Git 금지, secret 금지, 위험 변경 보고, 근거 경로 반환을 가진다.
+- [x] `subagents.md`에 Small 변경은 single agent, 독립 read-only 검토는 최대 3개 병렬, write는 1명이라는 dispatcher 표를 추가한다.
+- [x] `AGENTS.md`에 “명시적 요청 또는 project workflow가 정한 경우에만 subagent 위임” 원칙을 추가한다.
+- [x] `compose-ui-reviewer`를 명시 호출해 파일 수정 없이 common output format과 근거 경로를 반환하는 runtime 수동 확인을 기록했다.
 
 ### Exit gate
 
 - `python3 scripts/ai/generate_knowledge_index.py --check`
 - `python3 scripts/ai/verify_knowledge_graph.py`
 - agent TOML 경로·ID·required document 관계 검사 통과
-- main agent가 reviewer 결과를 합쳐 최종 판단·검증·보고를 작성한 예시 1건 확인
+- 새 Codex session 또는 명시적 reviewer 호출에서 reviewer가 파일 수정 없이 결과 형식을 반환하고, main agent가 이를 최종 판단·검증·보고에 통합한 예시 1건 확인
+
+### Phase 1 실행 결과
+
+- 다섯 reviewer TOML에 `sandbox_mode = "read-only"`를 설정하고, 제한된 write 위임 예외를 제거했다.
+- project `.codex/config.toml`에 reviewer 최대 병렬 수 3을 설정했다. 모델·reasoning·connector·승인 설정은 repository에 고정하지 않았다.
+- `AGENTS.md`와 `subagents.md`에 명시적 위임, Small 변경의 single-agent 기본값, 독립 read-only 검토 최대 3개, write 담당 1명, 공통 결과 형식을 추가했다.
+- `compose-ui-reviewer`를 명시 호출해 문서·코드 근거와 finding을 반환하고, working tree에 reviewer의 파일 변경이 없음을 확인했다. Phase 1 운영 exit gate를 완료했다.
 
 ## Phase 2 — Build CI 최소 권한과 secret 없는 검증
 

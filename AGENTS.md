@@ -73,6 +73,15 @@ Screenshot test 도입 후의 module별 `updateDebugScreenshotTest`·`validateDe
 
 단순 질의와 짧은 상태 응답을 제외한 모든 project 작업은 시작 시 `project-knowledge-grounding`을 적용한다. 파일을 수정하는 모든 project 작업은 종료 전에 `session-retrospective`를 적용해 작업 이력, generated Index, 지식 관계 검증과 Change Report를 함께 점검한다.
 
+## Custom Agent Delegation
+
+custom agent의 역할·필수 문서·운영 계약은 `docs/ai/subagents.md`와 `docs/ai/registry/agents.toml`을 따른다.
+
+- custom agent는 사용자가 명시적으로 요청했거나, 현재 workflow가 독립적인 검토가 필요하다고 정한 경우에만 호출한다.
+- reviewer는 hard read-only다. 구현은 main agent가 직접 수행하거나, main agent가 명시한 제한된 write scope의 별도 worker만 수행한다.
+- Small 변경은 기본적으로 main agent만 사용한다. 독립적인 read-only 조사·검토는 최대 3개까지 병렬화할 수 있으며, 같은 파일 또는 같은 동작을 수정하는 작업은 한 명만 write 담당으로 둔다.
+- main agent는 subagent 결과를 검토·통합하고, 위험 판단·최종 적용·검증·Change Report 책임을 유지한다.
+
 ## Coding Conventions
 
 Kotlin/Android 코드 작성 규칙의 source of truth는 `docs/ai/android-coding-conventions.md`다. 기존 프로젝트 custom docs도 함께 보존한다.
