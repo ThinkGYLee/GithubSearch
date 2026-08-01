@@ -1,0 +1,13 @@
+<resources>
+    <string name="placeholder_searchbar">검색</string>
+    <string name="home_no_item">저장된 아이템이 없습니다</string>
+    <string name="search_result_no_user">해당 사용자가 없습니다. 키워드를 변경해 보세요.</string>
+    <string name="text_selected_count">%d개 선택됨</string>
+    <string name="text_select_all">모두 선택</string>
+    <string name="text_unselect_all">모두 선택 해제</string>
+    <string name="text_exit_selection">선택 모드 종료</string>
+    <string name="text_search_placeholder">Github ID로 검색</string>
+    <string name="text_search_button">검색하세요</string>
+    <string name="content_description_delete">삭제</string>
+    <string name="content_description_background_logo">Github 배경 로고</string>
+</resources>

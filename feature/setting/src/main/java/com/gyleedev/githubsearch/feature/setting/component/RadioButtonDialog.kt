@@ -21,8 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gyleedev.githubsearch.feature.setting.model.SettingDialogItem
 import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
+import com.gyleedev.githubsearch.feature.setting.model.SettingDialogItem
 
 @Composable
 fun RadioButtonDialog(
@@ -115,17 +115,16 @@ fun RadioButtons(
         items.forEach { item ->
             Row(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp)
-                    .selectable(
-                        selected = selectedIndex == items.indexOf(item),
-                        onClick = {
-                            onIndexChange(items.indexOf(item))
-                        },
-                        role = Role.RadioButton,
-                    )
-                    .padding(bottom = 3.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .selectable(
+                            selected = selectedIndex == items.indexOf(item),
+                            onClick = {
+                                onIndexChange(items.indexOf(item))
+                            },
+                            role = Role.RadioButton,
+                        ).padding(bottom = 3.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(

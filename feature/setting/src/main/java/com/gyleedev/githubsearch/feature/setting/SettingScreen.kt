@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
+import com.gyleedev.githubsearch.feature.setting.R as SettingR
 import com.gyleedev.githubsearch.feature.setting.component.RadioButtonDialog
 import com.gyleedev.githubsearch.feature.setting.component.SettingMainBlock
 import com.gyleedev.githubsearch.feature.setting.component.TwoButtonDialog
@@ -44,9 +45,8 @@ import com.gyleedev.githubsearch.feature.setting.model.SettingEvent
 import com.gyleedev.githubsearch.feature.setting.model.SettingItem
 import com.gyleedev.githubsearch.feature.setting.model.SettingRowItem
 import com.gyleedev.githubsearch.feature.setting.model.ThemeItem
-import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
-import com.gyleedev.githubsearch.feature.setting.R as SettingR
+import kotlinx.coroutines.flow.collectLatest
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,11 +72,12 @@ fun SettingScreen(
     LaunchedEffect(viewModel.showRevokeResult, lifecycleOwner, context) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.showRevokeResult.collectLatest { result ->
-                val message = when (result) {
-                    RevokeResult.SUCCESS -> revokeSuccessMessage
-                    RevokeResult.FAIL -> revokeFailMessage
-                    RevokeResult.NO_KEY -> revokeNoKeyMessage
-                }
+                val message =
+                    when (result) {
+                        RevokeResult.SUCCESS -> revokeSuccessMessage
+                        RevokeResult.FAIL -> revokeFailMessage
+                        RevokeResult.NO_KEY -> revokeNoKeyMessage
+                    }
 
                 snackBarHostState.showSnackbar(
                     message = message,
@@ -89,10 +90,11 @@ fun SettingScreen(
     LaunchedEffect(viewModel.showResetResult, lifecycleOwner, context) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.showResetResult.collectLatest { result ->
-                val message = when (result) {
-                    ResetDataResult.Success -> resetSuccessMessage
-                    ResetDataResult.Fail -> resetFailMessage
-                }
+                val message =
+                    when (result) {
+                        ResetDataResult.Success -> resetSuccessMessage
+                        ResetDataResult.Fail -> resetFailMessage
+                    }
 
                 snackBarHostState.showSnackbar(
                     message = message,
@@ -119,9 +121,10 @@ fun SettingScreen(
                 items = settingList,
                 isDark = isDark,
                 onClick = viewModel::changDialogState,
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier =
+                    modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
             )
 
             if (state.showLanguageDialog) {
@@ -187,53 +190,56 @@ fun SettingScreen(
     }
 }
 
-val settingList = listOf(
-    SettingItem.Title(
-        text = SettingR.string.setting_title,
-    ),
-    SettingItem.Card(
-        items = listOf(
-            SettingRowItem.ClickableItem(
-                icon = Icons.Outlined.DarkMode,
-                content = SettingR.string.setting_theme,
-                event = SettingEvent.THEME,
-            ),
-            SettingRowItem.ClickableItem(
-                icon = Icons.Outlined.Language,
-                content = SettingR.string.setting_language,
-                event = SettingEvent.LANGUAGE,
-            ),
-            SettingRowItem.ClickableItem(
-                icon = Icons.Outlined.AccountCircle,
-                content = SettingR.string.setting_login,
-                event = SettingEvent.AUTH,
-            ),
-            SettingRowItem.ClickableItem(
-                icon = Icons.Outlined.Storage,
-                content = SettingR.string.setting_reset,
-                event = SettingEvent.RESET,
-            ),
+val settingList =
+    listOf(
+        SettingItem.Title(
+            text = SettingR.string.setting_title,
         ),
-    ),
-    SettingItem.Title(
-        text = SettingR.string.setting_information,
-    ),
-    SettingItem.Card(
-        items = listOf(
-            SettingRowItem.TextItem(
-                icon = Icons.AutoMirrored.Outlined.Help,
-                content = SettingR.string.setting_version,
-                event = SettingEvent.NONE,
-                text = BuildConfig.VERSION_NAME,
-            ),
-            SettingRowItem.ClickableItem(
-                icon = Icons.Outlined.Description,
-                content = SettingR.string.setting_term,
-                event = SettingEvent.POLICY,
-            ),
+        SettingItem.Card(
+            items =
+                listOf(
+                    SettingRowItem.ClickableItem(
+                        icon = Icons.Outlined.DarkMode,
+                        content = SettingR.string.setting_theme,
+                        event = SettingEvent.THEME,
+                    ),
+                    SettingRowItem.ClickableItem(
+                        icon = Icons.Outlined.Language,
+                        content = SettingR.string.setting_language,
+                        event = SettingEvent.LANGUAGE,
+                    ),
+                    SettingRowItem.ClickableItem(
+                        icon = Icons.Outlined.AccountCircle,
+                        content = SettingR.string.setting_login,
+                        event = SettingEvent.AUTH,
+                    ),
+                    SettingRowItem.ClickableItem(
+                        icon = Icons.Outlined.Storage,
+                        content = SettingR.string.setting_reset,
+                        event = SettingEvent.RESET,
+                    ),
+                ),
         ),
-    ),
-)
+        SettingItem.Title(
+            text = SettingR.string.setting_information,
+        ),
+        SettingItem.Card(
+            items =
+                listOf(
+                    SettingRowItem.TextItem(
+                        icon = Icons.AutoMirrored.Outlined.Help,
+                        content = SettingR.string.setting_version,
+                        event = SettingEvent.NONE,
+                        text = BuildConfig.VERSION_NAME,
+                    ),
+                    SettingRowItem.ClickableItem(
+                        icon = Icons.Outlined.Description,
+                        content = SettingR.string.setting_term,
+                        event = SettingEvent.POLICY,
+                    ),
+                ),
+        ),
+    )
 
 val themeList =
     listOf(

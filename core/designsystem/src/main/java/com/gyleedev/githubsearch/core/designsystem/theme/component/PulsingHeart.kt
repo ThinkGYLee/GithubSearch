@@ -43,32 +43,32 @@ fun PulsingHeart(
         imageVector = Icons.Default.Favorite,
         contentDescription = null,
         tint = tint,
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale.value
-                scaleY = scale.value
-            }
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-            ) {
-                // 클릭 이벤트 콜백 실행
-                onClick()
+        modifier =
+            modifier
+                .graphicsLayer {
+                    scaleX = scale.value
+                    scaleY = scale.value
+                }.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                ) {
+                    // 클릭 이벤트 콜백 실행
+                    onClick()
 
-                // 애니메이션 실행 (박동 효과: 1.0 -> 1.3 -> 1.0)
-                scope.launch {
-                    // 수축 및 팽창
-                    scale.animateTo(
-                        targetValue = 1.3f,
-                        animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
-                    )
-                    // 원래 크기로 복원
-                    scale.animateTo(
-                        targetValue = 1f,
-                        animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
-                    )
-                }
-            },
+                    // 애니메이션 실행 (박동 효과: 1.0 -> 1.3 -> 1.0)
+                    scope.launch {
+                        // 수축 및 팽창
+                        scale.animateTo(
+                            targetValue = 1.3f,
+                            animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
+                        )
+                        // 원래 크기로 복원
+                        scale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing),
+                        )
+                    }
+                },
     )
 }
 
@@ -78,9 +78,10 @@ private fun PulsingHeartPreview() {
     GithubSearchTheme {
         Surface {
             Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .size(100.dp)
+                        .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 PulsingHeart(modifier = Modifier.size(48.dp))
@@ -95,9 +96,10 @@ private fun PulsingHeartDarkPreview() {
     GithubSearchTheme {
         Surface {
             Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .size(100.dp)
+                        .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 PulsingHeart(modifier = Modifier.size(48.dp))

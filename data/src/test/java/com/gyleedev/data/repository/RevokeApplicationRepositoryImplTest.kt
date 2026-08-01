@@ -15,7 +15,6 @@ import io.mockk.coVerify
 import io.mockk.coVerifySequence
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -23,6 +22,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class RevokeApplicationRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -36,78 +36,83 @@ class RevokeApplicationRepositoryImplTest {
     private val clock: Clock = mockk()
 
     private val mockSuccessResponse = Response.success(Unit)
-    private val mockErrorResponse = Response.error<Unit>(
-        400,
-        "Error".toResponseBody("application/json".toMediaTypeOrNull()),
-    )
+    private val mockErrorResponse =
+        Response.error<Unit>(
+            400,
+            "Error".toResponseBody("application/json".toMediaTypeOrNull()),
+        )
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `권한 해제 시 토큰이 비어있으면 NO_KEY를 반환한다`() = runTest {
-        // Given
-        val expectedResult = RevokeResult.NO_KEY
-        every { tokenPreference.getString() } returns ""
+    fun `권한 해제 시 토큰이 비어있으면 NO_KEY를 반환한다`() =
+        runTest {
+            // Given
+            val expectedResult = RevokeResult.NO_KEY
+            every { tokenPreference.getString() } returns ""
 
-        // When
-        val result = repository.revokeApplication()
+            // When
+            val result = repository.revokeApplication()
 
-        // Then
-        assertEquals(expectedResult, result)
-        coVerify(exactly = 1) { tokenPreference.getString() }
-    }
-
-    @Test
-    fun `권한 해제 시 토큰이 존재하고 API 호출에 성공하면 SUCCESS를 반환한다`() = runTest {
-        // Given
-        val expectedResult = RevokeResult.SUCCESS
-        val testToken = "valid_token"
-        val revokeRequest = RevokeRequest(testToken)
-
-        every { tokenPreference.getString() } returns testToken
-        coEvery { revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest) } returns mockSuccessResponse
-
-        // When
-        val result = repository.revokeApplication()
-
-        // Then
-        assertEquals(expectedResult, result)
-        coVerifySequence {
-            tokenPreference.getString()
-            revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest)
+            // Then
+            assertEquals(expectedResult, result)
+            coVerify(exactly = 1) { tokenPreference.getString() }
         }
-    }
 
     @Test
-    fun `권한 해제 시 토큰이 존재하지만 API 호출에 실패하면 FAIL을 반환한다`() = runTest {
-        // Given
-        val expectedResult = RevokeResult.FAIL
-        val testToken = "valid_token"
-        val revokeRequest = RevokeRequest(testToken)
+    fun `권한 해제 시 토큰이 존재하고 API 호출에 성공하면 SUCCESS를 반환한다`() =
+        runTest {
+            // Given
+            val expectedResult = RevokeResult.SUCCESS
+            val testToken = "valid_token"
+            val revokeRequest = RevokeRequest(testToken)
 
-        every { tokenPreference.getString() } returns testToken
-        coEvery { revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest) } returns mockErrorResponse
+            every { tokenPreference.getString() } returns testToken
+            coEvery { revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest) } returns mockSuccessResponse
 
-        // When
-        val result = repository.revokeApplication()
+            // When
+            val result = repository.revokeApplication()
 
-        // Then
-        assertEquals(expectedResult, result)
-        coVerifySequence {
-            tokenPreference.getString()
-            revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest)
+            // Then
+            assertEquals(expectedResult, result)
+            coVerifySequence {
+                tokenPreference.getString()
+                revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest)
+            }
         }
-    }
+
+    @Test
+    fun `권한 해제 시 토큰이 존재하지만 API 호출에 실패하면 FAIL을 반환한다`() =
+        runTest {
+            // Given
+            val expectedResult = RevokeResult.FAIL
+            val testToken = "valid_token"
+            val revokeRequest = RevokeRequest(testToken)
+
+            every { tokenPreference.getString() } returns testToken
+            coEvery { revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest) } returns mockErrorResponse
+
+            // When
+            val result = repository.revokeApplication()
+
+            // Then
+            assertEquals(expectedResult, result)
+            coVerifySequence {
+                tokenPreference.getString()
+                revokeService.revoke(BuildConfig.CLIENT_ID, revokeRequest)
+            }
+        }
 }

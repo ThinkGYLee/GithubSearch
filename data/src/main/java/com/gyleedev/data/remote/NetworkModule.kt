@@ -21,31 +21,33 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeApi
-    fun provideApiOkHttpClient(tokenPreference: TokenPreference): OkHttpClient = if (BuildConfig.DEBUG) {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        val tokenInterceptor = TokenInterceptor(tokenPreference)
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideApiOkHttpClient(tokenPreference: TokenPreference): OkHttpClient =
+        if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor()
+            val tokenInterceptor = TokenInterceptor(tokenPreference)
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        OkHttpClient
-            .Builder()
-            .addInterceptor(tokenInterceptor)
-            .addNetworkInterceptor(loggingInterceptor)
-            .build()
-    } else {
-        OkHttpClient.Builder().build()
-    }
+            OkHttpClient
+                .Builder()
+                .addInterceptor(tokenInterceptor)
+                .addNetworkInterceptor(loggingInterceptor)
+                .build()
+        } else {
+            OkHttpClient.Builder().build()
+        }
 
     @Singleton
     @Provides
     @TypeApi
     fun provideApiRetrofit(
         @TypeApi okHttpClient: OkHttpClient,
-    ): Retrofit = Retrofit
-        .Builder()
-        .client(okHttpClient)
-        .baseUrl(apiUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    ): Retrofit =
+        Retrofit
+            .Builder()
+            .client(okHttpClient)
+            .baseUrl(apiUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
     @Singleton
     @Provides
@@ -57,29 +59,31 @@ class NetworkModule {
     @Singleton
     @Provides
     @TypeAccess
-    fun provideAccessOkHttpClient(): OkHttpClient = if (BuildConfig.DEBUG) {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideAccessOkHttpClient(): OkHttpClient =
+        if (BuildConfig.DEBUG) {
+            val loggingInterceptor = HttpLoggingInterceptor()
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        OkHttpClient
-            .Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-    } else {
-        OkHttpClient.Builder().build()
-    }
+            OkHttpClient
+                .Builder()
+                .addInterceptor(loggingInterceptor)
+                .build()
+        } else {
+            OkHttpClient.Builder().build()
+        }
 
     @Singleton
     @Provides
     @TypeAccess
     fun provideAccessRetrofit(
         @TypeAccess okHttpClient: OkHttpClient,
-    ): Retrofit = Retrofit
-        .Builder()
-        .client(okHttpClient)
-        .baseUrl(accessUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    ): Retrofit =
+        Retrofit
+            .Builder()
+            .client(okHttpClient)
+            .baseUrl(accessUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
     @Singleton
     @Provides
@@ -107,11 +111,13 @@ class NetworkModule {
     @TypeRevoke
     fun provideRevokeRetrofit(
         @TypeRevoke okHttpClient: OkHttpClient,
-    ): Retrofit = Retrofit.Builder()
-        .client(okHttpClient)
-        .baseUrl(apiUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    ): Retrofit =
+        Retrofit
+            .Builder()
+            .client(okHttpClient)
+            .baseUrl(apiUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
     @Singleton
     @Provides

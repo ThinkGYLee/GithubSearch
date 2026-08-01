@@ -13,14 +13,14 @@ import com.gyleedev.githubsearch.core.testing.ignoreUnused
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 
 class GetUserWithFlowRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -35,49 +35,52 @@ class GetUserWithFlowRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `유저 조회 시 해당 ID의 데이터가 존재하면 올바르게 매핑된 모델을 Flow로 반환한다`() = runTest {
-        // Given
-        val expectedId = "testId"
-        val expectedEntity = createDummyUserEntity(id = 1, repoCount = 5).copy(githubId = expectedId)
-        val expectedModel = expectedEntity.toModel()
+    fun `유저 조회 시 해당 ID의 데이터가 존재하면 올바르게 매핑된 모델을 Flow로 반환한다`() =
+        runTest {
+            // Given
+            val expectedId = "testId"
+            val expectedEntity = createDummyUserEntity(id = 1, repoCount = 5).copy(githubId = expectedId)
+            val expectedModel = expectedEntity.toModel()
 
-        every { userDao.getUserByGithubId(expectedId) } returns flowOf(expectedEntity)
+            every { userDao.getUserByGithubId(expectedId) } returns flowOf(expectedEntity)
 
-        // When
-        val resultFlow = repository.getUserWithFlow(expectedId)
-        val actualResult = resultFlow.first()
+            // When
+            val resultFlow = repository.getUserWithFlow(expectedId)
+            val actualResult = resultFlow.first()
 
-        // Then
-        assertEquals(expectedModel, actualResult)
-        coVerify(exactly = 1) { userDao.getUserByGithubId(expectedId).ignoreUnused() }
-    }
+            // Then
+            assertEquals(expectedModel, actualResult)
+            coVerify(exactly = 1) { userDao.getUserByGithubId(expectedId).ignoreUnused() }
+        }
 
     @Test
-    fun `유저 조회 시 해당 ID의 데이터가 존재하지 않으면 null을 Flow로 반환한다`() = runTest {
-        // Given
-        val expectedId = "testId"
+    fun `유저 조회 시 해당 ID의 데이터가 존재하지 않으면 null을 Flow로 반환한다`() =
+        runTest {
+            // Given
+            val expectedId = "testId"
 
-        every { userDao.getUserByGithubId(expectedId) } returns flowOf(null)
+            every { userDao.getUserByGithubId(expectedId) } returns flowOf(null)
 
-        // When
-        val resultFlow = repository.getUserWithFlow(expectedId)
-        val actualResult = resultFlow.first()
+            // When
+            val resultFlow = repository.getUserWithFlow(expectedId)
+            val actualResult = resultFlow.first()
 
-        // Then
-        assertNull(actualResult)
-        coVerify(exactly = 1) { userDao.getUserByGithubId(expectedId).ignoreUnused() }
-    }
+            // Then
+            assertNull(actualResult)
+            coVerify(exactly = 1) { userDao.getUserByGithubId(expectedId).ignoreUnused() }
+        }
 }

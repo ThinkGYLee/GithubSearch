@@ -57,16 +57,16 @@ fun FavoritePulsingHeart(
         imageVector = icon,
         contentDescription = null,
         tint = tint,
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale.value
-                scaleY = scale.value
-            }
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-            ),
+        modifier =
+            modifier
+                .graphicsLayer {
+                    scaleX = scale.value
+                    scaleY = scale.value
+                }.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                ),
     )
 }
 
@@ -76,9 +76,10 @@ private fun FavoritePulsingHeartFavoritedPreview() {
     GithubSearchTheme {
         Surface {
             Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .size(100.dp)
+                        .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 FavoritePulsingHeart(isFavorite = true, onClick = {}, modifier = Modifier.size(48.dp))
@@ -93,9 +94,10 @@ private fun FavoritePulsingHeartUnfavoritedPreview() {
     GithubSearchTheme {
         Surface {
             Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .size(100.dp)
+                        .padding(16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 FavoritePulsingHeart(isFavorite = false, onClick = {}, modifier = Modifier.size(48.dp))

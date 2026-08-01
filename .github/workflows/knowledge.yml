@@ -1,0 +1,45 @@
+name: Knowledge verification
+
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'docs/**'
+      - '.codex/skills/**'
+      - '.codex/agents/**'
+      - 'scripts/ai/**'
+      - '.github/workflows/knowledge.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'AGENTS.md'
+      - 'docs/**'
+      - '.codex/skills/**'
+      - '.codex/agents/**'
+      - 'scripts/ai/**'
+      - '.github/workflows/knowledge.yml'
+
+concurrency:
+  group: knowledge-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Generated index and graph
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # history record의 base_commit을 실제 Git 객체로 검증한다.
+          fetch-depth: 0
+
+      - name: Verify generated knowledge artifacts
+        run: |
+          python3 --version
+          python3 scripts/ai/generate_knowledge_index.py --check
+          python3 scripts/ai/verify_knowledge_graph.py

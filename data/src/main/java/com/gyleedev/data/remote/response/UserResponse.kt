@@ -19,20 +19,21 @@ data class UserResponse(
     @SerializedName("blog") val blogUrl: String,
 )
 
-fun UserResponse.toModel(): UserModel = UserModel(
-    id = 0L,
-    name = name,
-    login = login,
-    followers = followers,
-    following = following,
-    avatar = avatar,
-    company = company,
-    email = email,
-    bio = bio,
-    repoCount = repoCount,
-    createdDate = createdDate,
-    updatedDate = updatedDate,
-    reposAddress = reposAddress,
-    blogUrl = blogUrl,
-    favorite = false,
-)
+fun UserResponse.toModel(): UserModel =
+    UserModel(
+        id = 0L,
+        name = name,
+        login = login,
+        followers = followers,
+        following = following,
+        avatar = avatar,
+        company = company,
+        email = email,
+        bio = bio,
+        repoCount = repoCount,
+        createdDate = createdDate,
+        updatedDate = updatedDate,
+        reposAddress = reposAddress,
+        blogUrl = blogUrl,
+        favorite = false,
+    )

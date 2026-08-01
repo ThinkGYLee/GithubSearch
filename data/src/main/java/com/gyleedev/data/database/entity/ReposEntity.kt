@@ -38,20 +38,22 @@ data class ReposEntity(
     val stargazer: Int,
 )
 
-fun ReposEntity.toModel(): RepositoryModel = RepositoryModel(
-    name = name,
-    userGithubId = userGithubId,
-    description = description,
-    language = language,
-    stargazer = stargazer,
-)
+fun ReposEntity.toModel(): RepositoryModel =
+    RepositoryModel(
+        name = name,
+        userGithubId = userGithubId,
+        description = description,
+        language = language,
+        stargazer = stargazer,
+    )
 
-fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity = ReposEntity(
-    id = 0,
-    userEntityId = userEntityId,
-    userGithubId = userGithubId,
-    description = description,
-    name = name,
-    stargazer = stargazer,
-    language = language,
-)
+fun RepositoryModel.toEntity(userEntityId: Long): ReposEntity =
+    ReposEntity(
+        id = 0,
+        userEntityId = userEntityId,
+        userGithubId = userGithubId,
+        description = description,
+        name = name,
+        stargazer = stargazer,
+        language = language,
+    )

@@ -27,11 +27,11 @@ fun SettingRow(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable(onClick = onClick, role = Role.Button)
-            .padding(horizontal = 16.dp),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .clickable(onClick = onClick, role = Role.Button)
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

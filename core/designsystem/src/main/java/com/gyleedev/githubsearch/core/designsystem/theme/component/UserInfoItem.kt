@@ -37,21 +37,21 @@ fun UserInfoItem(
     isSelected: Boolean = false,
     transitionKeyPrefix: String = "",
 ) {
-    val exposeTitle = if (name != null) {
-        "$name ($login)"
-    } else {
-        login
-    }
+    val exposeTitle =
+        if (name != null) {
+            "$name ($login)"
+        } else {
+            login
+        }
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .heightIn(min = 80.dp, max = 100.dp)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-            )
-            .padding(12.dp),
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp, max = 100.dp)
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                ).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

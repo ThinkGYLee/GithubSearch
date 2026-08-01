@@ -1,0 +1,12 @@
+<resources>
+    <string name="detail_user_title_repos">레포지토리</string>
+    <string name="detail_user_title_follower">팔로워</string>
+    <string name="detail_user_title_following">팔로잉</string>
+    <string name="detail_repos_title_text">레포지토리</string>
+    <string name="detail_repo_no_item">레포지토리가 없습니다</string>
+    <string name="icon_content_description_arrow_back">뒤로가기 아이콘</string>
+    <string name="icon_content_description_favorite_filled">채워진 즐겨찾기 아이콘</string>
+    <string name="icon_content_description_favorite_bordered">비어있는 즐겨찾기 아이콘</string>
+    <string name="title_user_profile">사용자 프로필</string>
+    <string name="content_description_repository_language">레포지토리 언어</string>
+</resources>

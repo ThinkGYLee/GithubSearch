@@ -2,10 +2,13 @@
 
 이 프로젝트는 GitHub 사용자 및 레포지토리를 검색하고 관리하는 안드로이드 앱 `GitHub Search`입니다.
 
-## 🧭 Master Knowledge (AI 전용 가이드)
-효율적인 협업과 고품질 코드 생성을 위해 다음 지침을 최우선으로 참조하십시오:
-1. **[AI Master Guide](./docs/ai/GEMINI.md)**: AI 상호작용 프로토콜 및 전체 가이드라인 맵.
-2. **[Coding Guidelines](./docs/ai/CODING_GUIDELINES.md)**: 4단계 추론 워크플로우 및 품질 통제 규칙.
+## 🧭 Codex 기준 참조
+Codex/agent 작업 기준 source of truth는 **[AGENTS.md](./AGENTS.md)**와 **[AI Docs](./docs/ai/README.md)**입니다. 이 파일은 Gemini/legacy context로 보존하며, 규칙이 충돌할 경우 `AGENTS.md`와 `docs/ai/*`를 우선합니다.
+
+## 🧭 Gemini / Legacy Context
+Gemini 계열 도구에서 프로젝트 맥락을 빠르게 파악하기 위한 참고 문서입니다:
+1. **[Gemini Adapter Guide](./docs/ai/GEMINI.md)**: Gemini 상호작용 맥락 및 legacy guide.
+2. **[Coding Guidelines](./docs/ai/CODING_GUIDELINES.md)**: 기존 AI coding workflow와 품질 통제 참고.
 3. **[UI Guidelines](./docs/ai/UI_GUIDELINES.md)**: Compose 설계 원칙 및 Material 3 적용 지침.
 4. **[Data & Logic](./docs/ai/DATA_LOGIC_GUIDELINES.md)**: 아키텍처 계층별 구현 표준.
 
@@ -19,7 +22,9 @@
 6. **[Testing Guide](./docs/testing/TESTING_GUIDE.md)**: 테스트 프레임워크 및 네이밍 전략.
 
 ## Quick Start for AI
-- 새로운 기능을 만들 때는 **4단계 추론 워크플로우(Analyze-Design-Implement-Verify)**를 엄격히 따르십시오.
-- 모든 작업 완료 후 **Hooks**를 통한 자동 검증 결과를 반드시 확인하십시오.
-- **[CRITICAL] 커밋 메시지 언어**: 개인 프로젝트의 가독성을 위해 커밋 메시지의 **제목(Header)과 본문(Body) 모두 반드시 한국어**로 작성하십시오.
+- 작업 workflow는 `docs/ai/workflows.md`를 따르십시오.
+- verification 판단은 `docs/ai/quality-gates.md`를 따르십시오.
+- task scope와 risky change 판단은 `docs/ai/task-scope-control.md`를 따르십시오.
+- 최종 응답과 commit message 형식은 `docs/ai/change-report-template.md`와 `docs/ai/android-coding-conventions.md`를 따르십시오.
+- **[CRITICAL] 커밋 메시지 규칙**: 커밋 컨벤션의 source of truth는 `docs/ai/android-coding-conventions.md`의 Git Commit Convention을 따르십시오.
 - **[CRITICAL] 커밋 전 명시적 승인 필수**: `git commit` 수행 전 반드시 변경 사항을 요약 보고하고, 사용자의 명시적인 승인("네", "진행하세요" 등)을 받은 후에만 별도의 턴에서 커밋을 실행하십시오. 질문과 커밋을 동시에 수행하는 것은 금지됩니다.

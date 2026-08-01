@@ -15,6 +15,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit4.MockKRule
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
@@ -22,14 +26,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
-
     @get:Rule
     val mockkRule = MockKRule(this)
 
@@ -60,16 +59,18 @@ class DetailViewModelTest {
 
     // id를 받아오는가 못받아오는가에 따라서도 수행해야할 동작이 있어서 따로 뺌
     private fun createViewModel(id: String? = null) {
-        val savedStateHandle = SavedStateHandle().apply {
-            id?.let { set("id", it) }
-        }
-        viewModel = DetailViewModel(
-            updateUserFromGithubUseCase = updateUserFromGithubUseCase,
-            getUserWithFlowUseCase = getUserWithFlowUseCase,
-            getReposWithFlowUseCase = getReposWithFlowUseCase,
-            updateFavoriteStatusUseCase = updateFavoriteStatusUseCase,
-            savedStateHandle = savedStateHandle,
-        )
+        val savedStateHandle =
+            SavedStateHandle().apply {
+                id?.let { set("id", it) }
+            }
+        viewModel =
+            DetailViewModel(
+                updateUserFromGithubUseCase = updateUserFromGithubUseCase,
+                getUserWithFlowUseCase = getUserWithFlowUseCase,
+                getReposWithFlowUseCase = getReposWithFlowUseCase,
+                updateFavoriteStatusUseCase = updateFavoriteStatusUseCase,
+                savedStateHandle = savedStateHandle,
+            )
     }
 
     private fun TestScope.collectViewModelFlows() {
@@ -77,118 +78,124 @@ class DetailViewModelTest {
         backgroundScope.launch { viewModel.repo.collect() }
     }
 
-    private fun createDummyRepo(userGithubId: String) = RepositoryModel(
-        name = "Repo Name",
-        userGithubId = userGithubId,
-        description = "Description",
-        language = "Kotlin",
-        stargazer = 100,
-    )
+    private fun createDummyRepo(userGithubId: String) =
+        RepositoryModel(
+            name = "Repo Name",
+            userGithubId = userGithubId,
+            description = "Description",
+            language = "Kotlin",
+            stargazer = 100,
+        )
 
     @Test
-    fun `초기화 시 id가 전달되면 GitHub로부터 데이터 업데이트를 시도하고 UI 상태를 갱신한다`() = runTest {
-        // Given
-        val expectedId = "test_user"
-        val expectedUser = createDummyUser(expectedId)
-        val expectedRepos = listOf(createDummyRepo(expectedId))
+    fun `초기화 시 id가 전달되면 GitHub로부터 데이터 업데이트를 시도하고 UI 상태를 갱신한다`() =
+        runTest {
+            // Given
+            val expectedId = "test_user"
+            val expectedUser = createDummyUser(expectedId)
+            val expectedRepos = listOf(createDummyRepo(expectedId))
 
-        coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(expectedUser)
-        coEvery { getReposWithFlowUseCase(expectedId) } returns flowOf(expectedRepos)
+            coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(expectedUser)
+            coEvery { getReposWithFlowUseCase(expectedId) } returns flowOf(expectedRepos)
 
-        // When
-        createViewModel(id = expectedId)
-        collectViewModelFlows()
-        runCurrent()
+            // When
+            createViewModel(id = expectedId)
+            collectViewModelFlows()
+            runCurrent()
 
-        // Then
-        coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
-        coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
-        assertEquals(expectedUser, viewModel.user.value)
-        assertEquals(expectedRepos, viewModel.repo.value)
-    }
-
-    @Test
-    fun `초기화 시 id가 없으면 데이터 업데이트를 수행하지 않는다`() = runTest {
-        // Given
-        val expectedId = null
-
-        // When
-        createViewModel(id = expectedId)
-        collectViewModelFlows()
-        runCurrent()
-
-        // Then
-        coVerify(exactly = 0) { updateUserFromGithubUseCase(any()) }
-        coVerify(exactly = 0) { getUserWithFlowUseCase(any()).ignoreUnused() }
-        coVerify(exactly = 0) { getReposWithFlowUseCase(any()).ignoreUnused() }
-        coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
-        assertEquals(null, viewModel.user.value)
-        assertEquals(emptyList<RepositoryModel>(), viewModel.repo.value)
-    }
+            // Then
+            coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
+            coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
+            assertEquals(expectedUser, viewModel.user.value)
+            assertEquals(expectedRepos, viewModel.repo.value)
+        }
 
     @Test
-    fun `초기화 시 id가 빈 값이면 데이터 업데이트를 수행하지 않는다`() = runTest {
-        // Given
-        val expectedId = ""
+    fun `초기화 시 id가 없으면 데이터 업데이트를 수행하지 않는다`() =
+        runTest {
+            // Given
+            val expectedId = null
 
-        // When
-        createViewModel(id = expectedId)
-        collectViewModelFlows()
-        runCurrent()
+            // When
+            createViewModel(id = expectedId)
+            collectViewModelFlows()
+            runCurrent()
 
-        // Then
-        coVerify(exactly = 0) { updateUserFromGithubUseCase(any()) }
-        coVerify(exactly = 0) { getUserWithFlowUseCase(any()).ignoreUnused() }
-        coVerify(exactly = 0) { getReposWithFlowUseCase(any()).ignoreUnused() }
-        coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
-        assertEquals(null, viewModel.user.value)
-        assertEquals(emptyList<RepositoryModel>(), viewModel.repo.value)
-    }
-
-    @Test
-    fun `즐겨찾기 상태를 업데이트하면 현재 user 값을 사용하여 UseCase를 호출한다`() = runTest {
-        // Given
-        val expectedId = "test_user"
-        val expectedUser = createDummyUser(expectedId)
-
-        coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(expectedUser)
-
-        createViewModel(id = expectedId)
-        collectViewModelFlows()
-        runCurrent()
-
-        // When
-        viewModel.updateFavoriteStatus()
-        runCurrent()
-
-        // Then
-        coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
-        coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 1) { updateFavoriteStatusUseCase(expectedUser) }
-    }
+            // Then
+            coVerify(exactly = 0) { updateUserFromGithubUseCase(any()) }
+            coVerify(exactly = 0) { getUserWithFlowUseCase(any()).ignoreUnused() }
+            coVerify(exactly = 0) { getReposWithFlowUseCase(any()).ignoreUnused() }
+            coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
+            assertEquals(null, viewModel.user.value)
+            assertEquals(emptyList<RepositoryModel>(), viewModel.repo.value)
+        }
 
     @Test
-    fun `현재 user 값이 null일 때 즐겨찾기 상태를 업데이트하면 UseCase를 호출하지 않는다`() = runTest {
-        // Given
-        val expectedId = "test_user"
+    fun `초기화 시 id가 빈 값이면 데이터 업데이트를 수행하지 않는다`() =
+        runTest {
+            // Given
+            val expectedId = ""
 
-        coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(null)
+            // When
+            createViewModel(id = expectedId)
+            collectViewModelFlows()
+            runCurrent()
 
-        createViewModel(id = expectedId)
-        collectViewModelFlows()
-        runCurrent()
+            // Then
+            coVerify(exactly = 0) { updateUserFromGithubUseCase(any()) }
+            coVerify(exactly = 0) { getUserWithFlowUseCase(any()).ignoreUnused() }
+            coVerify(exactly = 0) { getReposWithFlowUseCase(any()).ignoreUnused() }
+            coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
+            assertEquals(null, viewModel.user.value)
+            assertEquals(emptyList<RepositoryModel>(), viewModel.repo.value)
+        }
 
-        // When
-        viewModel.updateFavoriteStatus()
-        runCurrent()
+    @Test
+    fun `즐겨찾기 상태를 업데이트하면 현재 user 값을 사용하여 UseCase를 호출한다`() =
+        runTest {
+            // Given
+            val expectedId = "test_user"
+            val expectedUser = createDummyUser(expectedId)
 
-        // Then
-        coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
-        coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
-        coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
-    }
+            coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(expectedUser)
+
+            createViewModel(id = expectedId)
+            collectViewModelFlows()
+            runCurrent()
+
+            // When
+            viewModel.updateFavoriteStatus()
+            runCurrent()
+
+            // Then
+            coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
+            coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 1) { updateFavoriteStatusUseCase(expectedUser) }
+        }
+
+    @Test
+    fun `현재 user 값이 null일 때 즐겨찾기 상태를 업데이트하면 UseCase를 호출하지 않는다`() =
+        runTest {
+            // Given
+            val expectedId = "test_user"
+
+            coEvery { getUserWithFlowUseCase(expectedId) } returns flowOf(null)
+
+            createViewModel(id = expectedId)
+            collectViewModelFlows()
+            runCurrent()
+
+            // When
+            viewModel.updateFavoriteStatus()
+            runCurrent()
+
+            // Then
+            coVerify(exactly = 1) { updateUserFromGithubUseCase(expectedId) }
+            coVerify(exactly = 1) { getUserWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 1) { getReposWithFlowUseCase(expectedId).ignoreUnused() }
+            coVerify(exactly = 0) { updateFavoriteStatusUseCase(any()) }
+        }
 }

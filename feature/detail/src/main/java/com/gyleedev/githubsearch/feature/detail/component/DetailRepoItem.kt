@@ -22,12 +22,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.util.getColor
 import com.gyleedev.githubsearch.core.designsystem.util.parseEmojis
+import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
+import com.gyleedev.githubsearch.feature.detail.R
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
 @Composable
@@ -39,21 +42,23 @@ fun DetailRepoItem(
     modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                vertical = 8.dp,
-                horizontal = 16.dp,
-            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(
+                    vertical = 8.dp,
+                    horizontal = 16.dp,
+                ),
         border = CardDefaults.outlinedCardBorder().copy(width = 0.2.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 16.dp,
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 16.dp,
+                    ),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -67,7 +72,7 @@ fun DetailRepoItem(
                     )
                 }
                 CustomSurfaceChip(
-                    text = stargazer.toString(),
+                    text = stargazer.toCompactString(),
                     icon = Icons.Outlined.StarOutline,
                     onClick = {},
                     enabled = false,
@@ -95,7 +100,7 @@ fun DetailRepoItem(
                     Icon(
                         imageVector = Icons.Filled.Circle,
                         tint = getColor(language),
-                        contentDescription = "repository language",
+                        contentDescription = stringResource(id = R.string.content_description_repository_language),
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -119,9 +124,7 @@ fun DetailRepoItem(
     name = "Dark Mode",
 )
 @Composable
-private fun DetailRepoInfoPreview(
-    repo: RepositoryModel = DetailPreviewData.skydovesRepos.first(),
-) {
+private fun DetailRepoInfoPreview(repo: RepositoryModel = DetailPreviewData.skydovesRepos.first()) {
     GithubSearchTheme {
         Surface {
             DetailRepoItem(

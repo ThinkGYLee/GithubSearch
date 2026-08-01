@@ -5,16 +5,18 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-class TokenInterceptor @Inject constructor(
-    private val tokenPreference: TokenPreference,
-) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val accessToken = tokenPreference.getString()
-        val builder = chain.request().newBuilder()
+class TokenInterceptor
+    @Inject
+    constructor(
+        private val tokenPreference: TokenPreference,
+    ) : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val accessToken = tokenPreference.getString()
+            val builder = chain.request().newBuilder()
 
-        if (accessToken.isNotBlank()) {
-            builder.addHeader("Authorization", "token $accessToken")
+            if (accessToken.isNotBlank()) {
+                builder.addHeader("Authorization", "token $accessToken")
+            }
+            return chain.proceed(builder.build())
         }
-        return chain.proceed(builder.build())
     }
-}

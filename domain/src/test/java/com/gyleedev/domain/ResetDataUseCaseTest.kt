@@ -8,10 +8,10 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import kotlinx.coroutines.test.runTest
 
 class ResetDataUseCaseTest {
     private val repository: GitHubRepository = mockk()
@@ -23,32 +23,34 @@ class ResetDataUseCaseTest {
     }
 
     @Test
-    fun `데이터 초기화 성공 시 성공 결과를 반환한다`() = runTest {
-        // Given
-        val expectedResult = ResetDataResult.Success
+    fun `데이터 초기화 성공 시 성공 결과를 반환한다`() =
+        runTest {
+            // Given
+            val expectedResult = ResetDataResult.Success
 
-        coEvery { repository.resetUser() } just runs
+            coEvery { repository.resetUser() } just runs
 
-        // When
-        val actualResult = useCase()
+            // When
+            val actualResult = useCase()
 
-        // Then
-        assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.resetUser() }
-    }
+            // Then
+            assertEquals(expectedResult, actualResult)
+            coVerify(exactly = 1) { repository.resetUser() }
+        }
 
     @Test
-    fun `데이터 초기화 중 예외가 발생하면 실패 결과를 반환한다`() = runTest {
-        // Given
-        val expectedResult = ResetDataResult.Fail
+    fun `데이터 초기화 중 예외가 발생하면 실패 결과를 반환한다`() =
+        runTest {
+            // Given
+            val expectedResult = ResetDataResult.Fail
 
-        coEvery { repository.resetUser() } throws Exception("Database Error")
+            coEvery { repository.resetUser() } throws Exception("Database Error")
 
-        // When
-        val actualResult = useCase()
+            // When
+            val actualResult = useCase()
 
-        // Then
-        assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { repository.resetUser() }
-    }
+            // Then
+            assertEquals(expectedResult, actualResult)
+            coVerify(exactly = 1) { repository.resetUser() }
+        }
 }

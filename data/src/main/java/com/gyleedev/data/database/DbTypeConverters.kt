@@ -6,9 +6,10 @@ import java.time.Instant
 object DbTypeConverters {
     @TypeConverter
     @JvmStatic
-    fun toInstant(value: String?): Instant? = value?.let {
-        Instant.parse(value)
-    }
+    fun toInstant(value: String?): Instant? =
+        value?.let {
+            Instant.parse(value)
+        }
 
     @TypeConverter
     @JvmStatic

@@ -12,10 +12,10 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class DeleteAccessTokenRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -30,25 +30,27 @@ class DeleteAccessTokenRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `DeleteAccessToken 기능 확인`() = runTest {
-        // Given
-        every { tokenPreference.deleteKey() } just runs
-        // When
-        repository.deleteAccessToken()
-        // Then
-        verify(exactly = 1) { tokenPreference.deleteKey() }
-    }
+    fun `DeleteAccessToken 기능 확인`() =
+        runTest {
+            // Given
+            every { tokenPreference.deleteKey() } just runs
+            // When
+            repository.deleteAccessToken()
+            // Then
+            verify(exactly = 1) { tokenPreference.deleteKey() }
+        }
 }

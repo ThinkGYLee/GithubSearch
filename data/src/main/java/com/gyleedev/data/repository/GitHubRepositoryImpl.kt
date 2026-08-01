@@ -19,6 +19,7 @@ import com.gyleedev.data.remote.TypeApi
 import com.gyleedev.data.remote.TypeRevoke
 import com.gyleedev.data.remote.request.RevokeRequest
 import com.gyleedev.data.remote.response.toModel
+import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.GetAccessTokenRepositoryResult
 import com.gyleedev.githubsearch.domain.model.RepositoryModel
@@ -27,25 +28,26 @@ import com.gyleedev.githubsearch.domain.model.UserFetchResult
 import com.gyleedev.githubsearch.domain.model.UserModel
 import com.gyleedev.githubsearch.domain.model.UserSyncResult
 import com.gyleedev.githubsearch.domain.repository.GitHubRepository
+import java.time.Clock
+import java.time.Instant
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import java.time.Clock
-import java.time.Instant
-import javax.inject.Inject
-import com.gyleedev.githubsearch.domain.model.AccessTime as AccessTimeModel
 
-class GitHubRepositoryImpl @Inject constructor(
-    private val userDao: UserDao,
-    private val reposDao: ReposDao,
-    private val accessTimeDao: AccessTimeDao,
-    @TypeApi private val githubApiService: GithubApiService,
-    @TypeAccess private val accessService: AccessService,
-    @TypeRevoke private val revokeService: RevokeService,
-    private val tokenPreference: TokenPreference,
-    private val clock: Clock,
-) : GitHubRepository {
+class GitHubRepositoryImpl
+    @Inject
+    constructor(
+        private val userDao: UserDao,
+        private val reposDao: ReposDao,
+        private val accessTimeDao: AccessTimeDao,
+        @TypeApi private val githubApiService: GithubApiService,
+        @TypeAccess private val accessService: AccessService,
+        @TypeRevoke private val revokeService: RevokeService,
+        private val tokenPreference: TokenPreference,
+        private val clock: Clock,
+    ) : GitHubRepository {
     /*
     세팅
         1. 데이터 리셋 [resetData]
@@ -83,210 +85,225 @@ class GitHubRepositoryImpl @Inject constructor(
         2. 토큰 저장하기 [saveAccessToken]
      */
 
-    // Home
-    override fun getUsers(): Flow<PagingData<UserModel>> = Pager(
-        config =
-        PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false,
-        ),
-        pagingSourceFactory = { userDao.getUsers() },
-    ).flow.map { pagingData ->
-        pagingData.map {
-            it.toModel()
+        // Home
+        override fun getUsers(): Flow<PagingData<UserModel>> =
+            Pager(
+                config =
+                    PagingConfig(
+                        pageSize = 10,
+                        enablePlaceholders = false,
+                    ),
+                pagingSourceFactory = { userDao.getUsers() },
+            ).flow.map { pagingData ->
+                pagingData.map {
+                    it.toModel()
+                }
+            }
+        // flowOn 디스페처 지정을 할때 안할때의 차이? 해야되나 안해도 괜찮나?
+
+        override fun getUserWithFlow(id: String): Flow<UserModel?> = userDao.getUserByGithubId(id).map { it?.toModel() }
+
+        // Favorite
+        override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> =
+            Pager(
+                config =
+                    PagingConfig(
+                        pageSize = 10,
+                        enablePlaceholders = false,
+                    ),
+                pagingSourceFactory = {
+                    userDao.getUsers(status)
+                },
+            ).flow.map { pagingData ->
+                pagingData.map { it.toModel() }
+            }
+
+        override fun getReposWithFlow(githubId: String): Flow<List<RepositoryModel>> =
+            reposDao
+                .getReposByGithubIdWithFlow(githubId)
+                .map { list ->
+                    list.map { entity ->
+                        entity.toModel()
+                    }
+                }
+
+        override suspend fun updateFavoriteUsers(
+            userSet: Set<String>,
+            favorite: Boolean,
+        ): Int = userDao.updateFavoriteStatus(userSet, favorite)
+
+        override suspend fun upsertAccessTime(
+            id: Long,
+            githubId: String,
+            isRepoFetched: Boolean,
+        ) {
+            val entity =
+                AccessTimeEntity(
+                    id = id,
+                    githubId = githubId,
+                    accessTime = Instant.now(clock),
+                    isRepoFetched = isRepoFetched,
+                )
+            accessTimeDao.upsertAccessTime(entity)
         }
-    }
-    // flowOn 디스페처 지정을 할때 안할때의 차이? 해야되나 안해도 괜찮나?
 
-    override fun getUserWithFlow(id: String): Flow<UserModel?> = userDao.getUserByGithubId(id).map { it?.toModel() }
+        override suspend fun fetchUser(id: String): UserFetchResult {
+            val response = githubApiService.getUser(id)
 
-    // Favorite
-    override fun getFavorites(status: FilterStatus): Flow<PagingData<UserModel>> = Pager(
-        config =
-        PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false,
-        ),
-        pagingSourceFactory = {
-            userDao.getUsers(status)
-        },
-    ).flow.map { pagingData ->
-        pagingData.map { it.toModel() }
-    }
+            // 성공 범위(200-299)인 경우 처리
+            if (response.isSuccessful) {
+                val userResponse = response.body()
 
-    override fun getReposWithFlow(githubId: String): Flow<List<RepositoryModel>> = reposDao.getReposByGithubIdWithFlow(githubId)
-        .map { list ->
-            list.map { entity ->
-                entity.toModel()
+                if (userResponse != null) {
+                    return UserFetchResult.Success(
+                        user = userResponse.toModel(),
+                    )
+                }
+
+                return UserFetchResult.UnknownError
+            }
+
+            // 성공 범위가 아닌 경우(400-500대) 상태 코드별 처리
+            return when (response.code()) {
+                // 유저를 찾을 수 없음
+                404 -> {
+                    UserFetchResult.NoSuchUser
+                }
+
+                // 기본 할당량 초과
+                403 -> {
+                    UserFetchResult.ExceedQuota
+                }
+
+                // 보조 제한(Secondary Rate Limit) 초과
+                429 -> {
+                    UserFetchResult.ExceedQuota
+                }
+
+                // 그 외 에러
+                else -> {
+                    UserFetchResult.UnknownError
+                }
             }
         }
 
-    override suspend fun updateFavoriteUsers(
-        userSet: Set<String>,
-        favorite: Boolean,
-    ): Int = userDao.updateFavoriteStatus(userSet, favorite)
+        override suspend fun fetchRepos(id: String): List<RepositoryModel> {
+            val response = githubApiService.getRepos(id)
+            val body = response.body()
+            return if (response.isSuccessful && body != null) {
+                body.map { response ->
+                    response.toModel(id = id)
+                }
+            } else {
+                emptyList()
+            }
+        }
 
-    override suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean) {
-        val entity = AccessTimeEntity(
-            id = id,
-            githubId = githubId,
-            accessTime = Instant.now(clock),
-            isRepoFetched = isRepoFetched,
-        )
-        accessTimeDao.upsertAccessTime(entity)
-    }
-
-    override suspend fun fetchUser(id: String): UserFetchResult {
-        val response = githubApiService.getUser(id)
-
-        // 성공 범위(200-299)인 경우 처리
-        if (response.isSuccessful) {
-            val userResponse = response.body()
-
-            if (userResponse != null) {
-                return UserFetchResult.Success(
-                    user = userResponse.toModel(),
+        // 마지막 액세스 시간 가져오기
+        override suspend fun getLastAccessById(id: String): AccessTimeModel? =
+            accessTimeDao.getTimeByGithubId(id)?.let {
+                AccessTimeModel(
+                    id = it.id,
+                    githubId = it.githubId,
+                    accessTime = it.accessTime,
+                    isRepoFetched = it.isRepoFetched,
                 )
             }
 
-            return UserFetchResult.UnknownError
-        }
+        override suspend fun syncUserData(githubId: String): UserSyncResult {
+            val userFetchResult = fetchUser(githubId)
+            val localUser = getUserWithFlow(githubId).first()
 
-        // 성공 범위가 아닌 경우(400-500대) 상태 코드별 처리
-        return when (response.code()) {
-            // 유저를 찾을 수 없음
-            404 -> {
-                UserFetchResult.NoSuchUser
-            }
+            return if (userFetchResult is UserFetchResult.Success && localUser != null) {
+                val insertUser =
+                    userFetchResult.user.copy(
+                        id = localUser.id,
+                        favorite = localUser.favorite,
+                    )
+                val upsertResult = upsertUser(insertUser)
 
-            // 기본 할당량 초과
-            403 -> {
-                UserFetchResult.ExceedQuota
-            }
+                // upsert 결과가 -1이면 업데이트가 일어난 것이므로 기존 localUser.id 사용
+                val finalEntityId = if (upsertResult == -1L) localUser.id else upsertResult
 
-            // 보조 제한(Secondary Rate Limit) 초과
-            429 -> {
-                UserFetchResult.ExceedQuota
-            }
-
-            // 그 외 에러
-            else -> {
-                UserFetchResult.UnknownError
+                UserSyncResult.Success(entityId = finalEntityId)
+            } else {
+                UserSyncResult.Fail
             }
         }
-    }
 
-    override suspend fun fetchRepos(id: String): List<RepositoryModel> {
-        val response = githubApiService.getRepos(id)
-        val body = response.body()
-        return if (response.isSuccessful && body != null) {
-            body.map { response ->
-                response.toModel(id = id)
+        override suspend fun syncRepoDataList(
+            entityId: Long,
+            githubId: String,
+        ) {
+            val fetchedRepos = fetchRepos(githubId)
+            if (fetchedRepos.isNotEmpty()) {
+                insertRepositoryList(entityId, fetchedRepos)
             }
-        } else {
-            emptyList()
         }
-    }
 
-    // 마지막 액세스 시간 가져오기
-    override suspend fun getLastAccessById(id: String): AccessTimeModel? = accessTimeDao.getTimeByGithubId(id)?.let {
-        AccessTimeModel(
-            id = it.id,
-            githubId = it.githubId,
-            accessTime = it.accessTime,
-            isRepoFetched = it.isRepoFetched,
-        )
-    }
+        override suspend fun deleteUserById(githubId: String) = userDao.deleteUserById(githubId)
 
-    override suspend fun syncUserData(githubId: String): UserSyncResult {
-        val userFetchResult = fetchUser(githubId)
-        val localUser = getUserWithFlow(githubId).first()
+        override suspend fun upsertUser(user: UserModel): Long = userDao.upsertUser(user.toEntity())
 
-        return if (userFetchResult is UserFetchResult.Success && localUser != null) {
-            val insertUser = userFetchResult.user.copy(
-                id = localUser.id,
-                favorite = localUser.favorite,
-            )
-            val upsertResult = upsertUser(insertUser)
+        override suspend fun getUserId(id: String): Long? = userDao.getUser(id)?.id
 
-            // upsert 결과가 -1이면 업데이트가 일어난 것이므로 기존 localUser.id 사용
-            val finalEntityId = if (upsertResult == -1L) localUser.id else upsertResult
-
-            UserSyncResult.Success(entityId = finalEntityId)
-        } else {
-            UserSyncResult.Fail
+        override suspend fun insertRepositoryList(
+            userEntityId: Long,
+            list: List<RepositoryModel>,
+        ) {
+            val mappedList =
+                list.map { model ->
+                    model.toEntity(
+                        userEntityId = userEntityId,
+                    )
+                }
+            reposDao.insertRepos(mappedList)
         }
-    }
 
-    override suspend fun syncRepoDataList(entityId: Long, githubId: String) {
-        val fetchedRepos = fetchRepos(githubId)
-        if (fetchedRepos.isNotEmpty()) {
-            insertRepositoryList(entityId, fetchedRepos)
-        }
-    }
-
-    override suspend fun deleteUserById(githubId: String) = userDao.deleteUserById(githubId)
-
-    override suspend fun upsertUser(user: UserModel): Long = userDao.upsertUser(user.toEntity())
-
-    override suspend fun getUserId(id: String): Long? = userDao.getUser(id)?.id
-
-    override suspend fun insertRepositoryList(
-        userEntityId: Long,
-        list: List<RepositoryModel>,
-    ) {
-        val mappedList = list.map { model ->
-            model.toEntity(
-                userEntityId = userEntityId,
-            )
-        }
-        reposDao.insertRepos(mappedList)
-    }
-
-    // Main
-    override suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult {
-        val response =
-            accessService.getAccessToken(code = code)
-        return if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                val accessToken = body.accessToken
-                GetAccessTokenRepositoryResult.Success(token = accessToken)
+        // Main
+        override suspend fun getAccessToken(code: String): GetAccessTokenRepositoryResult {
+            val response =
+                accessService.getAccessToken(code = code)
+            return if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    val accessToken = body.accessToken
+                    GetAccessTokenRepositoryResult.Success(token = accessToken)
+                } else {
+                    GetAccessTokenRepositoryResult.Fail
+                }
             } else {
                 GetAccessTokenRepositoryResult.Fail
             }
-        } else {
-            GetAccessTokenRepositoryResult.Fail
         }
-    }
 
-    override suspend fun saveAccessToken(token: String) {
-        tokenPreference.setString(str = token)
-    }
-
-    // Setting
-    override suspend fun resetUser() {
-        userDao.resetUser()
-    }
-
-    override suspend fun revokeApplication(): RevokeResult {
-        val accessToken = tokenPreference.getString()
-        if (accessToken.isBlank()) {
-            return RevokeResult.NO_KEY
+        override suspend fun saveAccessToken(token: String) {
+            tokenPreference.setString(str = token)
         }
-        val response = revokeService.revoke(request = RevokeRequest(accessToken))
-        return if (response.isSuccessful) {
-            RevokeResult.SUCCESS
-        } else {
-            RevokeResult.FAIL
+
+        // Setting
+        override suspend fun resetUser() {
+            userDao.resetUser()
         }
+
+        override suspend fun revokeApplication(): RevokeResult {
+            val accessToken = tokenPreference.getString()
+            if (accessToken.isBlank()) {
+                return RevokeResult.NO_KEY
+            }
+            val response = revokeService.revoke(request = RevokeRequest(accessToken))
+            return if (response.isSuccessful) {
+                RevokeResult.SUCCESS
+            } else {
+                RevokeResult.FAIL
+            }
+        }
+
+        override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(tokenPreference.isKeyExist())
+
+        override suspend fun deleteAccessToken() {
+            tokenPreference.deleteKey()
+        }
+
+        override suspend fun deleteUsersWithSet(userIds: Set<String>): Int = userDao.deleteUsersWithSet(userIds)
     }
-
-    override suspend fun hasAccessToken(): Flow<Boolean> = flowOf(tokenPreference.isKeyExist())
-
-    override suspend fun deleteAccessToken() {
-        tokenPreference.deleteKey()
-    }
-
-    override suspend fun deleteUsersWithSet(userIds: Set<String>): Int = userDao.deleteUsersWithSet(userIds)
-}

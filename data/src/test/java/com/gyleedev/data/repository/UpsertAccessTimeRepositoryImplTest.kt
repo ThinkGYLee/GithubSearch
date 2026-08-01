@@ -14,11 +14,11 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
+import kotlinx.coroutines.test.runTest
 
 class UpsertAccessTimeRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -33,42 +33,45 @@ class UpsertAccessTimeRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `액세스 시간을 업데이트할 때 주입된 Clock을 사용하여 AccessTimeEntity를 생성하고 Dao를 호출한다`() = runTest {
-        // Given
-        val expectedId = 1L
-        val expectedGithubId = "test_github_id"
-        val expectedIsRepoFetched = true
-        val expectedInstant = Instant.ofEpochMilli(1680000000000L)
+    fun `액세스 시간을 업데이트할 때 주입된 Clock을 사용하여 AccessTimeEntity를 생성하고 Dao를 호출한다`() =
+        runTest {
+            // Given
+            val expectedId = 1L
+            val expectedGithubId = "test_github_id"
+            val expectedIsRepoFetched = true
+            val expectedInstant = Instant.ofEpochMilli(1680000000000L)
 
-        // Instant.now(clock)은 내부적으로 clock.instant()를 호출하므로 이를 모킹
-        every { clock.instant() } returns expectedInstant
+            // Instant.now(clock)은 내부적으로 clock.instant()를 호출하므로 이를 모킹
+            every { clock.instant() } returns expectedInstant
 
-        val expectedEntity = AccessTimeEntity(
-            id = expectedId,
-            githubId = expectedGithubId,
-            accessTime = expectedInstant,
-            isRepoFetched = expectedIsRepoFetched,
-        )
+            val expectedEntity =
+                AccessTimeEntity(
+                    id = expectedId,
+                    githubId = expectedGithubId,
+                    accessTime = expectedInstant,
+                    isRepoFetched = expectedIsRepoFetched,
+                )
 
-        coEvery { accessTimeDao.upsertAccessTime(expectedEntity) } just runs
+            coEvery { accessTimeDao.upsertAccessTime(expectedEntity) } just runs
 
-        // When
-        repository.upsertAccessTime(expectedId, expectedGithubId, expectedIsRepoFetched)
+            // When
+            repository.upsertAccessTime(expectedId, expectedGithubId, expectedIsRepoFetched)
 
-        // Then
-        coVerify(exactly = 1) { accessTimeDao.upsertAccessTime(expectedEntity) }
-    }
+            // Then
+            coVerify(exactly = 1) { accessTimeDao.upsertAccessTime(expectedEntity) }
+        }
 }

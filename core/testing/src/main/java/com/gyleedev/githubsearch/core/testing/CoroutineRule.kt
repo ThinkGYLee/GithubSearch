@@ -1,5 +1,7 @@
 package com.gyleedev.githubsearch.core.testing
 
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -7,8 +9,6 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 
 /**
  * 테스트에서 사용할 디스패처들을 제공하는 인터페이스입니다.
@@ -39,7 +39,6 @@ class SharedTestDispatcherProvider(
 class CoroutineRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : TestWatcher() {
-
     override fun starting(description: Description) {
         Dispatchers.setMain(testDispatcher)
     }

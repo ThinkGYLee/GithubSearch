@@ -35,11 +35,12 @@ fun FlippableUserAvatar(
     )
 
     Box(
-        modifier = modifier
-            .graphicsLayer {
-                rotationY = rotation
-                cameraDistance = 12f * density
-            },
+        modifier =
+            modifier
+                .graphicsLayer {
+                    rotationY = rotation
+                    cameraDistance = 12f * density
+                },
         contentAlignment = Alignment.Center,
     ) {
         if (rotation <= 90f) {
@@ -52,11 +53,12 @@ fun FlippableUserAvatar(
         } else {
             // Replicate UserAvatar's size and shape
             Box(
-                modifier = Modifier
-                    .size(size)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .graphicsLayer { rotationY = 180f },
+                modifier =
+                    Modifier
+                        .size(size)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .graphicsLayer { rotationY = 180f },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

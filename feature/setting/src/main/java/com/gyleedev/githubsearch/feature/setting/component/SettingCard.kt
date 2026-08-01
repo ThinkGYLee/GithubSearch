@@ -25,15 +25,15 @@ fun SettingCard(
 ) {
     Card(
         colors =
-        if (isDark) {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            )
-        } else {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-            )
-        },
+            if (isDark) {
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                )
+            } else {
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                )
+            },
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(),
     ) {

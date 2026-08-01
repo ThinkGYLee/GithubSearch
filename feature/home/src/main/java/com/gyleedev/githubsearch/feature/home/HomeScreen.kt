@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,6 +75,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.core.designsystem.theme.component.PulsingHeart
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
@@ -83,15 +83,16 @@ import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FetchState
 import com.gyleedev.githubsearch.domain.model.UpdateFavoriteResult
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.feature.home.R
+import com.gyleedev.githubsearch.feature.home.R as HomeR
 import com.skydoves.cloudy.cloudy
 import kotlinx.coroutines.flow.collectLatest
-import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
-import com.gyleedev.githubsearch.feature.home.R as HomeR
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun HomeScreen(
-    moveToDetail: (String, String) -> Unit,
+    onUserClick: (String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     requestAuthentication: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -143,11 +144,12 @@ fun HomeScreen(
     LaunchedEffect(viewModel.showUpdateState, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.showUpdateState.collectLatest { result ->
-                val message = if (result == UpdateFavoriteResult.Success) {
-                    updateSuccess
-                } else {
-                    updateFail
-                }
+                val message =
+                    if (result == UpdateFavoriteResult.Success) {
+                        updateSuccess
+                    } else {
+                        updateFail
+                    }
                 snackbarHostState.showSnackbar(
                     message = message,
                     duration = SnackbarDuration.Short,
@@ -181,7 +183,8 @@ fun HomeScreen(
             onFavoriteRequest = viewModel::updateSelectedFavorite,
             onDeleteConfirm = viewModel::deleteSelectedUsers,
             onDeleteDismiss = { viewModel.changeDeleteDialogState(false) },
-            moveToDetail = moveToDetail,
+            onUserClick = onUserClick,
+            onSearchUserClick = onSearchUserClick,
             modifier = modifier,
         )
     }
@@ -207,7 +210,8 @@ internal fun HomeScreen(
     onDeleteDismiss: () -> Unit,
     onDeleteRequest: () -> Unit,
     onFavoriteRequest: () -> Unit,
-    moveToDetail: (String, String) -> Unit,
+    onUserClick: (String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -225,15 +229,16 @@ internal fun HomeScreen(
                 onSearchItemReset = onSearchItemReset,
                 onToggleAll = onToggleAllSelection,
                 onClearSelection = onClearSelection,
-                moveToDetail = moveToDetail,
+                onSearchUserClick = onSearchUserClick,
             )
         },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                modifier =
+                    Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -241,20 +246,21 @@ internal fun HomeScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (userList.itemCount > 0) {
-                HomeItemList(
+                HomeScreenSuccess(
                     modifier = Modifier.fillMaxSize(),
                     users = userList,
                     mode = uiState.mode,
                     selectedUsers = uiState.selectedUsers,
                     onToggleSelection = onToggleSelection,
-                    onClick = { moveToDetail(it, "home") },
+                    onClick = onUserClick,
                     topPadding = paddingValues.calculateTopPadding(),
                 )
             } else {
                 NoItem(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = paddingValues.calculateTopPadding()),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(top = paddingValues.calculateTopPadding()),
                 )
             }
 
@@ -262,10 +268,11 @@ internal fun HomeScreen(
                 isActive = uiState.selectedUsers.isNotEmpty(),
                 onDeleteRequest = onDeleteRequest,
                 onFavoriteRequest = onFavoriteRequest,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin + 20.dp),
             )
         }
 
@@ -300,7 +307,7 @@ private fun HomeTopAppBar(
     onSearchItemReset: () -> Unit,
     onToggleAll: () -> Unit,
     onClearSelection: () -> Unit,
-    moveToDetail: (String, String) -> Unit,
+    onSearchUserClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -321,24 +328,26 @@ private fun HomeTopAppBar(
             if (mode != HomeMode.SEARCH) {
                 // 투명처리
                 Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), // 짙은 농도 복구
-                                0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                                1f to Color.Transparent,
-                            ),
-                        )
-                        .cloudy(radius = 60),
+                    modifier =
+                        Modifier
+                            .matchParentSize()
+                            .background(
+                                brush =
+                                    Brush.verticalGradient(
+                                        0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), // 짙은 농도 복구
+                                        0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                                        1f to Color.Transparent,
+                                    ),
+                            ).cloudy(radius = 60),
                 ) {}
             } else {
                 // 서치와 디폴트일 때
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(statusBarPadding)
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(statusBarPadding)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
                 )
             }
 
@@ -359,7 +368,7 @@ private fun HomeTopAppBar(
                         onActiveChanged = onActiveChanged,
                         onSearch = onSearch,
                         onSearchItemReset = onSearchItemReset,
-                        moveToDetail = { moveToDetail(it, "search") },
+                        moveToDetail = onSearchUserClick,
                         searchState = searchState,
                         loading = isLoading,
                     )
@@ -379,21 +388,29 @@ private fun SelectionTopBar(
     modifier: Modifier = Modifier,
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = "${selectedCount}개 선택됨") },
+        title = { Text(text = stringResource(id = R.string.text_selected_count, selectedCount)) },
         windowInsets = WindowInsets(0, 0, 0, 0),
         navigationIcon = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .clickable { onToggleAll() },
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp)
+                        .clickable { onToggleAll() },
             ) {
                 Checkbox(
                     checked = isAllSelected,
                     onCheckedChange = null,
                 )
                 Text(
-                    text = if (isAllSelected) "모두 선택 해제" else "모두 선택",
+                    text =
+                        if (isAllSelected) {
+                            stringResource(
+                                id = R.string.text_unselect_all,
+                            )
+                        } else {
+                            stringResource(id = R.string.text_select_all)
+                        },
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp),
@@ -402,13 +419,17 @@ private fun SelectionTopBar(
         },
         actions = {
             IconButton(onClick = onClearSelection) {
-                Icon(imageVector = Icons.Rounded.Close, contentDescription = "Exit Selection")
+                Icon(
+                    imageVector = Icons.Rounded.Close,
+                    contentDescription = stringResource(id = R.string.text_exit_selection),
+                )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Transparent,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                scrolledContainerColor = Color.Transparent,
+            ),
         modifier = modifier,
     )
 }
@@ -442,7 +463,7 @@ private fun EmbeddedSearchBar(
                 onExpandedChange = onActiveChanged,
                 placeholder = {
                     Text(
-                        text = "Search With Github Id",
+                        text = stringResource(id = R.string.text_search_placeholder),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
@@ -484,32 +505,42 @@ private fun EmbeddedSearchBar(
                     }
                 },
                 // searchBar 의 placeholder 영역 음영
-                modifier = if (isSearchActive) {
-                    Modifier
-                } else {
-                    Modifier.background(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                        shape = SearchBarDefaults.inputFieldShape,
-                    )
-                },
+                modifier =
+                    if (isSearchActive) {
+                        Modifier
+                    } else {
+                        Modifier.background(
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                            shape = SearchBarDefaults.inputFieldShape,
+                        )
+                    },
             )
         },
         expanded = isSearchActive,
         onExpandedChange = onActiveChanged,
-        colors = SearchBarDefaults.colors(
-            containerColor = if (isSearchActive) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) else Color.Transparent,
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = animatePadding),
+        colors =
+            SearchBarDefaults.colors(
+                containerColor =
+                    if (isSearchActive) {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(
+                            alpha = 0.7f,
+                        )
+                    } else {
+                        Color.Transparent
+                    },
+            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = animatePadding),
     ) {
         if (searchState is SearchUiState.Success) {
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp)
-                    .imePadding(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp)
+                        .imePadding(),
             ) {
                 SearchResultItem(
                     onClick = moveToDetail,
@@ -523,14 +554,14 @@ private fun EmbeddedSearchBar(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                Button(
+                /*Button(
                     onClick = { onSearch(query) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.BottomCenter),
                 ) {
                     Text("검색하세요")
-                }
+                }*/
             }
         }
     }
@@ -593,7 +624,7 @@ private fun DeleteDialog(
 }
 
 @Composable
-private fun HomeItemList(
+private fun HomeScreenSuccess(
     users: LazyPagingItems<UserModel>,
     mode: HomeMode,
     selectedUsers: Set<String>,
@@ -604,9 +635,10 @@ private fun HomeItemList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            top = topPadding + 12.dp,
-        ),
+        contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                top = topPadding + 12.dp,
+            ),
     ) {
         items(
             users.itemCount,
@@ -637,10 +669,11 @@ private fun HomeItemList(
         // 시스템 바 영역 + LiquidNavBar + 여유 확보
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         }
     }
@@ -657,11 +690,11 @@ private fun SearchResultItem(
 ) {
     Row(
         modifier =
-        modifier
-            .padding(top = 20.dp)
-            .fillMaxWidth()
-            .heightIn(min = 80.dp)
-            .clickable(onClick = { onClick(login) }),
+            modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .clickable(onClick = { onClick(login) }),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -715,17 +748,19 @@ private fun HomeFloatingToolBar(
                 shape = CircleShape,
                 shadowElevation = 12.dp,
                 color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
-                modifier = Modifier
-                    .matchParentSize()
-                    .clip(CircleShape)
-                    .cloudy(radius = 80),
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .clip(CircleShape)
+                        .cloudy(radius = 80),
             ) {}
 
             Row(
-                modifier = Modifier.padding(
-                    horizontal = 20.dp,
-                    vertical = 12.dp,
-                ),
+                modifier =
+                    Modifier.padding(
+                        horizontal = 20.dp,
+                        vertical = 12.dp,
+                    ),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {

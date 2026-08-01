@@ -20,13 +20,16 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gyleedev.githubsearch.core.designsystem.theme.GithubSearchTheme
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserAvatar
+import com.gyleedev.githubsearch.core.designsystem.util.toCompactString
 import com.gyleedev.githubsearch.domain.model.UserModel
+import com.gyleedev.githubsearch.feature.detail.R
 import com.gyleedev.githubsearch.feature.detail.extractDomain
 import com.gyleedev.githubsearch.feature.detail.preview.DetailPreviewData
 
@@ -47,9 +50,10 @@ fun DetailUserProfile(
     transitionKeyPrefix: String = "",
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         UserAvatar(
@@ -125,10 +129,11 @@ fun DetailUserProfile(
         Spacer(modifier = Modifier.height(24.dp))
         ElevatedCard {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp, horizontal = 16.dp)
-                    .height(IntrinsicSize.Min),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp, horizontal = 16.dp)
+                        .height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -136,14 +141,14 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = repos.toString(),
+                        text = repos.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Repository",
+                        text = stringResource(id = R.string.detail_user_title_repos),
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -154,14 +159,14 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = followers.toString(),
+                        text = followers.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Follower",
+                        text = stringResource(id = R.string.detail_user_title_follower),
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -172,14 +177,14 @@ fun DetailUserProfile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = following.toString(),
+                        text = following.toCompactString(),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Following",
+                        text = stringResource(id = R.string.detail_user_title_following),
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -200,9 +205,7 @@ fun DetailUserProfile(
     name = "Dark Mode",
 )
 @Composable
-private fun DetailUserInfoPreview(
-    user: UserModel = DetailPreviewData.skydovesUser,
-) {
+private fun DetailUserInfoPreview(user: UserModel = DetailPreviewData.skydovesUser) {
     GithubSearchTheme {
         Surface {
             DetailUserProfile(
@@ -232,9 +235,7 @@ private fun DetailUserInfoPreview(
     name = "Dark Mode",
 )
 @Composable
-private fun ChipPreview(
-    user: UserModel = DetailPreviewData.skydovesUser,
-) {
+private fun ChipPreview(user: UserModel = DetailPreviewData.skydovesUser) {
     GithubSearchTheme {
         Surface {
             CustomSurfaceChip(

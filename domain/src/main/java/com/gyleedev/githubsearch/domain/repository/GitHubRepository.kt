@@ -22,7 +22,10 @@ interface GitHubRepository {
 
     suspend fun fetchRepos(id: String): List<RepositoryModel>
 
-    suspend fun updateFavoriteUsers(userSet: Set<String>, favorite: Boolean): Int
+    suspend fun updateFavoriteUsers(
+        userSet: Set<String>,
+        favorite: Boolean,
+    ): Int
 
     suspend fun deleteUsersWithSet(userIds: Set<String>): Int
 
@@ -33,11 +36,18 @@ interface GitHubRepository {
 
     suspend fun syncUserData(githubId: String): UserSyncResult
 
-    suspend fun syncRepoDataList(entityId: Long, githubId: String)
+    suspend fun syncRepoDataList(
+        entityId: Long,
+        githubId: String,
+    )
 
     suspend fun deleteUserById(githubId: String)
 
-    suspend fun upsertAccessTime(id: Long, githubId: String, isRepoFetched: Boolean = true)
+    suspend fun upsertAccessTime(
+        id: Long,
+        githubId: String,
+        isRepoFetched: Boolean = true,
+    )
 
     suspend fun upsertUser(user: UserModel): Long
 

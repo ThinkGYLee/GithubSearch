@@ -1,0 +1,11 @@
+schema_version = 1
+
+[[skill]]
+id = "project-knowledge-grounding"
+path = ".codex/skills/project-knowledge-grounding/SKILL.md"
+required_documents = ["root-agents", "workflows", "knowledge-operations"]
+
+[[skill]]
+id = "session-retrospective"
+path = ".codex/skills/session-retrospective/SKILL.md"
+required_documents = ["knowledge-operations", "change-report", "history-readme"]

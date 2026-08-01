@@ -12,12 +12,12 @@ import com.gyleedev.githubsearch.domain.model.AccessTime
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
 import java.time.Instant
+import kotlinx.coroutines.test.runTest
 
 class GetLastAccessByIdRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -32,60 +32,65 @@ class GetLastAccessByIdRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `마지막 액세스 시간 조회 시 데이터가 존재하면 모델로 매핑하여 반환한다`() = runTest {
-        // Given
-        val requestGithubId = "test_github_id"
-        val expectedInstant = Instant.ofEpochMilli(1680000000000L)
-        val expectedEntity = AccessTimeEntity(
-            id = 1L,
-            githubId = requestGithubId,
-            accessTime = expectedInstant,
-            isRepoFetched = true,
-        )
-        val expectedResult = AccessTime(
-            id = 1L,
-            githubId = requestGithubId,
-            accessTime = expectedInstant,
-            isRepoFetched = true,
-        )
+    fun `마지막 액세스 시간 조회 시 데이터가 존재하면 모델로 매핑하여 반환한다`() =
+        runTest {
+            // Given
+            val requestGithubId = "test_github_id"
+            val expectedInstant = Instant.ofEpochMilli(1680000000000L)
+            val expectedEntity =
+                AccessTimeEntity(
+                    id = 1L,
+                    githubId = requestGithubId,
+                    accessTime = expectedInstant,
+                    isRepoFetched = true,
+                )
+            val expectedResult =
+                AccessTime(
+                    id = 1L,
+                    githubId = requestGithubId,
+                    accessTime = expectedInstant,
+                    isRepoFetched = true,
+                )
 
-        coEvery { accessTimeDao.getTimeByGithubId(requestGithubId) } returns expectedEntity
+            coEvery { accessTimeDao.getTimeByGithubId(requestGithubId) } returns expectedEntity
 
-        // When
-        val result = repository.getLastAccessById(requestGithubId)
+            // When
+            val result = repository.getLastAccessById(requestGithubId)
 
-        // Then
-        assertEquals(expectedResult, result)
-        coVerify(exactly = 1) { accessTimeDao.getTimeByGithubId(requestGithubId) }
-    }
+            // Then
+            assertEquals(expectedResult, result)
+            coVerify(exactly = 1) { accessTimeDao.getTimeByGithubId(requestGithubId) }
+        }
 
     @Test
-    fun `마지막 액세스 시간 조회 시 데이터가 존재하지 않으면 null을 반환한다`() = runTest {
-        // Given
-        val requestGithubId = "test_github_id"
-        val expectedEntity: AccessTimeEntity? = null
-        val expectedResult: AccessTime? = null
+    fun `마지막 액세스 시간 조회 시 데이터가 존재하지 않으면 null을 반환한다`() =
+        runTest {
+            // Given
+            val requestGithubId = "test_github_id"
+            val expectedEntity: AccessTimeEntity? = null
+            val expectedResult: AccessTime? = null
 
-        coEvery { accessTimeDao.getTimeByGithubId(requestGithubId) } returns expectedEntity
+            coEvery { accessTimeDao.getTimeByGithubId(requestGithubId) } returns expectedEntity
 
-        // When
-        val result = repository.getLastAccessById(requestGithubId)
+            // When
+            val result = repository.getLastAccessById(requestGithubId)
 
-        // Then
-        assertEquals(expectedResult, result)
-        coVerify(exactly = 1) { accessTimeDao.getTimeByGithubId(requestGithubId) }
-    }
+            // Then
+            assertEquals(expectedResult, result)
+            coVerify(exactly = 1) { accessTimeDao.getTimeByGithubId(requestGithubId) }
+        }
 }

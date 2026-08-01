@@ -12,13 +12,13 @@ import com.gyleedev.githubsearch.domain.model.RepositoryModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class FetchReposRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -31,82 +31,87 @@ class FetchReposRepositoryImplTest {
     private val tokenPreference: TokenPreference = mockk()
     private val clock: Clock = mockk()
 
-    private val mockModel = listOf(
-        RepositoryModel(
-            name = "name_1",
-            userGithubId = "testUser",
-            description = "desc_1",
-            language = "Kotlin",
-            stargazer = 10,
-        ),
-        RepositoryModel(
-            name = "name_2",
-            userGithubId = "testUser",
-            description = "desc_2",
-            language = "Java",
-            stargazer = 20,
-        ),
-    )
+    private val mockModel =
+        listOf(
+            RepositoryModel(
+                name = "name_1",
+                userGithubId = "testUser",
+                description = "desc_1",
+                language = "Kotlin",
+                stargazer = 10,
+            ),
+            RepositoryModel(
+                name = "name_2",
+                userGithubId = "testUser",
+                description = "desc_2",
+                language = "Java",
+                stargazer = 20,
+            ),
+        )
 
-    private val mockResponse = listOf(
-        RepoResponse(
-            name = "name_1",
-            description = "desc_1",
-            language = "Kotlin",
-            stargazer = 10,
-        ),
-        RepoResponse(
-            name = "name_2",
-            description = "desc_2",
-            language = "Java",
-            stargazer = 20,
-        ),
-    )
+    private val mockResponse =
+        listOf(
+            RepoResponse(
+                name = "name_1",
+                description = "desc_1",
+                language = "Kotlin",
+                stargazer = 10,
+            ),
+            RepoResponse(
+                name = "name_2",
+                description = "desc_2",
+                language = "Java",
+                stargazer = 20,
+            ),
+        )
 
     private val mockSuccess = Response.success(mockResponse)
     private val mockFail = Response.error<List<RepoResponse>>(404, "".toResponseBody(null))
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `Api Response 가 Success 일 때`() = runTest {
-        // Given
-        val givenId = "testUser"
-        val expectedResult = mockModel
-        coEvery { githubApiService.getRepos(givenId) } returns mockSuccess
+    fun `Api Response 가 Success 일 때`() =
+        runTest {
+            // Given
+            val givenId = "testUser"
+            val expectedResult = mockModel
+            coEvery { githubApiService.getRepos(givenId) } returns mockSuccess
 
-        // When
-        val actualResult = repository.fetchRepos(givenId)
+            // When
+            val actualResult = repository.fetchRepos(givenId)
 
-        // Then
-        assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
-    }
+            // Then
+            assertEquals(expectedResult, actualResult)
+            coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
+        }
 
     @Test
-    fun `Api Response 가 Error 일 때`() = runTest {
-        // Given
-        val givenId = "testUser"
-        val expectedResult = emptyList<RepositoryModel>()
-        coEvery { githubApiService.getRepos(givenId) } returns mockFail
+    fun `Api Response 가 Error 일 때`() =
+        runTest {
+            // Given
+            val givenId = "testUser"
+            val expectedResult = emptyList<RepositoryModel>()
+            coEvery { githubApiService.getRepos(givenId) } returns mockFail
 
-        // When
-        val actualResult = repository.fetchRepos(givenId)
+            // When
+            val actualResult = repository.fetchRepos(givenId)
 
-        // Then
-        assertEquals(expectedResult, actualResult)
-        coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
-    }
+            // Then
+            assertEquals(expectedResult, actualResult)
+            coVerify(exactly = 1) { githubApiService.getRepos(givenId) }
+        }
 }

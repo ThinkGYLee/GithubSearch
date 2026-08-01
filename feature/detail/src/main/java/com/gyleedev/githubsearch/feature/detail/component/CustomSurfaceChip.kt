@@ -34,10 +34,11 @@ fun CustomSurfaceChip(
         // 아이콘과 텍스트를 가로로 배치하기 위해 Row 사용
         // Chip 내부 여백
         Row(
-            modifier = Modifier.padding(
-                horizontal = 12.dp,
-                vertical = 6.dp,
-            ),
+            modifier =
+                Modifier.padding(
+                    horizontal = 12.dp,
+                    vertical = 6.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {

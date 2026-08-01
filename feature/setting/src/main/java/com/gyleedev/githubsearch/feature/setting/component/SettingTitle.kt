@@ -20,10 +20,10 @@ fun SettingTitle(
 ) {
     Row(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 20.dp)
-            .height(48.dp),
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 20.dp)
+                .height(48.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

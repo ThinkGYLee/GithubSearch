@@ -1,0 +1,15 @@
+schema_version = 1
+
+[grounding]
+require_relevant_document_and_code = true
+allow_code_impact_none = true
+insufficient_context_action = "research-or-report"
+
+[history]
+record_root = "docs/history/records"
+record_required_for = ["medium", "large", "risky", "policy", "skill", "agent"]
+conversation_storage = "sanitized-decision-summary"
+
+[retrospective]
+required_sections = ["요청", "근거", "결정", "변경", "검증", "지시 이행", "스킬 평가", "개선 후보"]
+max_automatic_improvement_iterations = 1

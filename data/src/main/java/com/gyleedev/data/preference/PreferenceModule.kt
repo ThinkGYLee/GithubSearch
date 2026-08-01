@@ -9,10 +9,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class PreferenceModule {
-
     @Binds
     @Singleton
-    abstract fun bindTokenPreference(
-        tokenPreferenceImpl: TokenPreferenceImpl,
-    ): TokenPreference
+    abstract fun bindTokenPreference(tokenPreferenceImpl: TokenPreferenceImpl): TokenPreference
 }
