@@ -162,11 +162,11 @@ Uncertainty: <none or missing evidence>
 
 ### 체크리스트
 
-- [ ] `app`·`data` BuildConfig에 필요한 값과 `build-logic`의 `getApiKey` fallback 순서를 확인한다.
-- [ ] `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`의 비밀이 아닌 placeholder가 compile·unit test·instrumentation APK build에 충분한지 로컬에서 확인한다.
-- [ ] verify job에 `contents: read` 외 권한·production secret이 없는지 workflow YAML에서 확인한다.
-- [ ] PR comment와 Pages deploy job이 verify job과 분리됐는지 확인한다.
-- [ ] fork PR, 일반 PR, `main`/`develop` push의 실행 경로와 권한을 표로 기록한다.
+- [x] `app`·`data` BuildConfig에 필요한 값과 `build-logic`의 `getApiKey` fallback 순서를 확인한다.
+- [x] `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`의 비밀이 아닌 placeholder가 compile·unit test·instrumentation APK build에 충분한지 로컬에서 확인한다.
+- [x] verify job에 `contents: read` 외 권한·production secret이 없는지 workflow YAML에서 확인한다.
+- [x] PR comment와 Pages deploy job이 verify job과 분리됐는지 확인한다.
+- [x] fork PR, 일반 PR, `main`/`develop` push의 실행 경로와 권한을 표로 기록한다.
 - [ ] 저장소 관리자가 `Knowledge verification`과 새 verify status를 required status로 지정한다.
 
 ### Exit gate
@@ -174,6 +174,13 @@ Uncertainty: <none or missing evidence>
 - CI와 같은 Gradle command가 non-secret placeholder 환경에서 통과한다.
 - workflow YAML parse와 GitHub Actions 권한 검토를 통과한다.
 - 원격 PR에서 verify·knowledge workflow가 통과하고, production secret 로그·PR 전달이 없음을 확인한다.
+
+### Phase 2 실행 결과
+
+- `build` job은 `contents: read`만 사용하며, `CLIENT_ID`·`CLIENT_SECRET`·`REDIRECT_URI`에 비밀이 아닌 고정 placeholder를 전달한다. Gradle cache encryption secret과 OAuth secret 검증 step은 제거했다.
+- `coverage-comment` job은 internal PR에서만 실행하고 `pull-requests: write`만 사용한다. fork PR은 job 조건에서 제외한다.
+- `deploy-pages` job은 `main`·`develop` push에서만 실행하고 `pages: write`, `id-token: write`만 사용한다. Gradle 산출물은 일반 artifact로 전달되며 deploy job은 source checkout이나 Gradle 실행을 하지 않는다.
+- 로컬 placeholder 검증과 YAML 검토는 완료했다. required status 지정과 원격 PR 실행 확인은 저장소 관리자·후속 PR 단계에서 완료한다.
 
 ### 위험과 rollback
 
