@@ -41,6 +41,7 @@
 - `reporting-system-migration-plan.md`: SmartTimer식 보고·작업 이력·지식 운영 체계의 GithubSearch 이식 범위와 phase별 exit gate.
 - `knowledge-governance-enforcement-plan.md`: local document 분리, graph verifier 확대, AI 절차·hook·별도 CI 강제의 후속 실행 명세.
 - `knowledge-governance-enforcement-prompt.md`: 위 실행 명세를 구현할 때 사용하는 제약 포함 실행 프롬프트.
+- `codex-operation-hardening-plan.md`: 공식 Codex 가이드에 근거한 agent 권한, CI 최소 권한, worktree, review 운영 보강의 단계별 실행 명세.
 - `knowledge-operations.md`: 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고 규칙.
 - `SKILLS_CATALOG.md`: project skill의 trigger와 경계.
 

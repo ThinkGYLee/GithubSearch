@@ -54,6 +54,7 @@
 
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
+| `codex-operation-hardening-plan` | [docs/ai/codex-operation-hardening-plan.md](../../docs/ai/codex-operation-hardening-plan.md) | primary | `.codex, .githooks, .github, build-logic, app, data` |
 | `jacoco-setup-plan` | [docs/plan/JACOCO_SETUP_PLAN.md](../../docs/plan/JACOCO_SETUP_PLAN.md) | auxiliary | `build.gradle.kts, app, domain, data, feature, core` |
 | `knowledge-governance-enforcement-plan` | [docs/ai/knowledge-governance-enforcement-plan.md](../../docs/ai/knowledge-governance-enforcement-plan.md) | primary | `docs, scripts/ai, .codex, .github` |
 | `multi-module-refactoring-plan` | [docs/plan/MULTI_MODULE_REFACTORING_PLAN.md](../../docs/plan/MULTI_MODULE_REFACTORING_PLAN.md) | auxiliary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |

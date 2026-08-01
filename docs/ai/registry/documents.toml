@@ -120,6 +120,13 @@ authority = "primary"
 code_paths = ["docs", "scripts/ai", ".codex", ".github"]
 
 [[document]]
+id = "codex-operation-hardening-plan"
+path = "docs/ai/codex-operation-hardening-plan.md"
+kind = "roadmap"
+authority = "primary"
+code_paths = [".codex", ".githooks", ".github", "build-logic", "app", "data"]
+
+[[document]]
 id = "subagents"
 path = "docs/ai/subagents.md"
 kind = "index"
