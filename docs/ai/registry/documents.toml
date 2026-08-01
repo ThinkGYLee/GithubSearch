@@ -212,6 +212,13 @@ authority = "auxiliary"
 code_paths = ["app", "feature"]
 
 [[document]]
+id = "liquid-navigation-ui-follow-up-plan"
+path = "docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["app", "feature/setting", "core/designsystem"]
+
+[[document]]
 id = "unit-test-improvement-plan"
 path = "docs/plan/UNIT_TEST_IMPROVEMENT_PLAN.md"
 kind = "roadmap"

@@ -57,6 +57,7 @@
 | `codex-operation-hardening-plan` | [docs/ai/codex-operation-hardening-plan.md](../../docs/ai/codex-operation-hardening-plan.md) | primary | `.codex, .githooks, .github, build-logic, app, data` |
 | `jacoco-setup-plan` | [docs/plan/JACOCO_SETUP_PLAN.md](../../docs/plan/JACOCO_SETUP_PLAN.md) | auxiliary | `build.gradle.kts, app, domain, data, feature, core` |
 | `knowledge-governance-enforcement-plan` | [docs/ai/knowledge-governance-enforcement-plan.md](../../docs/ai/knowledge-governance-enforcement-plan.md) | primary | `docs, scripts/ai, .codex, .github` |
+| `liquid-navigation-ui-follow-up-plan` | [docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md](../../docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md) | auxiliary | `app, feature/setting, core/designsystem` |
 | `multi-module-refactoring-plan` | [docs/plan/MULTI_MODULE_REFACTORING_PLAN.md](../../docs/plan/MULTI_MODULE_REFACTORING_PLAN.md) | auxiliary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |
 | `reporting-system-migration-plan` | [docs/ai/reporting-system-migration-plan.md](../../docs/ai/reporting-system-migration-plan.md) | primary | `docs, scripts/ai, .codex` |
 | `screenshot-test-plan` | [docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md](../../docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md) | primary | `gradle, feature/setting, core/designsystem, .github` |
