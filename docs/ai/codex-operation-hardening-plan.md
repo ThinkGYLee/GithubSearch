@@ -1,6 +1,6 @@
 # Codex 운영 정책 보강 명세
 
-> **Status:** active — Phase 0~4 completed, Phase 5 planned
+> **Status:** active — Phase 0~4 completed, Phase 5 in progress
 >
 > **Purpose:** GithubSearch의 Codex 운영 정책을 공식 Codex 가이드의 durable guidance, bounded subagent, 최소 권한, worktree 안전성 원칙에 맞춰 단계적으로 보강한다.
 >
@@ -19,7 +19,7 @@
 | 문서·agent 지식 관계 | registry, generated Index, `knowledge.yml` | 운영 중, read-only CI | 유지 |
 | Android build·coverage·배포 권한 | `build.yml`, 저장소 관리자 | verify/comment/deploy 분리, 원격 PR 검증 완료 | Phase 5에서 required status 확인 |
 | worktree local 설정·기기 검증 | `worktree-policy.md`, 사용자 Local 환경 | secret 미복사·Local handoff 경계 문서화 | Phase 5에서 반복 적용 회고 |
-| branch protection·required status | 저장소 관리자 | 외부 설정 | Phase 5에서 관리자 확인 |
+| branch protection·required status | 저장소 관리자 | `develop` branch protection·required status 미설정 확인 | Phase 5 관리자 설정 대기 |
 
 이 분리는 다음 경계를 고정한다.
 
@@ -285,6 +285,14 @@ Uncertainty: <none or missing evidence>
 
 - 최소 세 번의 Medium 이상 작업에서 policy를 적용하고, 결과가 history와 Change Report에 남아 있다.
 - CI 권한·secret 노출·worktree secret 복사·parallel write 충돌이 없음을 확인한다.
+
+### Phase 5 현재 상태
+
+- Phase 0~4는 독립 commit과 completed history record를 갖는다. Phase 2의 draft PR #161은 Build·Knowledge·coverage comment 성공과 Pages deploy skip을 확인했다.
+- PR #161의 remote head는 아직 `b6bba07`이며, Phase 3·4 commit은 local branch에만 있다. push 후 PR CI를 다시 확인해야 한다.
+- `develop`은 현재 branch protection이 없어 required status가 지정되지 않았다. 이는 저장소 관리자만 변경한다.
+- `github-pages` environment에는 branch policy가 있으나 protected branch 전용은 아니다. Pages 권한·배포 branch 정책은 관리자 확인이 필요하다.
+- 실제 Codex managed worktree의 Android 검증·Local handoff 반복 사례와 review 품질 3~5건 회고는 아직 부족하다.
 
 ## 적용 순서와 승인 경계
 
