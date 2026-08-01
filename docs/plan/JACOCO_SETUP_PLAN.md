@@ -35,7 +35,7 @@
 - **Workflow 작성**: `.github/workflows/jacoco-report.yml`
     - 트리거: `pull_request` (target: main, develop)
     - 명령어: `./gradlew testDebugUnitTest jacocoFullReport` (통합 리포트 생성)
-- **GitHub Pages 배포**: `main` 브랜치 머지 시 전체 커버리지 HTML 리포트를 배포하여 히스토리를 관리합니다.
+- **GitHub Pages 배포**: 기본 통합 브랜치인 `develop` 머지 시 전체 커버리지 HTML 리포트를 배포합니다. 하나의 Pages 사이트를 `main`과 공유하지 않아 어느 브랜치의 리포트인지 혼동되지 않게 합니다.
 
 ### 4단계: PR Comment 피드백 자동화
 - **Madrapps/jacoco-report 액션 연동**:

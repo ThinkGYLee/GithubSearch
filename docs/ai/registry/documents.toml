@@ -120,11 +120,46 @@ authority = "primary"
 code_paths = ["docs", "scripts/ai", ".codex", ".github"]
 
 [[document]]
+id = "codex-operation-hardening-plan"
+path = "docs/ai/codex-operation-hardening-plan.md"
+kind = "roadmap"
+authority = "primary"
+code_paths = [".codex", ".githooks", ".github", "build-logic", "app", "data"]
+
+[[document]]
+id = "cross-project-operation-principles-template"
+path = "docs/ai/cross-project-operation-principles-template.md"
+kind = "template"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex", ".githooks", ".github", "docs/ai"]
+
+[[document]]
+id = "worktree-policy"
+path = "docs/ai/worktree-policy.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex", ".gitignore", "docs/ai"]
+
+[[document]]
+id = "code-review"
+path = "docs/ai/code-review.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex/agents", ".githooks", ".github", "docs/ai"]
+
+[[document]]
 id = "subagents"
 path = "docs/ai/subagents.md"
 kind = "index"
 authority = "primary"
 code_paths = [".codex/agents", "docs/ai"]
+
+[[document]]
+id = "navigation-contracts"
+path = "docs/ai/navigation-contracts.md"
+kind = "architecture"
+authority = "primary"
+code_paths = ["app", "feature/detail"]
 
 [[document]]
 id = "task-scope"
@@ -196,6 +231,13 @@ path = "docs/plan/TYPE_SAFE_NAVIGATION_MIGRATION_PLAN.md"
 kind = "roadmap"
 authority = "auxiliary"
 code_paths = ["app", "feature"]
+
+[[document]]
+id = "liquid-navigation-ui-follow-up-plan"
+path = "docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md"
+kind = "roadmap"
+authority = "auxiliary"
+code_paths = ["app", "feature/setting", "core/designsystem"]
 
 [[document]]
 id = "unit-test-improvement-plan"

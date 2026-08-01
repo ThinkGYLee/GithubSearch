@@ -36,10 +36,15 @@
 - `android-coding-conventions.md`: Kotlin/Android 코드 작성 규칙과 commit convention.
 - `change-report-template.md`: 최종 응답, 커밋 메시지, PR 설명 재사용 형식.
 - `template-sync-policy.md`: skill template과 project docs 간 sync 정책.
-- `subagents.md`: GithubSearch에서 단계적으로 사용할 Codex subagent 4개 역할과 운영 규칙 초안.
+- `subagents.md`: GithubSearch에서 실제 운영하는 Codex custom agent 5개 역할과 공통 근거·권한·위험 변경 규칙.
+- `navigation-contracts.md`: 현재 Compose navigation의 route, argument, 호출자, back stack, 상태 복원 계약 정본.
 - `reporting-system-migration-plan.md`: SmartTimer식 보고·작업 이력·지식 운영 체계의 GithubSearch 이식 범위와 phase별 exit gate.
 - `knowledge-governance-enforcement-plan.md`: local document 분리, graph verifier 확대, AI 절차·hook·별도 CI 강제의 후속 실행 명세.
 - `knowledge-governance-enforcement-prompt.md`: 위 실행 명세를 구현할 때 사용하는 제약 포함 실행 프롬프트.
+- `codex-operation-hardening-plan.md`: 공식 Codex 가이드에 근거한 agent 권한, CI 최소 권한, worktree, review 운영 보강의 단계별 실행 명세.
+- `cross-project-operation-principles-template.md`: Phase 0~2 결과를 바탕으로 다른 repository 도입 시 재사용할 원칙과 project-specific 조정 항목을 구분한 provisional template.
+- `worktree-policy.md`: Codex App worktree의 secret-free 검증 범위, Local handoff, branch 제한, `.worktreeinclude` 예외를 정의하는 GithubSearch 적용 정책.
+- `code-review.md`: custom reviewer, `/review`, 사람 PR review의 scope, P0~P2 finding, evidence, test-gap, lifecycle hook 경계를 정의하는 공통 기준.
 - `knowledge-operations.md`: 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고 규칙.
 - `SKILLS_CATALOG.md`: project skill의 trigger와 경계.
 

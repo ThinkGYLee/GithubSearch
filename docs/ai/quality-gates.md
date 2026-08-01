@@ -56,6 +56,22 @@ hook은 Gradle이 working tree를 읽기 때문에 values 리소스를 수정한
 
 CI full command는 CI 기준의 full verification이며 local에서 항상 강제하지 않는다. local에서는 변경 범위에 맞는 최소 검증을 우선하고, 여러 모듈, DI, Gradle, build-logic 영향처럼 범위가 넓은 경우 CI full command 실행을 고려한다.
 
+### Build CI 권한과 실행 경로
+
+`build.yml`은 PR 코드가 production credential 또는 Pages 배포 권한으로 실행되지 않도록 job을 분리한다. build job의 CI 입력값은 컴파일용 고정 placeholder이며 OAuth 운영값이 아니다.
+
+| 이벤트 | 실행 job | 권한 | secret/배포 경계 |
+| --- | --- | --- | --- |
+| 일반 PR | `build`, `coverage-comment` | `contents: read`, `pull-requests: write` | build는 non-secret placeholder만 사용하고, 댓글 job은 JaCoCo artifact만 받아 PR 댓글만 작성한다. |
+| fork PR | `build` | `contents: read` | 댓글 job을 실행하지 않는다. production OAuth·Gradle cache encryption secret을 전달하지 않는다. |
+| `main` push | `build` | `contents: read` | build·coverage 검증만 실행하며 GitHub Pages를 덮어쓰지 않는다. |
+| `develop` push | `build`, `deploy-pages` | `contents: read`, `pages: write`·`id-token: write` | deploy job은 build가 전달한 Pages package만 업로드·배포하며 source checkout·Gradle 실행을 하지 않는다. |
+
+- `pull_request_target`은 사용하지 않는다.
+- `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`는 build job에서 `githubsearch-ci-placeholder`, `githubsearch://ci` 같은 비밀이 아닌 고정 값으로만 제공한다.
+- `GRADLE_CACHE_ENCRYPTION_KEY`를 CI job에 전달하지 않는다.
+- 저장소 관리자는 원격 PR에서 새 job이 정상 동작함을 확인한 뒤, 필요한 verify status와 `Knowledge verification`을 required status로 지정한다.
+
 ## Verification Section
 
 최종 응답의 Verification 섹션에는 아래 내용을 포함한다.

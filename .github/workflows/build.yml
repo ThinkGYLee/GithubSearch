@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
-      pull-requests: write
-      pages: write
-      id-token: write
+      contents: read
+
+    outputs:
+      code_changed: ${{ steps.filter.outputs.code_changed }}
 
     timeout-minutes: 60
 
@@ -53,21 +53,6 @@ jobs:
             echo "code_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Validate Secrets
-        if: steps.filter.outputs.code_changed == 'true'
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: |
-          if [ -z "$CLIENT_ID" ]; then
-            echo "::error::CLIENT_ID secret is missing!"
-            exit 1
-          fi
-          if [ -z "$CLIENT_SECRET" ]; then
-            echo "::error::CLIENT_SECRET secret is missing!"
-            exit 1
-          fi
-
       - name: Validate Gradle Wrapper
         if: steps.filter.outputs.code_changed == 'true'
         uses: gradle/actions/wrapper-validation@v4
@@ -82,30 +67,25 @@ jobs:
       - name: Setup Gradle
         if: steps.filter.outputs.code_changed == 'true'
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Build and Test with JaCoCo
         if: steps.filter.outputs.code_changed == 'true'
         env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          CLIENT_ID: githubsearch-ci-placeholder
+          CLIENT_SECRET: githubsearch-ci-placeholder
+          REDIRECT_URI: githubsearch://ci
         run: ./gradlew spotlessCheck lintDebug assembleDebug assembleDebugAndroidTest testDebugUnitTest jacocoFullReport --parallel --build-cache --configure-on-demand
 
-      - name: Post JaCoCo Report Comment
-        if: github.event_name == 'pull_request' && steps.filter.outputs.code_changed == 'true'
-        uses: Madrapps/jacoco-report@v1.7.1
+      - name: Upload JaCoCo Report
+        if: steps.filter.outputs.code_changed == 'true'
+        uses: actions/upload-artifact@v4
         with:
-          paths: |
-            ${{ github.workspace }}/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 0
-          min-coverage-changed-files: 0
-          title: "📈 테스트 커버리지 리포트"
-          update-comment: true
+          name: jacoco-report
+          path: build/reports/jacoco/jacocoFullReport
+          if-no-files-found: error
 
       - name: Prepare Deployment Directory
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
         run: |
           mkdir -p build/dist/badges
           touch build/dist/.nojekyll
@@ -208,19 +188,73 @@ jobs:
           EOF
 
       - name: Verify Artifacts
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
         run: |
           echo "--- Checking Generated Badges ---"
           ls -R build/dist/badges/
           echo "--------------------------------"
 
+      - name: Upload Coverage Pages Package
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-pages
+          path: build/dist
+          if-no-files-found: error
+
+  coverage-comment:
+    name: "JaCoCo PR Comment"
+    needs: build
+    if: github.event_name == 'pull_request' && needs.build.outputs.code_changed == 'true' && github.event.pull_request.head.repo.fork == false
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download JaCoCo Report
+        uses: actions/download-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/jacocoFullReport
+
+      - name: Post JaCoCo Report Comment
+        uses: Madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: "📈 테스트 커버리지 리포트"
+          update-comment: true
+
+  deploy-pages:
+    name: "Deploy Coverage Pages"
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.build.outputs.code_changed == 'true'
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download Coverage Pages Package
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-pages
+          path: build/dist
+
       - name: Upload Pages Artifact
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/dist
 
       - name: Deploy to GitHub Pages
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
         id: deployment
         uses: actions/deploy-pages@v4

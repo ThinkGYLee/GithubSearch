@@ -41,6 +41,14 @@ Template metadata는 `docs/ai/README.md`를 따른다.
 - Documentation Workflow: `문서 작업으로 진행해줘.`
 - Docs Safe Sync Workflow: `android-docs-bootstrap 기준으로 safe sync 해줘.`
 
+## Review Workflow
+
+- review 시작 전에 base branch, 특정 commit, working tree diff, 요청 파일 중 하나로 범위를 선언한다.
+- `docs/ai/code-review.md`의 P0~P2 severity, evidence, false-positive, test-gap 기준을 적용한다.
+- 관련 primary document와 코드·테스트 근거를 함께 확인하고, verdict·scope·evidence·finding·후속 검증·uncertainty를 결과에 남긴다.
+- finding이 없으면 `pass`와 검토 범위를 명시한다. style 선호만으로 finding을 만들지 않는다.
+- reviewer 결과는 read-only 근거이며, main agent 또는 사람이 최종 적용·검증·merge 판단을 수행한다.
+
 ## Documentation Workflow
 
 - 기존 문서를 덮어쓰기 전에 현재 파일을 먼저 읽는다.

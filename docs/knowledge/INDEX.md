@@ -12,6 +12,7 @@
 | `data-logic` | [docs/ai/DATA_LOGIC_GUIDELINES.md](../../docs/ai/DATA_LOGIC_GUIDELINES.md) | primary | `domain, data, feature, core` |
 | `design-guide` | [docs/design/DESIGN_GUIDE.md](../../docs/design/DESIGN_GUIDE.md) | auxiliary | `app, feature, core` |
 | `liquid-navigation-guide` | [docs/design/LIQUID_NAVIGATION_GUIDE.md](../../docs/design/LIQUID_NAVIGATION_GUIDE.md) | auxiliary | `app, core, feature` |
+| `navigation-contracts` | [docs/ai/navigation-contracts.md](../../docs/ai/navigation-contracts.md) | primary | `app, feature/detail` |
 | `ui-guidelines` | [docs/ai/UI_GUIDELINES.md](../../docs/ai/UI_GUIDELINES.md) | primary | `app, feature, core` |
 
 ## index
@@ -36,12 +37,14 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `ai-coding-guidelines` | [docs/ai/CODING_GUIDELINES.md](../../docs/ai/CODING_GUIDELINES.md) | auxiliary | `app, domain, data, feature, core` |
+| `code-review` | [docs/ai/code-review.md](../../docs/ai/code-review.md) | primary | `AGENTS.md, .codex/agents, .githooks, .github, docs/ai` |
 | `coding-conventions` | [docs/ai/android-coding-conventions.md](../../docs/ai/android-coding-conventions.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `convention` | [docs/CONVENTION.md](../../docs/CONVENTION.md) | auxiliary | `app, domain, data, feature, core` |
 | `quality-gates` | [docs/ai/quality-gates.md](../../docs/ai/quality-gates.md) | primary | `build.gradle.kts, .github, scripts/ai` |
 | `task-scope` | [docs/ai/task-scope-control.md](../../docs/ai/task-scope-control.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `template-sync-policy` | [docs/ai/template-sync-policy.md](../../docs/ai/template-sync-policy.md) | primary | `docs, .codex` |
 | `testing-guide` | [docs/testing/TESTING_GUIDE.md](../../docs/testing/TESTING_GUIDE.md) | primary | `domain, data, feature, core/testing` |
+| `worktree-policy` | [docs/ai/worktree-policy.md](../../docs/ai/worktree-policy.md) | primary | `AGENTS.md, .codex, .gitignore, docs/ai` |
 
 ## reference
 
@@ -53,8 +56,10 @@
 
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
+| `codex-operation-hardening-plan` | [docs/ai/codex-operation-hardening-plan.md](../../docs/ai/codex-operation-hardening-plan.md) | primary | `.codex, .githooks, .github, build-logic, app, data` |
 | `jacoco-setup-plan` | [docs/plan/JACOCO_SETUP_PLAN.md](../../docs/plan/JACOCO_SETUP_PLAN.md) | auxiliary | `build.gradle.kts, app, domain, data, feature, core` |
 | `knowledge-governance-enforcement-plan` | [docs/ai/knowledge-governance-enforcement-plan.md](../../docs/ai/knowledge-governance-enforcement-plan.md) | primary | `docs, scripts/ai, .codex, .github` |
+| `liquid-navigation-ui-follow-up-plan` | [docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md](../../docs/plan/LIQUID_NAVIGATION_UI_FOLLOW_UP_PLAN.md) | auxiliary | `app, feature/setting, core/designsystem` |
 | `multi-module-refactoring-plan` | [docs/plan/MULTI_MODULE_REFACTORING_PLAN.md](../../docs/plan/MULTI_MODULE_REFACTORING_PLAN.md) | auxiliary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |
 | `reporting-system-migration-plan` | [docs/ai/reporting-system-migration-plan.md](../../docs/ai/reporting-system-migration-plan.md) | primary | `docs, scripts/ai, .codex` |
 | `screenshot-test-plan` | [docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md](../../docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md) | primary | `gradle, feature/setting, core/designsystem, .github` |
@@ -66,6 +71,7 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `change-report` | [docs/ai/change-report-template.md](../../docs/ai/change-report-template.md) | primary | `AGENTS.md, docs/history, scripts/ai` |
+| `cross-project-operation-principles-template` | [docs/ai/cross-project-operation-principles-template.md](../../docs/ai/cross-project-operation-principles-template.md) | primary | `AGENTS.md, .codex, .githooks, .github, docs/ai` |
 | `knowledge-governance-enforcement-prompt` | [docs/ai/knowledge-governance-enforcement-prompt.md](../../docs/ai/knowledge-governance-enforcement-prompt.md) | primary | `docs, scripts/ai, .codex, .github` |
 
 ## workflow
