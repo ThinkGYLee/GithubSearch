@@ -127,6 +127,20 @@ authority = "primary"
 code_paths = [".codex", ".githooks", ".github", "build-logic", "app", "data"]
 
 [[document]]
+id = "cross-project-operation-principles-template"
+path = "docs/ai/cross-project-operation-principles-template.md"
+kind = "template"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex", ".githooks", ".github", "docs/ai"]
+
+[[document]]
+id = "worktree-policy"
+path = "docs/ai/worktree-policy.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex", ".gitignore", "docs/ai"]
+
+[[document]]
 id = "subagents"
 path = "docs/ai/subagents.md"
 kind = "index"

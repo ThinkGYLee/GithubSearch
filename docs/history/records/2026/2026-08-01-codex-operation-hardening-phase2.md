@@ -1,6 +1,6 @@
 ---
 id: GS-2026-0011
-status: in_progress
+status: completed
 base_commit: 81aa58f
 related_documents: [knowledge-operations, task-scope, quality-gates, codex-operation-hardening-plan, history-readme]
 related_code: [.github/workflows/build.yml, build-logic, app, data]
@@ -42,12 +42,14 @@ skills_used: [project-knowledge-grounding, session-retrospective]
 - `python3 scripts/ai/verify_knowledge_graph.py`: 0 error, 0 warning.
 - `python3 -m unittest discover -s scripts/ai/tests -p 'test_*.py'`: 11 tests 통과.
 - `actionlint`는 현재 local 환경에 설치되어 있지 않아 실행하지 못했다. YAML parser와 원격 PR workflow로 보완한다.
-- 원격 PR workflow 실행과 required status 지정은 아직 수행 전이다.
+- draft PR #161에서 `Knowledge verification`, `Build & Coverage`, `JaCoCo PR Comment`가 성공했고 `Deploy Coverage Pages`는 PR에서 skipped 됐다.
+- required status 지정은 저장소 관리자 후속 작업이다.
 
 ## 지시 이행
 
 - fulfilled: Phase 2 CI 최소 권한·secret-free 검증·댓글/Pages 분리를 적용했다.
-- partial: 원격 GitHub Actions 실행 확인과 required status 지정은 PR 생성 후 저장소 관리자 권한이 필요하다.
+- fulfilled: draft PR #161에서 verify·knowledge workflow와 PR coverage comment의 원격 동작을 확인했다.
+- partial: required status 지정은 저장소 관리자 권한이 필요하다.
 
 ## 스킬 평가
 
@@ -56,5 +58,5 @@ skills_used: [project-knowledge-grounding, session-retrospective]
 
 ## 개선 후보
 
-- 원격 workflow에서 artifact download가 최소 권한 job에서도 동작하는지 확인한다. 실패하면 권한을 넓히지 않고 GitHub 공식 action의 artifact 접근 요구사항을 근거로 최소 수정한다.
-- 원격 실행이 안정화되면 저장소 관리자가 `Knowledge verification`과 build verify status를 required status로 지정한다.
+- 최소 권한 `coverage-comment` job의 artifact download와 PR comment 동작은 draft PR #161에서 확인했다.
+- 저장소 관리자가 `Knowledge verification`과 build verify status를 required status로 지정한다.

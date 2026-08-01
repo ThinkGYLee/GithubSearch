@@ -98,6 +98,13 @@ Kotlin/Android 코드 작성 규칙의 source of truth는 `docs/ai/android-codin
 
 코드 수정 작업은 `docs/ai/quality-gates.md`의 검증 규칙을 따른다. 문서-only 변경은 Gradle 검증을 생략할 수 있다.
 
+## Worktree와 Local 환경
+
+Codex App worktree의 secret-free 검증 범위, Local handoff 조건, branch 중복 checkout 제한, `.worktreeinclude` 예외 절차는 `docs/ai/worktree-policy.md`를 따른다.
+
+- 현재 ignore된 `local.properties`와 keystore, token, `google-services.json`은 worktree에 복사하거나 `.worktreeinclude`에 등록하지 않는다.
+- 실제 OAuth·기기·signing·machine-specific 검증은 Local handoff로 분리한다.
+
 ## Screenshot Test Strategy
 
 Compose screenshot test의 도입 상태, 대상 module, fixture 분리, golden·CI 규칙은 `docs/testing/TESTING_GUIDE.md`와 `docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md`를 source of truth로 둔다. Gradle plugin/dependency, source set, CI 변경은 Risky Change이므로 계획의 Phase 1 전에는 사용자 승인을 받는다.

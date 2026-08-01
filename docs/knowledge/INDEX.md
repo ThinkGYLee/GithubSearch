@@ -43,6 +43,7 @@
 | `task-scope` | [docs/ai/task-scope-control.md](../../docs/ai/task-scope-control.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `template-sync-policy` | [docs/ai/template-sync-policy.md](../../docs/ai/template-sync-policy.md) | primary | `docs, .codex` |
 | `testing-guide` | [docs/testing/TESTING_GUIDE.md](../../docs/testing/TESTING_GUIDE.md) | primary | `domain, data, feature, core/testing` |
+| `worktree-policy` | [docs/ai/worktree-policy.md](../../docs/ai/worktree-policy.md) | primary | `AGENTS.md, .codex, .gitignore, docs/ai` |
 
 ## reference
 
@@ -69,6 +70,7 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `change-report` | [docs/ai/change-report-template.md](../../docs/ai/change-report-template.md) | primary | `AGENTS.md, docs/history, scripts/ai` |
+| `cross-project-operation-principles-template` | [docs/ai/cross-project-operation-principles-template.md](../../docs/ai/cross-project-operation-principles-template.md) | primary | `AGENTS.md, .codex, .githooks, .github, docs/ai` |
 | `knowledge-governance-enforcement-prompt` | [docs/ai/knowledge-governance-enforcement-prompt.md](../../docs/ai/knowledge-governance-enforcement-prompt.md) | primary | `docs, scripts/ai, .codex, .github` |
 
 ## workflow

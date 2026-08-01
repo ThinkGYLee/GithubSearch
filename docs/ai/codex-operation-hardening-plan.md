@@ -1,6 +1,6 @@
 # Codex 운영 정책 보강 명세
 
-> **Status:** active — Phase 0 and Phase 1 completed, Phase 2 pending
+> **Status:** active — Phase 0~3 completed, Phase 4~5 planned
 >
 > **Purpose:** GithubSearch의 Codex 운영 정책을 공식 Codex 가이드의 durable guidance, bounded subagent, 최소 권한, worktree 안전성 원칙에 맞춰 단계적으로 보강한다.
 >
@@ -17,8 +17,8 @@
 | Codex session 기본값 | 사용자 전역 config, project `.codex/config.toml` | reviewer 최대 병렬 수 3 적용 | 유지 |
 | staged 변경 검사 | `.githooks/pre-commit` | 운영 중, clone/worktree별 설치 필요 | 유지 |
 | 문서·agent 지식 관계 | registry, generated Index, `knowledge.yml` | 운영 중, read-only CI | 유지 |
-| Android build·coverage·배포 권한 | `build.yml`, 저장소 관리자 | 한 job에 혼재 | Phase 2에서 verify/comment/deploy 분리 |
-| worktree local 설정·기기 검증 | 사용자 Local 환경 | 정책 문서 없음 | Phase 3에서 문서화 |
+| Android build·coverage·배포 권한 | `build.yml`, 저장소 관리자 | verify/comment/deploy 분리, 원격 PR 검증 완료 | Phase 5에서 required status 확인 |
+| worktree local 설정·기기 검증 | `worktree-policy.md`, 사용자 Local 환경 | secret 미복사·Local handoff 경계 문서화 | Phase 5에서 반복 적용 회고 |
 | branch protection·required status | 저장소 관리자 | 외부 설정 | Phase 5에서 관리자 확인 |
 
 이 분리는 다음 경계를 고정한다.
@@ -207,15 +207,21 @@ Uncertainty: <none or missing evidence>
 
 ### 체크리스트
 
-- [ ] worktree 생성, Local handoff, branch 중복 checkout 제한을 문서화한다.
-- [ ] ignore 파일을 복사하지 않는 기본값과 필요한 수동 준비 항목을 문서화한다.
-- [ ] `.worktreeinclude`를 추가하려면 대상 파일이 credential을 포함하지 않는다는 저장소 관리자 검토를 기록한다.
-- [ ] 새 worktree에서 문서·unit/compile 검증 가능 범위와 Local 전용 검증 범위를 분리한다.
+- [x] worktree 생성, Local handoff, branch 중복 checkout 제한을 문서화한다.
+- [x] ignore 파일을 복사하지 않는 기본값과 필요한 수동 준비 항목을 문서화한다.
+- [x] `.worktreeinclude`를 추가하지 않았고, 미래 예외에는 credential-free 대상의 저장소 관리자 검토와 작업 이력을 요구한다.
+- [x] 새 worktree에서 문서·unit/compile 검증 가능 범위와 Local 전용 검증 범위를 분리한다.
 
 ### Exit gate
 
 - worktree 문서가 secret 복사를 지시하지 않는다.
 - 새 worktree에서 가능한 검증과 handoff 조건이 명확하다.
+
+### Phase 3 실행 결과
+
+- `.worktreeinclude`를 추가하지 않았다. `local.properties`의 내용은 읽거나 복사하지 않았으며, SDK와 credential이 함께 있을 수 있는 ignore 파일로 취급한다.
+- `worktree-policy.md`에 secret-free worktree 범위, Android SDK 준비 실패 시의 Local handoff, 실제 OAuth·기기·signing 검증의 Local 전용 경계를 기록했다.
+- Git branch의 checkout 제한과 Codex App Handoff 사용 기준을 문서화했다.
 
 ## Phase 4 — 공통 code review 기준과 lifecycle hook 경계
 
