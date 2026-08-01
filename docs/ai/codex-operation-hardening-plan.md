@@ -158,7 +158,7 @@ Uncertainty: <none or missing evidence>
 1. compile·lint·test job은 `permissions: { contents: read }`만 가진다.
 2. PR build에는 production `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`, cache encryption secret을 주입하지 않는다. 현재 `getApiKey`가 이 값을 요구하므로 먼저 비밀이 아닌 고정 CI placeholder로 전체 Gradle 검증이 되는지 확인한다.
 3. JaCoCo PR 댓글을 유지한다면 별도 job으로 분리해 `pull-requests: write`만 준다. fork PR에서는 댓글 job을 실행하지 않는다.
-4. Pages upload·deploy는 `main`·`develop` push 전용 별도 job으로 분리해 그 job에만 `pages: write`, `id-token: write`를 준다.
+4. Pages upload·deploy는 `develop` push 전용 별도 job으로 분리해 그 job에만 `pages: write`, `id-token: write`를 준다. `main` push는 build만 실행해 하나의 GitHub Pages 사이트를 덮어쓰지 않는다.
 5. 외부 PR의 code를 secret 접근 권한으로 실행하게 만드는 `pull_request_target`은 사용하지 않는다.
 
 ### 체크리스트
@@ -167,7 +167,7 @@ Uncertainty: <none or missing evidence>
 - [x] `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`의 비밀이 아닌 placeholder가 compile·unit test·instrumentation APK build에 충분한지 로컬에서 확인한다.
 - [x] verify job에 `contents: read` 외 권한·production secret이 없는지 workflow YAML에서 확인한다.
 - [x] PR comment와 Pages deploy job이 verify job과 분리됐는지 확인한다.
-- [x] fork PR, 일반 PR, `main`/`develop` push의 실행 경로와 권한을 표로 기록한다.
+- [x] fork PR, 일반 PR, `main`/`develop` build와 `develop` Pages 배포의 실행 경로·권한을 표로 기록한다.
 - [ ] 저장소 관리자가 `Knowledge verification`과 새 verify status를 required status로 지정한다.
 
 ### Exit gate
@@ -180,7 +180,7 @@ Uncertainty: <none or missing evidence>
 
 - `build` job은 `contents: read`만 사용하며, `CLIENT_ID`·`CLIENT_SECRET`·`REDIRECT_URI`에 비밀이 아닌 고정 placeholder를 전달한다. Gradle cache encryption secret과 OAuth secret 검증 step은 제거했다.
 - `coverage-comment` job은 internal PR에서만 실행하고 `pull-requests: write`만 사용한다. fork PR은 job 조건에서 제외한다.
-- `deploy-pages` job은 `main`·`develop` push에서만 실행하고 `pages: write`, `id-token: write`만 사용한다. Gradle 산출물은 일반 artifact로 전달되며 deploy job은 source checkout이나 Gradle 실행을 하지 않는다.
+- `deploy-pages` job은 `develop` push에서만 실행하고 `pages: write`, `id-token: write`만 사용한다. `main` push는 build만 실행한다. Gradle 산출물은 일반 artifact로 전달되며 deploy job은 source checkout이나 Gradle 실행을 하지 않는다.
 - 로컬 placeholder 검증과 YAML 검토는 완료했다. required status 지정과 원격 PR 실행 확인은 저장소 관리자·후속 PR 단계에서 완료한다.
 
 ### 위험과 rollback
@@ -288,10 +288,9 @@ Uncertainty: <none or missing evidence>
 
 ### Phase 5 현재 상태
 
-- Phase 0~4는 독립 commit과 completed history record를 갖는다. Phase 2의 draft PR #161은 Build·Knowledge·coverage comment 성공과 Pages deploy skip을 확인했다.
-- PR #161의 remote head는 아직 `b6bba07`이며, Phase 3·4 commit은 local branch에만 있다. push 후 PR CI를 다시 확인해야 한다.
-- `develop`은 현재 branch protection이 없어 required status가 지정되지 않았다. 이는 저장소 관리자만 변경한다.
-- `github-pages` environment에는 branch policy가 있으나 protected branch 전용은 아니다. Pages 권한·배포 branch 정책은 관리자 확인이 필요하다.
+- Phase 0~4는 독립 commit과 completed history record를 갖는다. draft PR #161은 최신 remote head `3bc4acd`에서 Build·Knowledge·coverage comment 성공과 Pages deploy skip을 확인했다.
+- 저장소 관리자가 `develop` branch ruleset을 만들고 PR·`Build & Coverage`·`Generated index and graph`를 병합 조건으로 지정했다. 원격 설정의 최종 read-only 재확인은 다음 PR CI 확인과 함께 남아 있다.
+- `github-pages` environment는 `develop`만 배포하도록 유지한다. `main`과 `develop`이 하나의 Pages 사이트를 번갈아 덮어쓰지 않도록 workflow의 artifact·deploy 조건도 `develop` push 전용으로 조정한다.
 - 실제 Codex managed worktree의 Android 검증·Local handoff 반복 사례와 review 품질 3~5건 회고는 아직 부족하다.
 
 ## 적용 순서와 승인 경계

@@ -64,7 +64,8 @@ CI full command는 CI 기준의 full verification이며 local에서 항상 강�
 | --- | --- | --- | --- |
 | 일반 PR | `build`, `coverage-comment` | `contents: read`, `pull-requests: write` | build는 non-secret placeholder만 사용하고, 댓글 job은 JaCoCo artifact만 받아 PR 댓글만 작성한다. |
 | fork PR | `build` | `contents: read` | 댓글 job을 실행하지 않는다. production OAuth·Gradle cache encryption secret을 전달하지 않는다. |
-| `main`/`develop` push | `build`, `deploy-pages` | `contents: read`, `pages: write`·`id-token: write` | deploy job은 build가 전달한 Pages package만 업로드·배포하며 source checkout·Gradle 실행을 하지 않는다. |
+| `main` push | `build` | `contents: read` | build·coverage 검증만 실행하며 GitHub Pages를 덮어쓰지 않는다. |
+| `develop` push | `build`, `deploy-pages` | `contents: read`, `pages: write`·`id-token: write` | deploy job은 build가 전달한 Pages package만 업로드·배포하며 source checkout·Gradle 실행을 하지 않는다. |
 
 - `pull_request_target`은 사용하지 않는다.
 - `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`는 build job에서 `githubsearch-ci-placeholder`, `githubsearch://ci` 같은 비밀이 아닌 고정 값으로만 제공한다.

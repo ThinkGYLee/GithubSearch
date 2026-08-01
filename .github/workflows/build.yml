@@ -85,7 +85,7 @@ jobs:
           if-no-files-found: error
 
       - name: Prepare Deployment Directory
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
         run: |
           mkdir -p build/dist/badges
           touch build/dist/.nojekyll
@@ -188,14 +188,14 @@ jobs:
           EOF
 
       - name: Verify Artifacts
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
         run: |
           echo "--- Checking Generated Badges ---"
           ls -R build/dist/badges/
           echo "--------------------------------"
 
       - name: Upload Coverage Pages Package
-        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && steps.filter.outputs.code_changed == 'true'
+        if: github.ref == 'refs/heads/develop' && steps.filter.outputs.code_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-pages
@@ -232,7 +232,7 @@ jobs:
   deploy-pages:
     name: "Deploy Coverage Pages"
     needs: build
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && needs.build.outputs.code_changed == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.build.outputs.code_changed == 'true'
     runs-on: ubuntu-latest
 
     permissions:
