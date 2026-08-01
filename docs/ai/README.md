@@ -44,6 +44,7 @@
 - `codex-operation-hardening-plan.md`: 공식 Codex 가이드에 근거한 agent 권한, CI 최소 권한, worktree, review 운영 보강의 단계별 실행 명세.
 - `cross-project-operation-principles-template.md`: Phase 0~2 결과를 바탕으로 다른 repository 도입 시 재사용할 원칙과 project-specific 조정 항목을 구분한 provisional template.
 - `worktree-policy.md`: Codex App worktree의 secret-free 검증 범위, Local handoff, branch 제한, `.worktreeinclude` 예외를 정의하는 GithubSearch 적용 정책.
+- `code-review.md`: custom reviewer, `/review`, 사람 PR review의 scope, P0~P2 finding, evidence, test-gap, lifecycle hook 경계를 정의하는 공통 기준.
 - `knowledge-operations.md`: 문서·코드 근거, 작업 이력, project skill·agent 배선, 세션 회고 규칙.
 - `SKILLS_CATALOG.md`: project skill의 trigger와 경계.
 

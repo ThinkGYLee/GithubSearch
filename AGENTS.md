@@ -105,6 +105,10 @@ Codex App worktree의 secret-free 검증 범위, Local handoff 조건, branch �
 - 현재 ignore된 `local.properties`와 keystore, token, `google-services.json`은 worktree에 복사하거나 `.worktreeinclude`에 등록하지 않는다.
 - 실제 OAuth·기기·signing·machine-specific 검증은 Local handoff로 분리한다.
 
+## Code Review
+
+custom reviewer, Codex `/review`, 사람 PR review의 scope 선언, P0~P2 severity, evidence, test-gap, lifecycle hook 경계는 `docs/ai/code-review.md`를 따른다. style 선호만으로 finding을 만들지 않으며, 최종 적용·검증·merge 판단은 main agent 또는 사람이 소유한다.
+
 ## Screenshot Test Strategy
 
 Compose screenshot test의 도입 상태, 대상 module, fixture 분리, golden·CI 규칙은 `docs/testing/TESTING_GUIDE.md`와 `docs/testing/SCREENSHOT_TEST_IMPLEMENTATION_PLAN.md`를 source of truth로 둔다. Gradle plugin/dependency, source set, CI 변경은 Risky Change이므로 계획의 Phase 1 전에는 사용자 승인을 받는다.

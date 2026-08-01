@@ -1,6 +1,6 @@
 # Codex 운영 정책 보강 명세
 
-> **Status:** active — Phase 0~3 completed, Phase 4~5 planned
+> **Status:** active — Phase 0~4 completed, Phase 5 planned
 >
 > **Purpose:** GithubSearch의 Codex 운영 정책을 공식 Codex 가이드의 durable guidance, bounded subagent, 최소 권한, worktree 안전성 원칙에 맞춰 단계적으로 보강한다.
 >
@@ -50,9 +50,9 @@
 | durable guidance | `AGENTS.md`와 `docs/ai/*`가 역할·검증·위험 변경을 정의 | 6.3KB의 간결한 root 지시와 주제별 분리 | 실제 권한 강제와 reviewer 결과 형식 |
 | custom agent | 5개 reviewer와 registry·근거 경로 반환 규칙 존재 | review-first, Git·secret 금지, parent 책임 | technical read-only, 병렬 위임 판단 기준 |
 | Git hook·knowledge CI | staged guard와 `contents: read` knowledge CI 존재 | 생성 Index·graph 관계 검사 | 새 clone/worktree 설치 안내와 Codex lifecycle hook의 경계 |
-| build CI | build·coverage·PR comment·Pages 배포가 하나의 job에 있음 | build/knowledge workflow 분리 | job별 최소 권한과 production OAuth secret 제거 |
-| worktree | Git worktree 사용 가능 | Git branch 충돌 방지 | ignore된 `local.properties`의 안전한 처리 정책 |
-| review | 역할별 reviewer는 존재 | 파일·근거 중심 검토 | 공통 심각도와 `/review` 결과 기준 |
+| build CI | verify·PR comment·Pages deploy가 분리되고 PR 원격 검증 완료 | build/knowledge workflow 분리 | required status 관리자 지정 |
+| worktree | `worktree-policy.md`로 secret-free·Local handoff 경계 적용 | Git branch 충돌 방지 | Phase 5 실제 worktree 사례 회고 |
+| review | `code-review.md`, reviewer, `/review`, 사람 PR review | P0~P2·scope·근거·test-gap 공통 기준 적용 | Phase 5에서 실제 review 품질 회고 |
 
 ## Phase 0 — 결정 고정과 기준선 검사
 
@@ -112,9 +112,10 @@
 
 ```text
 Verdict: <pass / finding / insufficient context>
+Review scope: <base branch / commit / working-tree diff / requested files>
 Primary-document evidence: <path>
 Code/test evidence: <path>
-Findings: <severity, impact, affected path>
+Findings: <P0/P1/P2, impact, affected path>
 Verification or follow-up: <minimum action>
 Uncertainty: <none or missing evidence>
 ```
@@ -246,15 +247,22 @@ Uncertainty: <none or missing evidence>
 
 ### 체크리스트
 
-- [ ] 공통 review 문서에 심각도, evidence, false-positive 처리, test-gap 보고 형식을 추가한다.
-- [ ] `Review Workflow`가 새 문서를 참조한다.
-- [ ] agent 결과 형식과 사람/`/review` 결과 형식이 충돌하지 않는지 확인한다.
-- [ ] lifecycle hook 필요성은 실제 누락 기록을 근거로 판단하고, 필요하지 않으면 추가하지 않는다.
+- [x] 공통 review 문서에 심각도, evidence, false-positive 처리, test-gap 보고 형식을 추가한다.
+- [x] `Review Workflow`가 새 문서를 참조한다.
+- [x] agent 결과 형식과 사람/`/review` 결과 형식이 충돌하지 않는지 확인한다.
+- [x] lifecycle hook 필요성은 실제 누락 기록을 근거로 판단하고, 필요하지 않으면 추가하지 않는다.
 
 ### Exit gate
 
 - representative diff 1건에서 custom reviewer 또는 `/review` 결과가 공통 형식을 따른다.
 - 기존 Git hook·knowledge CI와 중복된 자동화가 추가되지 않는다.
+
+### Phase 4 실행 결과
+
+- `code-review.md`에 review scope, P0~P2 severity, evidence·false-positive·test-gap, 공통 결과 형식, Git hook·CI·lifecycle hook 책임을 정의했다.
+- `AGENTS.md`, Review Workflow, subagent 문서와 다섯 reviewer TOML에 review scope와 P0~P2 형식을 연결했다.
+- `compose-ui-reviewer`가 Liquid navigation 후보를 read-only로 검토해 scope·문서/코드 근거·P2 finding·follow-up·uncertainty 형식을 반환하는 것을 확인했다.
+- 기존 Git hook·Knowledge CI가 기계적 검증을 담당하고, 현재 작업 이력에서 반복된 세션 종료 누락 근거가 없으므로 lifecycle hook은 추가하지 않았다.
 
 ## Phase 5 — 운영 정착과 관리자 확인
 

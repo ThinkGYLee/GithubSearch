@@ -37,6 +37,7 @@
 | ID | 문서 | 권한 | 관련 코드 |
 |---|---|---|---|
 | `ai-coding-guidelines` | [docs/ai/CODING_GUIDELINES.md](../../docs/ai/CODING_GUIDELINES.md) | auxiliary | `app, domain, data, feature, core` |
+| `code-review` | [docs/ai/code-review.md](../../docs/ai/code-review.md) | primary | `AGENTS.md, .codex/agents, .githooks, .github, docs/ai` |
 | `coding-conventions` | [docs/ai/android-coding-conventions.md](../../docs/ai/android-coding-conventions.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `convention` | [docs/CONVENTION.md](../../docs/CONVENTION.md) | auxiliary | `app, domain, data, feature, core` |
 | `quality-gates` | [docs/ai/quality-gates.md](../../docs/ai/quality-gates.md) | primary | `build.gradle.kts, .github, scripts/ai` |

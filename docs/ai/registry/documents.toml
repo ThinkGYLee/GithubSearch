@@ -141,6 +141,13 @@ authority = "primary"
 code_paths = ["AGENTS.md", ".codex", ".gitignore", "docs/ai"]
 
 [[document]]
+id = "code-review"
+path = "docs/ai/code-review.md"
+kind = "policy"
+authority = "primary"
+code_paths = ["AGENTS.md", ".codex/agents", ".githooks", ".github", "docs/ai"]
+
+[[document]]
 id = "subagents"
 path = "docs/ai/subagents.md"
 kind = "index"

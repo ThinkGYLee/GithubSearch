@@ -8,7 +8,7 @@
 - 모든 custom agent는 결론 전에 관련 primary document와 현재 영향 코드 또는 테스트를 읽고, 결과에 두 근거 경로를 모두 남긴다.
 - 주 작업자는 요청 범위, 위험 변경 여부, 최종 적용 여부, 검증, 최종 보고를 계속 책임진다.
 - subagent에는 한 번에 하나의 명확한 산출물을 요청한다.
-- reviewer 결과에는 `Verdict`, primary-document evidence 경로, code/test evidence 경로, finding의 심각도·영향·경로, verification/follow-up, uncertainty를 포함한다.
+- reviewer 결과에는 `Verdict`, review scope, primary-document evidence 경로, code/test evidence 경로, `docs/ai/code-review.md`의 P0~P2 finding 심각도·영향·경로, verification/follow-up, uncertainty를 포함한다.
 - 모든 custom agent는 `git add`, `git commit`, `git push`, destructive Git operation을 실행하지 않는다.
 - `local.properties`, keystore, signing config, API key, token, password, `google-services.json` 내용은 읽거나 출력하지 않는다.
 - navigation route, public API, module dependency, Gradle, DI graph, Room schema/migration, 대규모 리팩터링, 파일 삭제·이동·이름 변경, generated file 편집은 위험 변경으로 먼저 보고한다. subagent 결과만으로 바로 적용하지 않는다.
@@ -34,9 +34,10 @@
 
 ```text
 Verdict: <pass / finding / insufficient context>
+Review scope: <base branch / commit / working-tree diff / requested files>
 Primary-document evidence: <path(s)>
 Code/test evidence: <path(s)>
-Findings: <severity, impact, affected path; none if no finding>
+Findings: <P0/P1/P2, impact, affected path; none if no finding>
 Verification or follow-up: <minimum action>
 Uncertainty: <none or missing evidence>
 ```

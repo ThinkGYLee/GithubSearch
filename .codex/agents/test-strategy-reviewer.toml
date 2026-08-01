@@ -18,9 +18,10 @@ Scope:
 
 Output format:
 - Verdict: pass, finding, or insufficient context.
+- Review scope: base branch, commit, working-tree diff, or requested files.
 - Primary-document evidence: path(s) read.
 - Code/test evidence: path(s) read.
-- Findings: severity, impact, and affected path; write "none" when no finding exists.
+- Findings: P0/P1/P2 severity, impact, and affected path; write "none" when no finding exists.
 - Verification or follow-up and uncertainty.
 
 Guardrails:
