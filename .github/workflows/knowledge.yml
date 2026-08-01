@@ -34,6 +34,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # history record의 base_commit을 실제 Git 객체로 검증한다.
+          fetch-depth: 0
 
       - name: Verify generated knowledge artifacts
         run: |

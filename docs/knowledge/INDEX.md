@@ -12,7 +12,6 @@
 | `data-logic` | [docs/ai/DATA_LOGIC_GUIDELINES.md](../../docs/ai/DATA_LOGIC_GUIDELINES.md) | primary | `domain, data, feature, core` |
 | `design-guide` | [docs/design/DESIGN_GUIDE.md](../../docs/design/DESIGN_GUIDE.md) | auxiliary | `app, feature, core` |
 | `liquid-navigation-guide` | [docs/design/LIQUID_NAVIGATION_GUIDE.md](../../docs/design/LIQUID_NAVIGATION_GUIDE.md) | auxiliary | `app, core, feature` |
-| `project-guide` | [docs/build/PROJECT_GUIDE.md](../../docs/build/PROJECT_GUIDE.md) | primary | `settings.gradle.kts, build-logic, app, domain, data, feature, core` |
 | `ui-guidelines` | [docs/ai/UI_GUIDELINES.md](../../docs/ai/UI_GUIDELINES.md) | primary | `app, feature, core` |
 
 ## index
@@ -40,7 +39,6 @@
 | `coding-conventions` | [docs/ai/android-coding-conventions.md](../../docs/ai/android-coding-conventions.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `convention` | [docs/CONVENTION.md](../../docs/CONVENTION.md) | auxiliary | `app, domain, data, feature, core` |
 | `quality-gates` | [docs/ai/quality-gates.md](../../docs/ai/quality-gates.md) | primary | `build.gradle.kts, .github, scripts/ai` |
-| `style-guide` | [docs/build/STYLE_GUIDE.md](../../docs/build/STYLE_GUIDE.md) | auxiliary | `app, domain, data, feature, core` |
 | `task-scope` | [docs/ai/task-scope-control.md](../../docs/ai/task-scope-control.md) | primary | `app, domain, data, feature, core, build-logic` |
 | `template-sync-policy` | [docs/ai/template-sync-policy.md](../../docs/ai/template-sync-policy.md) | primary | `docs, .codex` |
 | `testing-guide` | [docs/testing/TESTING_GUIDE.md](../../docs/testing/TESTING_GUIDE.md) | primary | `domain, data, feature, core/testing` |

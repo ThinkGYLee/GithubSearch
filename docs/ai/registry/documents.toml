@@ -154,19 +154,15 @@ kind = "architecture"
 authority = "auxiliary"
 code_paths = ["app", "feature", "core"]
 
-[[document]]
+[[local_document]]
 id = "project-guide"
 path = "docs/build/PROJECT_GUIDE.md"
-kind = "architecture"
-authority = "primary"
-code_paths = ["settings.gradle.kts", "build-logic", "app", "domain", "data", "feature", "core"]
+purpose = "개인 환경에만 존재하며 build/ ignore 규칙으로 Git 추적 대상이 아닌 프로젝트 참고 문서. 공유 정본·생성 Index·공통 작업 이력 참조에서는 제외한다."
 
-[[document]]
+[[local_document]]
 id = "style-guide"
 path = "docs/build/STYLE_GUIDE.md"
-kind = "policy"
-authority = "auxiliary"
-code_paths = ["app", "domain", "data", "feature", "core"]
+purpose = "개인 환경에만 존재하며 build/ ignore 규칙으로 Git 추적 대상이 아닌 스타일 참고 문서. 공유 정본·생성 Index·공통 작업 이력 참조에서는 제외한다."
 
 [[document]]
 id = "liquid-navigation-guide"

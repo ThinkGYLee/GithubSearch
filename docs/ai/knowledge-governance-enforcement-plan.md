@@ -72,7 +72,7 @@ SmartTimer의 원칙은 가져오되 구현을 복사하지 않는다. 특히 Sm
 - 로컬 보조 문서는 generated `docs/knowledge/INDEX.md`, 공통 history의 `related_documents`, project skill·agent의 `required_documents`에서 제외한다.
 - 로컬 문서의 내용, 링크, code path는 팀 공통 정본의 검증 대상이 아니다.
 
-초기 대상은 `docs/multi-module-migration-template.md` 하나다. 이 파일은 사용자 변경이므로 내용·Git 추적 상태를 바꾸지 않는다.
+초기 대상은 `docs/multi-module-migration-template.md` 하나다. 이 파일은 사용자 변경이므로 내용·Git 추적 상태를 바꾸지 않는다. 이후 첫 CI 실행에서 `docs/build/PROJECT_GUIDE.md`와 `docs/build/STYLE_GUIDE.md`가 `build/` ignore 규칙으로 Git에 없는 개인 참고 문서임을 확인했으므로, 같은 `local_document` 정책으로 분리한다.
 
 ### P1 — verifier 전수 검증
 
