@@ -46,9 +46,10 @@ fun UserAvatar(
     val transition = animatedVisibilityScope?.transition
 
     // 2. 현재 화면이 "완전히" 정지해 있는 상태인지 확인 (전환 중이 아님)
-    val isIdle = transition?.let {
-        it.currentState == it.targetState && it.currentState == EnterExitState.Visible
-    } ?: false
+    val isIdle =
+        transition?.let {
+            it.currentState == it.targetState && it.currentState == EnterExitState.Visible
+        } ?: false
 
     // 3. 투명도 로직: 전환 중이거나 로딩 중이면 배경을 숨김
     val targetAlpha = if (isSuccess && isIdle) 1f else 0f
@@ -59,35 +60,37 @@ fun UserAvatar(
         label = "avatarBackgroundAlphaTransition",
     )
 
-    val sharedBoundsModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-        with(sharedTransitionScope) {
-            val key = if (transitionKeyPrefix.isEmpty()) "avatar-$login" else "$transitionKeyPrefix-avatar-$login"
-            Modifier.sharedBounds(
-                rememberSharedContentState(key = key),
-                animatedVisibilityScope = animatedVisibilityScope,
-                boundsTransform = { _, _ ->
-                    tween(durationMillis = 500)
-                },
-                clipInOverlayDuringTransition = OverlayClip(CircleShape),
-            )
+    val sharedBoundsModifier =
+        if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+            with(sharedTransitionScope) {
+                val key = if (transitionKeyPrefix.isEmpty()) "avatar-$login" else "$transitionKeyPrefix-avatar-$login"
+                Modifier.sharedBounds(
+                    rememberSharedContentState(key = key),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(durationMillis = 500)
+                    },
+                    clipInOverlayDuringTransition = OverlayClip(CircleShape),
+                )
+            }
+        } else {
+            Modifier
         }
-    } else {
-        Modifier
-    }
 
     Box(
-        modifier = modifier
-            .size(size)
-            .then(sharedBoundsModifier)
-            .drawBehind {
-                // 투명도가 어느 정도 있을 때만 배경 원을 그림
-                if (backgroundAlpha > 0.01f) {
-                    drawCircle(
-                        color = Color.White.copy(alpha = backgroundAlpha),
-                        radius = size.toPx() / 2f - 0.5f,
-                    )
-                }
-            },
+        modifier =
+            modifier
+                .size(size)
+                .then(sharedBoundsModifier)
+                .drawBehind {
+                    // 투명도가 어느 정도 있을 때만 배경 원을 그림
+                    if (backgroundAlpha > 0.01f) {
+                        drawCircle(
+                            color = Color.White.copy(alpha = backgroundAlpha),
+                            radius = size.toPx() / 2f - 0.5f,
+                        )
+                    }
+                },
         contentAlignment = Alignment.Center,
     ) {
         GlideImage(
@@ -95,17 +98,19 @@ fun UserAvatar(
             onImageStateChanged = { state ->
                 if (state is GlideImageState.Success) isSuccess = true
             },
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape),
-            component = rememberImageComponent {
-                +ShimmerPlugin(
-                    Shimmer.Flash(
-                        baseColor = Color.White,
-                        highlightColor = Color.LightGray,
-                    ),
-                )
-            },
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+            component =
+                rememberImageComponent {
+                    +ShimmerPlugin(
+                        Shimmer.Flash(
+                            baseColor = Color.White,
+                            highlightColor = Color.LightGray,
+                        ),
+                    )
+                },
         )
     }
 }

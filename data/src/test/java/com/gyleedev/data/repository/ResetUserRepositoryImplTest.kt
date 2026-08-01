@@ -12,10 +12,10 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class ResetUserRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -30,27 +30,29 @@ class ResetUserRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `유저 초기화 시 UserDao의 resetUser를 호출한다`() = runTest {
-        // Given
-        coEvery { userDao.resetUser() } just runs
+    fun `유저 초기화 시 UserDao의 resetUser를 호출한다`() =
+        runTest {
+            // Given
+            coEvery { userDao.resetUser() } just runs
 
-        // When
-        repository.resetUser()
+            // When
+            repository.resetUser()
 
-        // Then
-        coVerify(exactly = 1) { userDao.resetUser() }
-    }
+            // Then
+            coVerify(exactly = 1) { userDao.resetUser() }
+        }
 }

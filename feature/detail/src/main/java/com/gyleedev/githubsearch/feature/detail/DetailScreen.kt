@@ -98,9 +98,9 @@ private fun DetailScreen(
 ) {
     LazyColumn(
         modifier =
-        modifier
-            .fillMaxSize()
-            .padding(vertical = 4.dp),
+            modifier
+                .fillMaxSize()
+                .padding(vertical = 4.dp),
         contentPadding = paddingValues,
     ) {
         item {

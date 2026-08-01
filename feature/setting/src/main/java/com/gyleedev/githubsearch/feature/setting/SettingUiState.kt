@@ -2,6 +2,7 @@ package com.gyleedev.githubsearch.feature.setting
 
 sealed interface SettingUiState {
     data object Loading : SettingUiState
+
     data class Success(
         val showLanguageDialog: Boolean,
         val showThemeDialog: Boolean,

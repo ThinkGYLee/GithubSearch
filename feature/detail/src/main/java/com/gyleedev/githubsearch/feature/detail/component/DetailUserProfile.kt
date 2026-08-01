@@ -50,9 +50,10 @@ fun DetailUserProfile(
     transitionKeyPrefix: String = "",
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         UserAvatar(
@@ -128,10 +129,11 @@ fun DetailUserProfile(
         Spacer(modifier = Modifier.height(24.dp))
         ElevatedCard {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp, horizontal = 16.dp)
-                    .height(IntrinsicSize.Min),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp, horizontal = 16.dp)
+                        .height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -203,9 +205,7 @@ fun DetailUserProfile(
     name = "Dark Mode",
 )
 @Composable
-private fun DetailUserInfoPreview(
-    user: UserModel = DetailPreviewData.skydovesUser,
-) {
+private fun DetailUserInfoPreview(user: UserModel = DetailPreviewData.skydovesUser) {
     GithubSearchTheme {
         Surface {
             DetailUserProfile(
@@ -235,9 +235,7 @@ private fun DetailUserInfoPreview(
     name = "Dark Mode",
 )
 @Composable
-private fun ChipPreview(
-    user: UserModel = DetailPreviewData.skydovesUser,
-) {
+private fun ChipPreview(user: UserModel = DetailPreviewData.skydovesUser) {
     GithubSearchTheme {
         Surface {
             CustomSurfaceChip(

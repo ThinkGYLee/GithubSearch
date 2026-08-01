@@ -38,11 +38,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.core.designsystem.theme.component.UserInfoItem
 import com.gyleedev.githubsearch.domain.model.FilterStatus
 import com.gyleedev.githubsearch.domain.model.UserModel
-import com.gyleedev.githubsearch.core.designsystem.R as DesignSystemR
 import com.gyleedev.githubsearch.feature.favorite.R as FavoriteR
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -59,8 +59,9 @@ fun FavoriteScreen(
     Scaffold(
         topBar = { FavoriteTopAppBar(onClick = viewModel::updateShowFilterDialog) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
     ) { paddingValues ->
         if (uiState is FavoriteUiState.Success) {
             val state = uiState as FavoriteUiState.Success
@@ -75,9 +76,10 @@ fun FavoriteScreen(
                 onItemLongClick = viewModel::showFavoriteDialog,
                 showFavoriteDialog = state.favoriteDialogState,
                 showFilterDialog = state.filterDialogState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding()),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = paddingValues.calculateTopPadding()),
             )
         }
     }
@@ -153,9 +155,10 @@ private fun FavoriteItemList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            top = 12.dp,
-        ),
+        contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                top = 12.dp,
+            ),
     ) {
         items(
             users.itemCount,
@@ -181,10 +184,11 @@ private fun FavoriteItemList(
         // 시스템 바 영역 + LiquidNavBar + 여유 확보
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         }
     }
@@ -252,13 +256,13 @@ fun FilterDialog(
             Column {
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.ALL,
-                            onClick = { onSelectedItemChange(FilterStatus.ALL) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.ALL,
+                                onClick = { onSelectedItemChange(FilterStatus.ALL) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -270,13 +274,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.REPO,
-                            onClick = { onSelectedItemChange(FilterStatus.REPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.REPO,
+                                onClick = { onSelectedItemChange(FilterStatus.REPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
@@ -288,13 +292,13 @@ fun FilterDialog(
                 }
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = selectedFilter == FilterStatus.NOREPO,
-                            onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
-                            role = Role.RadioButton,
-                        ),
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedFilter == FilterStatus.NOREPO,
+                                onClick = { onSelectedItemChange(FilterStatus.NOREPO) },
+                                role = Role.RadioButton,
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(

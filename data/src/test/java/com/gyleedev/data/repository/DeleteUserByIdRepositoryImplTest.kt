@@ -12,10 +12,10 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class DeleteUserByIdRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -30,27 +30,29 @@ class DeleteUserByIdRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `DeleteUserById 테스트`() = runTest {
-        // Given
-        val givenId = "user1"
-        coEvery { userDao.deleteUserById(githubId = givenId) } just runs
-        // When
-        repository.deleteUserById(givenId)
+    fun `DeleteUserById 테스트`() =
+        runTest {
+            // Given
+            val givenId = "user1"
+            coEvery { userDao.deleteUserById(githubId = givenId) } just runs
+            // When
+            repository.deleteUserById(givenId)
 
-        // Then
-        coVerify(exactly = 1) { userDao.deleteUserById(givenId) }
-    }
+            // Then
+            coVerify(exactly = 1) { userDao.deleteUserById(givenId) }
+        }
 }

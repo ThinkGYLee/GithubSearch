@@ -42,21 +42,23 @@ fun DetailRepoItem(
     modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                vertical = 8.dp,
-                horizontal = 16.dp,
-            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(
+                    vertical = 8.dp,
+                    horizontal = 16.dp,
+                ),
         border = CardDefaults.outlinedCardBorder().copy(width = 0.2.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 16.dp,
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 16.dp,
+                    ),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -122,9 +124,7 @@ fun DetailRepoItem(
     name = "Dark Mode",
 )
 @Composable
-private fun DetailRepoInfoPreview(
-    repo: RepositoryModel = DetailPreviewData.skydovesRepos.first(),
-) {
+private fun DetailRepoInfoPreview(repo: RepositoryModel = DetailPreviewData.skydovesRepos.first()) {
     GithubSearchTheme {
         Surface {
             DetailRepoItem(

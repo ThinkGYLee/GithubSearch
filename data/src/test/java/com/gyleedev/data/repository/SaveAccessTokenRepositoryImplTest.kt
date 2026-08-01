@@ -12,10 +12,10 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.Clock
+import kotlinx.coroutines.test.runTest
 
 class SaveAccessTokenRepositoryImplTest {
     private lateinit var repository: GitHubRepositoryImpl
@@ -30,29 +30,31 @@ class SaveAccessTokenRepositoryImplTest {
 
     @Before
     fun setUp() {
-        repository = GitHubRepositoryImpl(
-            userDao = userDao,
-            reposDao = reposDao,
-            accessTimeDao = accessTimeDao,
-            githubApiService = githubApiService,
-            accessService = accessService,
-            revokeService = revokeService,
-            tokenPreference = tokenPreference,
-            clock = clock,
-        )
+        repository =
+            GitHubRepositoryImpl(
+                userDao = userDao,
+                reposDao = reposDao,
+                accessTimeDao = accessTimeDao,
+                githubApiService = githubApiService,
+                accessService = accessService,
+                revokeService = revokeService,
+                tokenPreference = tokenPreference,
+                clock = clock,
+            )
     }
 
     @Test
-    fun `액세스 토큰 저장 시 TokenPreference의 setString을 올바른 파라미터와 함께 호출한다`() = runTest {
-        // Given
-        val expectedToken = "valid_access_token"
+    fun `액세스 토큰 저장 시 TokenPreference의 setString을 올바른 파라미터와 함께 호출한다`() =
+        runTest {
+            // Given
+            val expectedToken = "valid_access_token"
 
-        every { tokenPreference.setString(expectedToken) } just runs
+            every { tokenPreference.setString(expectedToken) } just runs
 
-        // When
-        repository.saveAccessToken(expectedToken)
+            // When
+            repository.saveAccessToken(expectedToken)
 
-        // Then
-        verify(exactly = 1) { tokenPreference.setString(expectedToken) }
-    }
+            // Then
+            verify(exactly = 1) { tokenPreference.setString(expectedToken) }
+        }
 }

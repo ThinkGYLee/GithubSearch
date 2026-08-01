@@ -31,8 +31,9 @@ fun DetailRepoInfo(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+        modifier =
+            modifier
+                .padding(horizontal = 24.dp, vertical = 12.dp),
     ) {
         if (name != null) {
             Text(
@@ -57,10 +58,10 @@ fun DetailRepoInfo(
                 imageVector = Icons.Filled.Star,
                 contentDescription = null,
                 modifier =
-                Modifier
-                    .padding(vertical = 8.dp)
-                    .width(24.dp)
-                    .height(24.dp),
+                    Modifier
+                        .padding(vertical = 8.dp)
+                        .width(24.dp)
+                        .height(24.dp),
                 tint = Yellow,
             )
             Text(
@@ -87,9 +88,7 @@ fun DetailRepoInfo(
     name = "Dark Mode",
 )
 @Composable
-private fun DetailRepoInfoPreview(
-    repo: RepositoryModel = DetailPreviewData.skydovesRepos.first(),
-) {
+private fun DetailRepoInfoPreview(repo: RepositoryModel = DetailPreviewData.skydovesRepos.first()) {
     GithubSearchTheme {
         Surface {
             DetailRepoInfo(

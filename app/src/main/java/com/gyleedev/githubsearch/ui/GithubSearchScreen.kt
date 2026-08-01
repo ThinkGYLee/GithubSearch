@@ -84,32 +84,34 @@ fun GithubSearchScreen(
     val loginFailMessage = stringResource(id = R.string.log_in_fail_message)
     val redirectUri = remember { AppBuildConfig.REDIRECT_URI }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data
-            if (intent != null) {
-                val resultUri = intent.data
-                if (resultUri != null) {
-                    val code = resultUri.getQueryParameter("code")
-                    code?.let { code ->
-                        if (code.isNotBlank()) {
-                            viewModel.getAccessToken(code)
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                if (intent != null) {
+                    val resultUri = intent.data
+                    if (resultUri != null) {
+                        val code = resultUri.getQueryParameter("code")
+                        code?.let { code ->
+                            if (code.isNotBlank()) {
+                                viewModel.getAccessToken(code)
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
     LaunchedEffect(viewModel.alertLoginSuccess, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.alertLoginSuccess.collectLatest { result ->
-                val message = when (result) {
-                    GetAccessTokenUseCaseResult.Fail -> loginFailMessage
-                    GetAccessTokenUseCaseResult.Success -> loginSuccessMessage
-                }
+                val message =
+                    when (result) {
+                        GetAccessTokenUseCaseResult.Fail -> loginFailMessage
+                        GetAccessTokenUseCaseResult.Success -> loginSuccessMessage
+                    }
                 snackBarHostState.showSnackbar(
                     message = message,
                     duration = SnackbarDuration.Short,
@@ -134,9 +136,10 @@ fun GithubSearchScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+                modifier =
+                    Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
             )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -145,8 +148,9 @@ fun GithubSearchScreen(
         // 콘텐츠 영역: Scaffold의 패딩을 무시하고 화면 전체를 점유하게 함
         // 이를 통해 리스트 아이템이 하단 내비게이션 바와 시스템 바 뒤로 흐르게 됨
         Box(
-            modifier = Modifier
-                .padding(paddingValue),
+            modifier =
+                Modifier
+                    .padding(paddingValue),
         ) {
             SharedTransitionLayout {
                 CompositionLocalProvider(
@@ -181,17 +185,17 @@ fun GithubSearchScreen(
                         composable(
                             route = "${BottomNavItem.Detail.screenRoute}/{id}?from={from}",
                             arguments =
-                            listOf(
-                                navArgument("id") {
-                                    type = NavType.StringType
-                                    nullable = false
-                                },
-                                navArgument("from") {
-                                    type = NavType.StringType
-                                    nullable = false
-                                    defaultValue = ""
-                                },
-                            ),
+                                listOf(
+                                    navArgument("id") {
+                                        type = NavType.StringType
+                                        nullable = false
+                                    },
+                                    navArgument("from") {
+                                        type = NavType.StringType
+                                        nullable = false
+                                        defaultValue = ""
+                                    },
+                                ),
                         ) { backStackEntry ->
                             val from = backStackEntry.arguments?.getString("from") ?: ""
                             CompositionLocalProvider(
@@ -245,8 +249,9 @@ fun GithubSearchScreen(
                             restoreState = true
                         }
                     },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter),
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter),
                 )
             }
         }
@@ -261,20 +266,22 @@ fun BottomNavigation(
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        0f to Color.Transparent, // 짙은 농도 복구
-                        0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                        1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                    ),
-                )
-                .cloudy(radius = 60),
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                0f to Color.Transparent, // 짙은 농도 복구
+                                0.9f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                                1f to MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                            ),
+                    ).cloudy(radius = 60),
         ) {}
         Column(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier =
+                modifier
+                    .fillMaxWidth(),
         ) {
             LiquidNavigationBar(
                 currentRoute = currentRoute,
@@ -282,9 +289,10 @@ fun BottomNavigation(
                 modifier = Modifier.fillMaxWidth(),
             )
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
             )
         }
     }

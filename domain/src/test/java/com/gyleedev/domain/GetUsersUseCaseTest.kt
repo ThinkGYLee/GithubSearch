@@ -9,11 +9,11 @@ import com.gyleedev.githubsearch.domain.usecase.GetUsersUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 
 class GetUsersUseCaseTest {
     private val repository: GitHubRepository = mockk()
@@ -50,36 +50,38 @@ class GetUsersUseCaseTest {
     }
 
     @Test
-    fun `유저 목록이 존재할 때 페이징 데이터를 정상적으로 반환한다`() = runTest {
-        // Given
-        val expectedData = mockUsers
-        val expectedPaging = PagingData.from(expectedData)
+    fun `유저 목록이 존재할 때 페이징 데이터를 정상적으로 반환한다`() =
+        runTest {
+            // Given
+            val expectedData = mockUsers
+            val expectedPaging = PagingData.from(expectedData)
 
-        coEvery { repository.getUsers() } returns flowOf(expectedPaging)
+            coEvery { repository.getUsers() } returns flowOf(expectedPaging)
 
-        // When
-        val resultFlow = useCase()
-        val actualResult = resultFlow.asSnapshot()
+            // When
+            val resultFlow = useCase()
+            val actualResult = resultFlow.asSnapshot()
 
-        // Then
-        assertEquals(expectedData, actualResult)
-        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
-    }
+            // Then
+            assertEquals(expectedData, actualResult)
+            coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
+        }
 
     @Test
-    fun `유저 목록이 없을 때 빈 페이징 데이터를 반환한다`() = runTest {
-        // Given
-        val expectedData = emptyList<UserModel>()
-        val expectedPaging = PagingData.from(expectedData)
+    fun `유저 목록이 없을 때 빈 페이징 데이터를 반환한다`() =
+        runTest {
+            // Given
+            val expectedData = emptyList<UserModel>()
+            val expectedPaging = PagingData.from(expectedData)
 
-        coEvery { repository.getUsers() } returns flowOf(expectedPaging)
+            coEvery { repository.getUsers() } returns flowOf(expectedPaging)
 
-        // When
-        val resultFlow = useCase()
-        val actualResult = resultFlow.asSnapshot()
+            // When
+            val resultFlow = useCase()
+            val actualResult = resultFlow.asSnapshot()
 
-        // Then
-        assertEquals(expectedData, actualResult)
-        coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
-    }
+            // Then
+            assertEquals(expectedData, actualResult)
+            coVerify(exactly = 1) { repository.getUsers().ignoreUnused() }
+        }
 }

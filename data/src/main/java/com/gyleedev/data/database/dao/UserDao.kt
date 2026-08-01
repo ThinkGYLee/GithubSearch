@@ -38,11 +38,12 @@ interface UserDao {
     @Upsert
     suspend fun upsertUser(user: UserEntity): Long
 
-    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> = when (status) {
-        FilterStatus.ALL -> getUsersAll()
-        FilterStatus.REPO -> getUsersRepo()
-        FilterStatus.NOREPO -> getUsersNonRepo()
-    }
+    fun getUsers(status: FilterStatus): PagingSource<Int, UserEntity> =
+        when (status) {
+            FilterStatus.ALL -> getUsersAll()
+            FilterStatus.REPO -> getUsersRepo()
+            FilterStatus.NOREPO -> getUsersNonRepo()
+        }
 
     @Query("DELETE FROM user")
     suspend fun resetUser()
@@ -51,5 +52,8 @@ interface UserDao {
     suspend fun deleteUsersWithSet(userIds: Set<String>): Int
 
     @Query("UPDATE user SET favorite = :isFavorite WHERE github_id COLLATE NOCASE IN (:userIds)")
-    suspend fun updateFavoriteStatus(userIds: Set<String>, isFavorite: Boolean): Int
+    suspend fun updateFavoriteStatus(
+        userIds: Set<String>,
+        isFavorite: Boolean,
+    ): Int
 }
