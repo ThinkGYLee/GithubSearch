@@ -276,8 +276,8 @@ Uncertainty: <none or missing evidence>
 ### 체크리스트
 
 - [ ] Phase 1~4를 각각 독립 커밋·PR로 검토한다. Phase 2는 별도 PR을 사용한다.
-- [ ] 각 phase의 exit gate, 실패 원인, rollback 여부를 history record에 남긴다.
-- [ ] 저장소 관리자가 required status와 Pages 환경 권한을 확인한다.
+- [x] 각 phase의 exit gate, 실패 원인, rollback 여부를 history record에 남긴다.
+- [x] 저장소 관리자가 required status와 Pages 환경 권한을 확인한다.
 - [ ] 3~5개 작업 후 subagent 사용률, 충돌, 검증 누락, review finding 품질을 회고한다.
 - [ ] 효과가 없는 규칙은 삭제가 아니라 먼저 완화 또는 범위 축소를 제안한다.
 
@@ -288,9 +288,9 @@ Uncertainty: <none or missing evidence>
 
 ### Phase 5 현재 상태
 
-- Phase 0~4는 독립 commit과 completed history record를 갖는다. draft PR #161은 최신 remote head `3bc4acd`에서 Build·Knowledge·coverage comment 성공과 Pages deploy skip을 확인했다.
-- 저장소 관리자가 `develop` branch ruleset을 만들고 PR·`Build & Coverage`·`Generated index and graph`를 병합 조건으로 지정했다. 원격 설정의 최종 read-only 재확인은 다음 PR CI 확인과 함께 남아 있다.
-- `github-pages` environment는 `develop`만 배포하도록 유지한다. `main`과 `develop`이 하나의 Pages 사이트를 번갈아 덮어쓰지 않도록 workflow의 artifact·deploy 조건도 `develop` push 전용으로 조정한다.
+- Phase 0~4는 독립 commit과 completed history record를 갖는다. PR #161은 `develop`에 병합됐고, 최신 commit `180b6f2`에서 Build·Knowledge·Pages deploy가 모두 성공했다.
+- 저장소 관리자가 `develop` branch ruleset을 만들고 PR·`Build & Coverage`·`Generated index and graph`를 병합 조건으로 지정했다. 원격 읽기 전용 조회로 PR·필수 status check·최신 branch 기준 재검증·삭제·force push 차단이 적용됐음을 확인했다.
+- `github-pages` environment는 `develop`만 배포하도록 유지한다. workflow도 `develop` push 전용으로 조정됐고, 병합 후 실제 Pages 배포 성공으로 단일 배포 경로를 확인했다.
 - 실제 Codex managed worktree의 Android 검증·Local handoff 반복 사례와 review 품질 3~5건 회고는 아직 부족하다.
 
 ## 적용 순서와 승인 경계
