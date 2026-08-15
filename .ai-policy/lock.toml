@@ -1,0 +1,9 @@
+schema_version = 1
+policy_revision = "ff209db464636ae3e50721117b29b3f70fcc66e4"
+base_revision = "180b6f219d326ebd1c8a424fe689346e6da7e28d"
+profile = "android-compose-default"
+root_agents_existed = true
+nested_agents_existed = false
+managed_digest_sha256 = "0ed77c2550b865b2603646f41ce08207a9268fbb920ed0a02c03ee0011d8f27b"
+project_digest_sha256 = "a06d03806d94fb7313d7708dca3dd899152581a1819959bd2caca4951d3db0c9"
+generated_root_agents_digest_sha256 = "787ef76defdd34506880f8057a9ef7d2b3ca979c2b5ae566a04f18f0d216d69b"
