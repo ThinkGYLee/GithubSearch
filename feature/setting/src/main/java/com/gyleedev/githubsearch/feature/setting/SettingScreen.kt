@@ -5,6 +5,7 @@ import androidx.annotation.RequiresExtension
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
@@ -33,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.gyleedev.githubsearch.core.designsystem.component.LiquidNavBarDefaults
 import com.gyleedev.githubsearch.domain.model.ResetDataResult
 import com.gyleedev.githubsearch.domain.model.RevokeResult
 import com.gyleedev.githubsearch.feature.setting.R as SettingR
@@ -111,7 +113,15 @@ fun SettingScreen(
                 modifier = Modifier,
             )
         },
-        snackbarHost = { SnackbarHost(snackBarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier =
+                    Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = LiquidNavBarDefaults.Height + LiquidNavBarDefaults.BottomMargin),
+            )
+        },
         modifier = modifier.fillMaxSize(),
     ) { paddingValues ->
 
